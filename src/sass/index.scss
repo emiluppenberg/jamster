@@ -1,0 +1,57 @@
+$note-bg: #f6f8fb;
+$note-border: #d8dee8;
+$group-border: #9ca8b8;
+
+.app {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+
+    .figure {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: max-content;
+        height: max-content;
+
+        & + .figure {
+            border-top: 2px solid $group-border;
+        }
+
+        .pattern {
+            display: inline-flex;
+            align-items: stretch;
+            width: max-content;
+
+            & + .pattern {
+                border-top: 2px solid $group-border;
+            }
+
+            .measure {
+                display: inline-flex;
+                width: max-content;
+
+                & + .measure {
+                    border-left: 2px solid $group-border;
+                }
+
+                .note {
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    box-sizing: border-box;
+                    margin-inline: 0;
+                    padding: 0;
+                    border: 0;
+                    background-color: $note-bg;
+                    text-align: center;
+                    color: black;
+
+                    & + .note {
+                        border-left: 1px solid $note-border;
+                    }
+                }
+            }
+        }
+    }
+}
