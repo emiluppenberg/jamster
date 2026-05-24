@@ -1,12 +1,24 @@
-$note-bg: #f6f8fb;
+$note-bg: #27292c;
+$note-color: #00ffd5;
 $note-border: #d8dee8;
-$group-border: #9ca8b8;
+$group-border: #037965;
 
 .app {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
     padding: 16px;
+
+    .app-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .bpm-input {
+        width: 4.5rem;
+    }
 
     .figure {
         display: inline-flex;
@@ -15,40 +27,73 @@ $group-border: #9ca8b8;
         width: max-content;
         height: max-content;
 
-        & + .figure {
-            border-top: 2px solid $group-border;
+        .figure-options {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+
+            .measures-input {
+                width: 1.5rem;
+            }
+
+            .zoom-input {
+                width: 3rem;
+            }
         }
+
+        // & + .figure {
+        //     border-top: 2px solid $group-border;
+        // }
 
         .pattern {
             display: inline-flex;
             align-items: stretch;
             width: max-content;
 
-            & + .pattern {
-                border-top: 2px solid $group-border;
-            }
+            // & + .pattern {
+            //     border-top: 2px solid $group-border;
+            // }
 
-            .measure {
+            .measures {
                 display: inline-flex;
-                width: max-content;
+                flex: 0 0 calc(var(--measure-width) * var(--number-of-measures));
+                width: calc(var(--measure-width) * var(--number-of-measures));
 
-                & + .measure {
-                    border-left: 2px solid $group-border;
-                }
+                .measure {
+                    display: inline-flex;
+                    flex: 0 0 var(--measure-width);
+                    width: var(--measure-width);
+                    min-width: 0;
 
-                .note {
-                    width: 1.5rem;
-                    height: 1.5rem;
-                    box-sizing: border-box;
-                    margin-inline: 0;
-                    padding: 0;
-                    border: 0;
-                    background-color: $note-bg;
-                    text-align: center;
-                    color: black;
+                    &.is-playing {
+                        background-color: #eef7ff;
+                    }
 
-                    & + .note {
-                        border-left: 1px solid $note-border;
+                    &+.measure {
+                        border-left: 2px solid $group-border;
+                    }
+
+                    .note {
+                        flex: 1 1 0;
+                        min-width: 0;
+                        width: auto;
+                        height: 1.5rem;
+                        box-sizing: border-box;
+                        margin-inline: 0;
+                        padding: 0;
+                        border: 0;
+                        background-color: $note-bg;
+                        text-align: start;
+                        color: $note-color;
+
+                        &.is-playing {
+                            background-color: #b8e2ff;
+                        }
+
+                        &+.note {
+                            border-left: 1px solid $note-border;
+                        }
                     }
                 }
             }
