@@ -10,10 +10,41 @@ $group-border: #037965;
     gap: 12px;
     padding: 16px;
 
-    .app-controls {
+    .playback-controls {
         display: flex;
         align-items: center;
         gap: 8px;
+    }
+
+    .playback {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+
+    .tracker {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .tracker-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .track {
+            display: flex;
+            flex-direction: row;
+        }
+    }
+
+    .figure-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .bpm-input {
@@ -26,19 +57,23 @@ $group-border: #037965;
         align-items: flex-start;
         width: max-content;
         height: max-content;
+        margin-top: 1rem;
 
         .figure-options {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.5rem;
             margin-bottom: 0.5rem;
 
-            .measures-input {
-                width: 1.5rem;
+            div {
+                display: flex;
+                align-items: center;
             }
 
-            .zoom-input {
-                width: 3rem;
+            input {
+                width: 1.5rem;
+                margin-left: 0.25rem;
+                text-align: center;
             }
         }
 
@@ -81,7 +116,7 @@ $group-border: #037965;
                         height: 1.5rem;
                         box-sizing: border-box;
                         margin-inline: 0;
-                        padding: 0;
+                        padding: 0 0 0 calc(var(--measure-width) / var(--max-notes-per-measure) / 3);
                         border: 0;
                         background-color: $note-bg;
                         text-align: start;

@@ -1,4 +1,4 @@
-import { useRef, type CSSProperties } from "react";
+import { useRef } from "react";
 import SampleInput from "./SampleInput";
 import type { PatternData } from "../types";
 

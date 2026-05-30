@@ -147,6 +147,7 @@ export interface FigureProps {
     playingMeasureIndex?: number;
     playingPosition64?: number;
     onFigureChange: (figure: FigureData) => void;
+    onPlayFigure: (figure: FigureData) => void;
 }
 
 const Figure = (props: FigureProps) => {
@@ -173,10 +174,15 @@ const Figure = (props: FigureProps) => {
         / defaultMeasuresAtScreenWidth
         * zoomLevel
     );
+    const maxNotesPerMeasure = Math.max(
+        1,
+        ...props.figure.patterns.map((pattern) => pattern.notesPerMeasure),
+    );
 
     const figureStyle = {
         "--measure-width": `${measureWidthRem}rem`,
         "--number-of-measures": props.figure.numberOfMeasures,
+        "--max-notes-per-measure": maxNotesPerMeasure,
     } as CSSProperties;
 
     const updateZoomLevel = (value: number) => {

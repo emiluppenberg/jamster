@@ -1,3 +1,10 @@
+export type Track = {
+    index: number;
+    timeline: Timeline;
+}
+
+export type Timeline = (number | undefined)[];
+
 export type FigureData = {
     index: number;
     numberOfMeasures: number;
