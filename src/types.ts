@@ -1,17 +1,17 @@
-export type Track = {
+export type TimelineData = {
     index: number;
-    timeline: Timeline;
+    slots: Slot[];
 }
 
-export type Timeline = (number | undefined)[];
-
-export type FigureData = {
-    index: number;
-    numberOfMeasures: number;
-    patterns: PatternData[];
-}
+export type Slot = number | undefined;
 
 export type PatternData = {
+    index: number;
+    numberOfMeasures: number;
+    rhythms: RhythmData[];
+}
+
+export type RhythmData = {
     index: number;
     gainNode: GainNode;
     notesPerMeasure: number;
