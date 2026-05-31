@@ -13,16 +13,18 @@ const SampleInput = (props: SampleInputProps) => {
         if (!file) return;
 
         const arrayBuffer = await file.arrayBuffer();
-        const audioBuffer = await context.audioContext.decodeAudioData(arrayBuffer); 
+        const audioBuffer = await context.audioContext.decodeAudioData(arrayBuffer);
         props.setSample(audioBuffer);
     }
     return (
-        <input
-            className="sample-input"
-            type="file"
-            accept="audio/*"
-            onChange={(e) => handleChange(e)}
-        />
+        <label className="sample-input">
+            Load sample
+            <input
+                type="file"
+                accept="audio/*"
+                onChange={(e) => handleChange(e)}
+            />
+        </label>
     )
 }
 

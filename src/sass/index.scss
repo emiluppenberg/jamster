@@ -1,7 +1,22 @@
-$note-bg: #27292c;
-$note-color: #00ffd5;
-$note-border: #d8dee8;
-$group-border: #037965;
+$deep: #35524a;
+$slate: #627c85;
+$blue: #779cab;
+$mint: #a2e8dd;
+$green: #32de8a;
+
+$ink: #0f1715;
+$surface: #17231f;
+$surface-raised: #20312c;
+$surface-soft: #263a35;
+$text: #eefaf7;
+$muted: rgba($mint, 0.68);
+$border: rgba($mint, 0.18);
+$border-strong: rgba($mint, 0.36);
+
+$note-bg: #13211d;
+$note-color: $mint;
+$note-border: rgba($blue, 0.28);
+$group-border: rgba($green, 0.58);
 $space-l: 10rem;
 $space-m: 1rem;
 $space-s: 0.5rem;
@@ -12,40 +27,143 @@ $width-m: 3rem;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
-    padding: 16px;
+    gap: 1rem;
+    min-height: 100svh;
+    box-sizing: border-box;
+    padding: 1.25rem;
+    overflow-x: auto;
+    background: $ink;
+    color: $text;
+
+    button,
+    input,
+    select {
+        font: inherit;
+    }
 
     button {
         min-width: $width-l;
     }
 
+    .btn-default {
+        min-height: 2rem;
+        padding: 0.35rem 0.75rem;
+        border: 1px solid rgba($green, 0.38);
+        border-radius: 6px;
+        background: rgba($green, 0.1);
+        color: $text;
+        cursor: pointer;
+        transition:
+            background-color 140ms ease,
+            border-color 140ms ease,
+            color 140ms ease,
+            transform 140ms ease;
+
+        &:hover {
+            border-color: rgba($green, 0.78);
+            background: rgba($green, 0.2);
+            color: $mint;
+        }
+
+        &:active {
+            transform: translateY(1px);
+        }
+    }
+
     label {
         width: $width-l;
         padding-right: $space-s;
+        color: $muted;
         text-align: end;
     }
 
     h1 {
         margin: 0;
+        color: $mint;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0;
     }
 
-    .playback-controls {
-        display: flex;
+    input,
+    select {
+        min-height: 2rem;
+        box-sizing: border-box;
+        border: 1px solid $border;
+        border-radius: 6px;
+        background: rgba($surface-raised, 0.86);
+        color: $text;
+        outline: none;
+
+        &:hover {
+            border-color: $border-strong;
+        }
+
+        &:focus-visible {
+            border-color: $green;
+            box-shadow: 0 0 0 3px rgba($green, 0.18);
+        }
+    }
+
+    select {
+        padding: 0 1.7rem 0 0.6rem;
+    }
+
+    input[type="number"] {
+        width: $width-m;
+        padding: 0 0.35rem;
+        text-align: center;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+
+    .sample-input {
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
+        min-height: 2rem;
+        width: calc($space-l - 0.75rem);
+        padding: 0;
+        box-sizing: border-box;
+        border: 1px solid rgba($blue, 0.45);
+        border-radius: 6px;
+        background: rgba($blue, 0.14);
+        color: $text;
+        cursor: pointer;
     }
 
     .playback {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .playback-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.65rem;
+        border: 1px solid $border;
+        border-radius: 8px;
+        background: $surface;
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+    }
+
+    .bpm-input {
+        border-color: rgba($green, 0.32);
+        color: $green;
+        font-weight: 700;
     }
 
     .controls {
         display: flex;
         flex-direction: row;
         align-items: center;
+        min-height: 2.4rem;
         margin-top: $space-m;
 
         h1 {
@@ -54,20 +172,11 @@ $width-m: 3rem;
         }
     }
 
-    .sample-input {
-        width: $space-l;
-    }
-
-    input[type="number"] {
-        width: $width-m;
-        text-align: center;
-    }
-
     .options {
         display: flex;
         align-items: center;
         gap: $space-s;
-        margin-bottom: $space-s;
+        min-height: 2.4rem;
 
         div {
             display: flex;
@@ -75,22 +184,47 @@ $width-m: 3rem;
         }
     }
 
+    .store {
+        display: flex;
+        align-items: center;
+    }
+
     .container {
         display: flex;
         flex-direction: column;
+        box-sizing: border-box;
 
         &.timelines {
-            gap: 0;
+            gap: 0.35rem;
         }
 
         &.patterns {
             gap: $space-m;
+            max-width: 100%;
         }
     }
 
     .timeline {
         display: flex;
         flex-direction: row;
+        width: max-content;
+        border: 1px solid $border;
+        border-radius: 6px;
+        overflow: hidden;
+        background: rgba($surface, 0.9);
+
+        .slot-pattern-select {
+            width: 5rem;
+            min-width: 5rem;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            color: $mint;
+
+            &+.slot-pattern-select {
+                border-left: 1px solid $border;
+            }
+        }
     }
 
     .pattern {
@@ -98,26 +232,54 @@ $width-m: 3rem;
         flex-direction: column;
         align-items: flex-start;
         width: max-content;
+        max-width: calc(100vw - 2.5rem);
         height: max-content;
-        margin-top: $space-m;
+        box-sizing: border-box;
+        padding: 0.75rem;
+        overflow-x: auto;
+        border: 1px solid $border;
+        border-radius: 8px;
+        background: $surface;
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
 
-        >.options {
-            padding-left: $space-l;
+        >.controls {
+            margin-top: 0;
+            margin-bottom: $space-s;
+            position: relative;
+
+            >:first-child {
+                position: absolute;
+            }
+
+            >.options {
+                padding-left: calc($space-l - 0.75rem);
+            }
         }
-
-        // & + .pattern {
-        //     border-top: 2px solid $group-border;
-        // }
     }
 
     .rhythm {
         display: inline-flex;
         align-items: stretch;
         width: max-content;
+        background: $surface-raised;
+        padding: 0.25rem;
+        border: 1px solid $border;
+        border-radius: 8px;
 
-        // & + .rhythm {
-        //     border-top: 2px solid $group-border;
-        // }
+        &+.rhythm {
+            border-top: 0;
+        }
+
+        .notes-per-measure-input {
+            width: 3.5rem;
+            min-width: 3.5rem;
+            border-radius: 0;
+            border-color: transparent $border transparent transparent;
+            background: $surface-soft;
+            color: $green;
+            font-weight: 700;
+            padding: 0;
+        }
 
         .measures {
             display: inline-flex;
@@ -129,9 +291,12 @@ $width-m: 3rem;
                 flex: 0 0 var(--measure-width);
                 width: var(--measure-width);
                 min-width: 0;
+                background: rgba($deep, 0.26);
+                align-items: center;
 
                 &.is-playing {
-                    background-color: #eef7ff;
+                    background: rgba($mint, 0.12);
+                    box-shadow: inset 0 0 0 1px rgba($mint, 0.18);
                 }
 
                 &+.measure {
@@ -142,17 +307,35 @@ $width-m: 3rem;
                     flex: 1 1 0;
                     min-width: 0;
                     width: auto;
-                    height: 1.5rem;
+                    height: 1.75rem;
                     box-sizing: border-box;
                     margin-inline: 0;
                     padding: 0 0 0 calc(var(--measure-width) / var(--max-notes-per-measure) / 3);
                     border: 0;
-                    background-color: $note-bg;
-                    text-align: start;
+                    background: $note-bg;
                     color: $note-color;
+                    text-align: start;
+                    font-weight: 700;
+                    caret-color: $green;
+
+                    &::placeholder {
+                        color: rgba($slate, 0.8);
+                    }
+
+                    &:hover {
+                        background: rgba($deep, 0.72);
+                    }
+
+                    &:focus-visible {
+                        position: relative;
+                        z-index: 1;
+                        background: rgba($deep, 0.95);
+                        box-shadow: inset 0 0 0 2px $green;
+                    }
 
                     &.is-playing {
-                        background-color: #b8e2ff;
+                        background: $green;
+                        color: $ink;
                     }
 
                     &+.note {

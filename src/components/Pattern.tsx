@@ -258,32 +258,35 @@ const Pattern = (props: PatternProps) => {
 
     return (
         <div className="pattern" style={patternStyle}>
-            <div className="options ">
-                <button className="btn-default" onClick={() => props.onPlayPattern(props.pattern)}>Play</button>
-                <div>
-                    <label>Measures</label>
-                    <input
-                        type="number"
-                        min={1}
-                        value={props.pattern.numberOfMeasures}
-                        onChange={(e) => {
-                            const numberOfMeasures = Number(e.target.value);
-                            if (!Number.isFinite(numberOfMeasures)) return;
-                            handleNumberOfMeasuresChange(Math.max(1, numberOfMeasures));
-                        }}
-                    />
-                </div>
-                <div>
-                    <label>Zoom</label>
-                    <input
-                        type="number"
-                        min={minimumZoomLevel}
-                        step={0.25}
-                        value={zoomLevel}
-                        onChange={(e) => {
-                            updateZoomLevel(Number(e.target.value));
-                        }}
-                    />
+            <div className="controls">
+                <button className="btn-default" onClick={addRhythm}>Add rhythm</button>
+                <div className="options ">
+                    <button className="btn-default" onClick={() => props.onPlayPattern(props.pattern)}>Play</button>
+                    <div>
+                        <label>Measures</label>
+                        <input
+                            type="number"
+                            min={1}
+                            value={props.pattern.numberOfMeasures}
+                            onChange={(e) => {
+                                const numberOfMeasures = Number(e.target.value);
+                                if (!Number.isFinite(numberOfMeasures)) return;
+                                handleNumberOfMeasuresChange(Math.max(1, numberOfMeasures));
+                            }}
+                        />
+                    </div>
+                    <div>
+                        <label>Zoom</label>
+                        <input
+                            type="number"
+                            min={minimumZoomLevel}
+                            step={0.25}
+                            value={zoomLevel}
+                            onChange={(e) => {
+                                updateZoomLevel(Number(e.target.value));
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
             {props.pattern.rhythms.map((rhythm) => (
@@ -297,7 +300,6 @@ const Pattern = (props: PatternProps) => {
                     onNotesPerMeasureChange={handleNotesPerMeasureChange}
                 />
             ))}
-            <button className="btn-default" onClick={addRhythm}>Add rhythm</button>
         </div>
     )
 }
