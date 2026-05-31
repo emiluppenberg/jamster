@@ -29,3 +29,13 @@ export type NoteData = {
     position64: number;
     value: string;
 }
+
+export type SavedPatternData = {
+    rhythms: SavedRhythmData[];
+}
+
+export type SavedRhythmData = {
+    sampleUrl: string;
+    notesPerMeasure: number;
+    noteSequences: string[];
+}
