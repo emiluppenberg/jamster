@@ -9,6 +9,7 @@ export type PatternData = {
     index: number;
     numberOfMeasures: number;
     rhythms: RhythmData[];
+    name: string;
 }
 
 export type RhythmData = {
@@ -32,6 +33,7 @@ export type NoteData = {
 
 export type SavedPatternData = {
     rhythms: SavedRhythmData[];
+    name: string;
 }
 
 export type SavedRhythmData = {

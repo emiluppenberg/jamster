@@ -7,6 +7,7 @@ const positionsPerMeasure = 64;
 const defaultMeasuresAtScreenWidth = 4;
 const defaultMeasuresScreenRatio = 0.75;
 const minimumZoomLevel = 0.25;
+const noteValueWidthRem = 0.6;
 
 const getViewportWidthRem = () => {
     if (typeof window === "undefined") return 75;
@@ -177,11 +178,17 @@ const Pattern = (props: PatternProps) => {
         1,
         ...props.pattern.rhythms.map((rhythm) => rhythm.notesPerMeasure),
     );
+    const densestNoteWidthRem = measureWidthRem / maxNotesPerMeasure;
+    const noteValuePaddingLeftRem = Math.max(
+        0,
+        (densestNoteWidthRem - noteValueWidthRem) / 2,
+    );
 
     const patternStyle = {
         "--measure-width": `${measureWidthRem}rem`,
         "--number-of-measures": props.pattern.numberOfMeasures,
         "--max-notes-per-measure": maxNotesPerMeasure,
+        "--note-value-padding-left": `${noteValuePaddingLeftRem}rem`,
     } as CSSProperties;
 
     const updateZoomLevel = (value: number) => {
@@ -256,12 +263,34 @@ const Pattern = (props: PatternProps) => {
         });
     }
 
+    const handleDeleteRhythm = (rhythmIndex: number) => {
+        props.onPatternChange({
+            ...props.pattern,
+            rhythms: props.pattern.rhythms.filter((rhythm) => rhythm.index !== rhythmIndex)
+        })
+    }
+
+    const handlePatternNameChange = (name: string) => {
+        props.onPatternChange({
+            ...props.pattern,
+            name,
+        });
+    }
+
     return (
         <div className="pattern" style={patternStyle}>
             <div className="controls">
-                <button className="btn-default" onClick={addRhythm}>Add rhythm</button>
+                <div className="anchor">
+                    <button className="btn delete">-</button>
+                    <input
+                        type="text"
+                        className="pattern-name"
+                        value={props.pattern.name}
+                        onChange={(e) => handlePatternNameChange(e.target.value)}
+                    />
+                </div>
                 <div className="options ">
-                    <button className="btn-default" onClick={() => props.onPlayPattern(props.pattern)}>Play</button>
+                    <button className="btn" onClick={() => props.onPlayPattern(props.pattern)}>Play</button>
                     <div>
                         <label>Measures</label>
                         <input
@@ -298,8 +327,12 @@ const Pattern = (props: PatternProps) => {
                     onNoteChange={handleNoteChange}
                     onSampleChange={handleSampleChange}
                     onNotesPerMeasureChange={handleNotesPerMeasureChange}
+                    onDelete={handleDeleteRhythm}
                 />
             ))}
+            <div className="add-rhythm">
+                <button className="btn" onClick={addRhythm}>Add rhythm</button>
+            </div>
         </div>
     )
 }

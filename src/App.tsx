@@ -8,7 +8,6 @@ import Timelines from './components/Timelines';
 import Store from './components/Store';
 
 const defaultNumberOfMeasures = 4;
-const exampleNumberOfMeasures = 1;
 
 const AppContainer = () => {
   return (
@@ -28,6 +27,7 @@ const AppContent = () => {
       index: currentPatterns.length,
       numberOfMeasures: defaultNumberOfMeasures,
       rhythms: [],
+      name: `Pattern ${currentPatterns.length}`
     },
   ])
 
@@ -56,7 +56,7 @@ const AppContent = () => {
             <div className="controls">
               <h1>Patterns</h1>
               <div className="options">
-                <button className="btn-default" onClick={addPattern}>Add</button>
+                <button className="btn" onClick={addPattern}>Add</button>
               </div>
             </div>
             <div className="container patterns">

@@ -16,6 +16,7 @@ export interface RhythmProps {
     ) => void;
     onSampleChange: (rhythmIndex: number, sample: AudioBuffer) => void;
     onNotesPerMeasureChange: (rhythmIndex: number, notesPerMeasure: number) => void;
+    onDelete: (rhytmIndex: number) => void;
 }
 
 const Rhythm = (props: RhythmProps) => {
@@ -33,11 +34,12 @@ const Rhythm = (props: RhythmProps) => {
 
     return (
         <div className="rhythm">
+            <button className="btn delete delete-rhythm" onClick={() => props.onDelete(props.rhythm.index)}>-</button>
             <SampleInput
                 setSample={(sample) => props.onSampleChange(props.rhythm.index, sample)}
             />
             <select
-                className="notes-per-measure-input"
+                className="notes-per-measure"
                 value={props.rhythm.notesPerMeasure}
                 onChange={(e) => {
                     props.onNotesPerMeasureChange(props.rhythm.index, Number(e.target.value));
@@ -45,7 +47,7 @@ const Rhythm = (props: RhythmProps) => {
             >
                 {notesPerMeasureOptions.map((notesPerMeasure) => (
                     <option key={notesPerMeasure} value={notesPerMeasure}>
-                        {notesPerMeasure}
+                        /{notesPerMeasure}
                     </option>
                 ))}
             </select>

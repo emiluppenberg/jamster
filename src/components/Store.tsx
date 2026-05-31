@@ -26,6 +26,7 @@ const examplePatterns: SavedPatternData[] = [
                 notesPerMeasure: 4,
                 noteSequences: ["-5-5"],
             }],
+        name: "Skip-beat"
     },
     {
         rhythms:
@@ -44,6 +45,7 @@ const examplePatterns: SavedPatternData[] = [
                 notesPerMeasure: 16,
                 noteSequences: ["----5----2--5---"],
             }],
+        name: "Trap-beat"
     }
 ];
 
@@ -112,13 +114,14 @@ const Store = (props: StoreProps) => {
                     rhythm.notesPerMeasure,
                     rhythm.noteSequences,
                 )
-            ))
+            )),
+            name: pattern.name
         }))));
     }
 
     return (
         <div className="store">
-            <button className="btn-default" onClick={handleLoadPatterns}>
+            <button className="btn" onClick={handleLoadPatterns}>
                 Load
             </button>
         </div>

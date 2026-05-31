@@ -71,7 +71,7 @@ const Timelines = (props: TimelinesProps) => {
             <div className="controls">
                 <h1>Timelines</h1>
                 <div className="options">
-                    <button className="btn-default" onClick={addTimeline}>Add</button>
+                    <button className="btn" onClick={addTimeline}>Add</button>
                     <div>
                         <label>Length</label>
                         <input
@@ -90,7 +90,7 @@ const Timelines = (props: TimelinesProps) => {
                         {Array.from({ length: slotCount }, (_, slotIndex) => (
                             <select
                                 key={slotIndex}
-                                className="slot-pattern-select"
+                                className="slot-pattern"
                                 value={timeline.slots[slotIndex] ?? ""}
                                 onChange={(e) => handleSlotChange(timeline.index, slotIndex, e.target.value)}
                             >

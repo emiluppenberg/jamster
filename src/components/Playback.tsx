@@ -220,7 +220,7 @@ const Playback = (props: PlaybackProps) => {
         <div className="playback">
             <div className="playback-controls">
                 <button
-                    className="btn-default"
+                    className="btn"
                     onClick={() => {
                         if (isPlaying) {
                             stopPlayback();
