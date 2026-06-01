@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { PatternData, TimelineData, Slot } from "../types";
+import type { PatternData, TimelineData, PatternIndex } from "../types";
 
-export interface TimelinesProps {
+export interface TimelineProps {
     patterns: PatternData[];
     timelines: TimelineData[];
     onTimelinesChange: (timelines: TimelineData[]) => void;
@@ -11,18 +11,18 @@ const getSlotCount = (timelines: TimelineData[]) => (
     Math.max(1, ...timelines.map((timeline) => timeline.slots.length))
 )
 
-const createSlots = (slotCount: number): Slot[] => (
+const createSlots = (slotCount: number): PatternIndex[] => (
     Array.from({ length: slotCount }, () => undefined)
 )
 
 const resizeSlots = (
-    slots: Slot[],
+    slots: PatternIndex[],
     slotCount: number,
-): Slot[] => (
+): PatternIndex[] => (
     Array.from({ length: slotCount }, (_, slotIndex) => slots[slotIndex])
 )
 
-const Timelines = (props: TimelinesProps) => {
+const Timeline = (props: TimelineProps) => {
     const [slotCount, setSlotCount] = useState(() => getSlotCount(props.timelines));
 
     const addTimeline = () => {
@@ -69,7 +69,7 @@ const Timelines = (props: TimelinesProps) => {
     return (
         <>
             <div className="controls">
-                <h1>Timelines</h1>
+                <h1>Timeline</h1>
                 <div className="options">
                     <button className="btn" onClick={addTimeline}>Add</button>
                     <div>
@@ -109,4 +109,4 @@ const Timelines = (props: TimelinesProps) => {
     )
 }
 
-export default Timelines;
+export default Timeline;

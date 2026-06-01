@@ -2,23 +2,13 @@ import Rhythm from "./Rhythm";
 import { useJamsterContext } from "../Context";
 import type { MeasureData, NoteData, PatternData, RhythmData } from "../types";
 import { useEffect, useState, type CSSProperties } from "react";
+import { getViewportWidthRem } from "../utils";
 
 const positionsPerMeasure = 64;
 const defaultMeasuresAtScreenWidth = 4;
 const defaultMeasuresScreenRatio = 0.75;
 const minimumZoomLevel = 0.25;
 const noteValueWidthRem = 0.6;
-
-const getViewportWidthRem = () => {
-    if (typeof window === "undefined") return 75;
-
-    const rootFontSize = Number.parseFloat(
-        window.getComputedStyle(document.documentElement).fontSize,
-    );
-
-    if (!Number.isFinite(rootFontSize) || rootFontSize <= 0) return 75;
-    return window.innerWidth / rootFontSize;
-}
 
 const getNotePosition64 = (noteIndex: number, notesPerMeasure: number) => (
     noteIndex * (positionsPerMeasure / notesPerMeasure)
@@ -151,7 +141,7 @@ export interface PatternProps {
 }
 
 const Pattern = (props: PatternProps) => {
-    const { audioContext } = useJamsterContext();
+    const { audioContext, analyserNode } = useJamsterContext();
     const [zoomLevel, setZoomLevel] = useState(1);
     const [viewportWidthRem, setViewportWidthRem] = useState(getViewportWidthRem);
 
@@ -205,7 +195,7 @@ const Pattern = (props: PatternProps) => {
     const createRhythm = (index: number): RhythmData => {
         const gainNode = audioContext.createGain();
         gainNode.gain.value = 0;
-        gainNode.connect(audioContext.destination);
+        gainNode.connect(analyserNode);
 
         return {
             index,

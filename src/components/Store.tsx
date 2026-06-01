@@ -54,8 +54,8 @@ export interface StoreProps {
 }
 
 const Store = (props: StoreProps) => {
-    const { audioContext } = useJamsterContext();
-    const [patternData, setPatternData] = useState(examplePatterns);
+    const { audioContext, analyserNode } = useJamsterContext();
+    const [patternData] = useState(examplePatterns);
     const getNotePosition64 = (noteIndex: number, notesPerMeasure: number) => (
         noteIndex * (64 / notesPerMeasure)
     )
@@ -92,7 +92,7 @@ const Store = (props: StoreProps) => {
     ): Promise<RhythmData> => {
         const gainNode = audioContext.createGain();
         gainNode.gain.value = 0;
-        gainNode.connect(audioContext.destination);
+        gainNode.connect(analyserNode);
 
         return {
             index,

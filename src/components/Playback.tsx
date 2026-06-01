@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useJamsterContext } from "../Context";
 import type { PatternData, TimelineData } from "../types";
+import Equalizer from "./Equalizer";
+import Store from "./Store";
 
 const defaultBpm = 120;
 const beatsPerMeasure = 4;
@@ -62,6 +64,7 @@ export interface PlaybackProps {
     patterns: PatternData[];
     timelines: TimelineData[];
     children: (props: PlaybackRenderProps) => ReactNode;
+    onStoreLoaded: (patterns: PatternData[]) => void;
 }
 
 const Playback = (props: PlaybackProps) => {
@@ -218,7 +221,7 @@ const Playback = (props: PlaybackProps) => {
 
     return (
         <div className="playback">
-            <div className="playback-controls">
+            <div className="menu">
                 <button
                     className="btn"
                     onClick={() => {
@@ -243,6 +246,8 @@ const Playback = (props: PlaybackProps) => {
                         setBpm(Math.max(1, nextBpm));
                     }}
                 />
+                <Store onStoreLoaded={props.onStoreLoaded} />
+                <Equalizer isPlaying={isPlaying} />
             </div>
             {props.children({
                 isPlaying,

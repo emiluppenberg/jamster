@@ -4,8 +4,7 @@ import Pattern from './components/Pattern'
 import Playback from './components/Playback';
 import { JamsterProvider } from './Context'
 import type { PatternData, TimelineData } from './types';
-import Timelines from './components/Timelines';
-import Store from './components/Store';
+import Timeline from './components/Timeline';
 
 const defaultNumberOfMeasures = 4;
 
@@ -44,11 +43,10 @@ const AppContent = () => {
 
   return (
     <div className='app'>
-      <Store onStoreLoaded={handleStoreLoaded} />
-      <Playback patterns={patterns} timelines={timelines}>
+      <Playback patterns={patterns} timelines={timelines} onStoreLoaded={handleStoreLoaded}>
         {({ isPlaying, playingPosition64, getPlayingMeasureIndex, playPattern }) => (
           <>
-            <Timelines
+            <Timeline
               patterns={patterns}
               timelines={timelines}
               onTimelinesChange={setTimelines}
