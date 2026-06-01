@@ -83,7 +83,7 @@ const Equalizer = (props: EqualizerProps) => {
 
             ctx.clearRect(0, 0, w, h);
             ctx.lineWidth = 2;
-            ctx.strokeStyle = "#22d3ee";
+            ctx.strokeStyle = "#32de8a";
             ctx.beginPath();
 
             const slice = w / array.length;

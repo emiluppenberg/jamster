@@ -50,7 +50,7 @@ const AppContent = () => {
 
   return (
     <div className='app'>
-      <Playback patterns={patterns} timelines={timelineRows} onStoreLoaded={handleStoreLoaded}>
+      <Playback patterns={patterns} timelineRows={timelineRows} onStoreLoaded={handleStoreLoaded}>
         {({ isPlaying, playingPosition64, playingSlotIndex, getPlayingMeasureIndex, playPattern }) => (
           <>
             <Timeline

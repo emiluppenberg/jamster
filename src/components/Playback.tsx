@@ -63,7 +63,7 @@ export type PlaybackRenderProps = {
 
 export interface PlaybackProps {
     patterns: PatternData[];
-    timelines: TimelineRowData[];
+    timelineRows: TimelineRowData[];
     children: (props: PlaybackRenderProps) => ReactNode;
     onStoreLoaded: (patterns: PatternData[], timelines: TimelineRowData[]) => void;
 }
@@ -76,7 +76,7 @@ const Playback = (props: PlaybackProps) => {
     const [soloPatternIndex, setSoloPatternIndex] = useState<number | undefined>(undefined);
     const [cursorTick, setCursorTick] = useState(0);
     const patternsRef = useRef(props.patterns);
-    const timelinesRef = useRef(props.timelines);
+    const timelineRowsRef = useRef(props.timelineRows);
     const playbackModeRef = useRef<PlaybackMode | undefined>(undefined);
     const soloPatternIndexRef = useRef<number | undefined>(undefined);
     const bpmRef = useRef(bpm);
@@ -89,8 +89,8 @@ const Playback = (props: PlaybackProps) => {
     }, [props.patterns]);
 
     useEffect(() => {
-        timelinesRef.current = props.timelines;
-    }, [props.timelines]);
+        timelineRowsRef.current = props.timelineRows;
+    }, [props.timelineRows]);
 
     useEffect(() => {
         bpmRef.current = bpm;
@@ -134,17 +134,17 @@ const Playback = (props: PlaybackProps) => {
     }
 
     const scheduleTick = (cursorTick: number, time: number) => {
-        const timelines = getPlaybackTimelines(
+        const timelineRows = getPlaybackTimelines(
             playbackModeRef.current,
-            timelinesRef.current,
+            timelineRowsRef.current,
             soloPatternIndexRef.current,
         );
-        const slotCount = getSlotCount(timelines);
+        const slotCount = getSlotCount(timelineRows);
         if (slotCount <= 0) return;
 
         const slotIndex = Math.floor(cursorTick / positionsPerMeasure) % slotCount;
 
-        timelines.forEach((timeline) => {
+        timelineRows.forEach((timeline) => {
             const pattern = getPatternByIndex(patternsRef.current, timeline.slots[slotIndex]);
             if (!pattern) return;
             schedulePattern(pattern, cursorTick, time);
@@ -162,7 +162,7 @@ const Playback = (props: PlaybackProps) => {
     }
 
     const startPlayback = async (mode: PlaybackMode, patternIndex?: number) => {
-        const timelines = getPlaybackTimelines(mode, props.timelines, patternIndex);
+        const timelines = getPlaybackTimelines(mode, props.timelineRows, patternIndex);
         if (getSlotCount(timelines) <= 0) return;
 
         if (schedulerTimerRef.current !== undefined) {
@@ -203,7 +203,7 @@ const Playback = (props: PlaybackProps) => {
     }
 
     const playingPosition64 = isPlaying ? cursorTick % positionsPerMeasure : undefined;
-    const playbackTimelines = getPlaybackTimelines(playbackMode, props.timelines, soloPatternIndex);
+    const playbackTimelines = getPlaybackTimelines(playbackMode, props.timelineRows, soloPatternIndex);
     const playbackSlotCount = getSlotCount(playbackTimelines);
     const playingSlotIndex = isPlaying && playbackSlotCount > 0
         ? Math.floor(cursorTick / positionsPerMeasure) % playbackSlotCount
@@ -212,7 +212,7 @@ const Playback = (props: PlaybackProps) => {
     const getPlayingMeasureIndex = (pattern: PatternData) => {
         if (!isPlaying) return undefined;
 
-        const timelines = getPlaybackTimelines(playbackMode, props.timelines, soloPatternIndex);
+        const timelines = getPlaybackTimelines(playbackMode, props.timelineRows, soloPatternIndex);
         const slotCount = getSlotCount(timelines);
         if (slotCount <= 0) return undefined;
 
@@ -252,7 +252,7 @@ const Playback = (props: PlaybackProps) => {
                         setBpm(Math.max(1, nextBpm));
                     }}
                 />
-                <Store onStoreLoaded={props.onStoreLoaded} />
+                <Store patterns={props.patterns} timelineRows={props.timelineRows} onStoreLoaded={props.onStoreLoaded} />
                 <Equalizer isPlaying={isPlaying} />
             </div>
             {props.children({

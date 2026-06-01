@@ -32,25 +32,32 @@ export type NoteData = {
     value: string;
 }
 
-export type SavedPatternData = {
-    rhythms: SavedRhythmData[];
+export type StoredPatternData = {
+    index: number;
+    rhythms: StoredRhythmData[];
     name: string;
 }
 
-export type SavedRhythmData = {
+export type StoredRhythmData = {
+    index: number;
     sampleFileName: string;
     notesPerMeasure: number;
-    noteSequences: string[];
+    measures: StoredMeasureData[];
 }
 
-export type SavedTimelineData = {
+export type StoredMeasureData = {
+    index: number;
+    noteSequence: string;
+}
+
+export type StoredTimelineRowData = {
     slots: PatternIndex[];
 }
 
-export type SavedData = {
+export type StoredData = {
     name: string;
-    timelines: SavedTimelineData[],
-    patterns: SavedPatternData[]
+    timelineRows: StoredTimelineRowData[],
+    patterns: StoredPatternData[]
 }
 
 export type StoredSample = {

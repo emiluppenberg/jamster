@@ -4,7 +4,8 @@ import snare1Url from '../assets/snare1.wav';
 import hihat2Url from '../assets/hihat2.wav';
 import kick2Url from '../assets/kick2.wav';
 import snare2Url from '../assets/snare2.wav';
-import type { StoredSample } from "../types";
+import type { StoredData, StoredSample } from "../types";
+import { exampleData } from '../utils';
 
 const seedExampleSamples = async (db: IDBDatabase): Promise<void> => {
     const urls = [
@@ -37,39 +38,54 @@ const seedExampleSamples = async (db: IDBDatabase): Promise<void> => {
     });
 }
 
+const seedExampleData = async (db: IDBDatabase): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("data", "readwrite");
+        const store = transaction.objectStore("data");
+
+        store.put(exampleData)
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+    });
+}
+
 export const openJamsterDB = async (): Promise<IDBDatabase> => (
     new Promise((resolve, reject) => {
         const request = indexedDB.open("jamster", 1);
-        let shouldSeedSamples = false;
+        let shouldSeed = false;
 
         request.onupgradeneeded = () => {
             const db = request.result;
 
             if (!db.objectStoreNames.contains("samples")) {
                 db.createObjectStore("samples", { keyPath: "sampleFileName" });
-                shouldSeedSamples = true;
+                shouldSeed = true;
             }
 
             if (!db.objectStoreNames.contains("data")) {
                 db.createObjectStore("data", { keyPath: "name" });
+                shouldSeed = true;
             }
         }
 
         request.onsuccess = async () => {
             const db = request.result;
-            shouldSeedSamples && await seedExampleSamples(db);
+            shouldSeed && await seedExampleSamples(db);
+            shouldSeed && await seedExampleData(db);
             resolve(db);
         }
 
         request.onerror = () => reject(request.error);
     })
 )
-export const loadSample = async (sampleFileName: string): Promise<StoredSample> => {
+export const getSample = async (sampleFileName: string): Promise<StoredSample | undefined> => {
     const db = await openJamsterDB();
 
     return new Promise((resolve, reject) => {
         const transaction = db.transaction("samples", "readonly");
         const store = transaction.objectStore("samples");
+
         const request = store.get(sampleFileName);
 
         request.onsuccess = () => resolve(request.result);
@@ -85,6 +101,34 @@ export const saveSample = async (sample: StoredSample): Promise<void> => {
         const store = transaction.objectStore("samples");
 
         store.put(sample);
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+    })
+}
+
+export const getData = async (): Promise<StoredData[]> => {
+    const db = await openJamsterDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("data", "readwrite");
+        const store = transaction.objectStore("data");
+
+        const request = store.getAll();
+
+        transaction.oncomplete = () => resolve(request.result);
+        transaction.onerror = () => reject(transaction.error);
+    })
+}
+
+export const saveData = async (data: StoredData): Promise<void> => {
+    const db = await openJamsterDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("data", "readwrite");
+        const store = transaction.objectStore("data");
+
+        store.put(data);
 
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);

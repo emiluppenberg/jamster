@@ -1,32 +1,33 @@
-import type { MeasureData, PatternData, RhythmData, SavedPatternData } from "../types";
-import { loadSample } from "./db";
+import type { MeasureData, PatternData, RhythmData, StoredMeasureData, StoredPatternData } from "../types";
+import { getSample } from "./db";
 
 export const getNotePosition64 = (noteIndex: number, notesPerMeasure: number) => (
     noteIndex * (64 / notesPerMeasure)
 )
 
 export const decodeStoredSample = async (audioContext: AudioContext, sampleFileName: string) => {
-    const storedSample = await loadSample(sampleFileName);
+    const storedSample = await getSample(sampleFileName);
+    if (!storedSample) throw new Error(`Error loading sample: ${sampleFileName}`)
     return audioContext.decodeAudioData(storedSample.arrayBuffer.slice(0));
 }
 
 export const loadMeasures = (
     notesPerMeasure: number,
-    noteSequences: string[],
-): MeasureData[] => (
-    Array.from({ length: noteSequences.length }, (_, measureIndex) => ({
-        index: measureIndex,
+    measures: StoredMeasureData[],
+): MeasureData[] => {
+    return measures.map((measure) => ({
+        index: measure.index,
         notes: Array.from({ length: notesPerMeasure }, (_, noteIndex) => {
-            const value = noteSequences[measureIndex][noteIndex] ?? "-";
+            const value = measure.noteSequence[noteIndex] ?? "-";
 
             return {
                 index: noteIndex,
                 position64: getNotePosition64(noteIndex, notesPerMeasure),
-                value: value === "-" ? "" : value,
-            };
-        }),
+                value: value === "-" ? "" : value
+            }
+        })
     }))
-)
+}
 
 export const loadRhythm = async (
     audioContext: AudioContext,
@@ -34,7 +35,7 @@ export const loadRhythm = async (
     index: number,
     sampleFileName: string,
     notesPerMeasure: number,
-    noteSequences: string[],
+    measures: StoredMeasureData[],
 ): Promise<RhythmData> => {
     const gainNode = audioContext.createGain();
     gainNode.gain.value = 0;
@@ -44,24 +45,24 @@ export const loadRhythm = async (
         index,
         gainNode,
         notesPerMeasure,
-        measures: loadMeasures(notesPerMeasure, noteSequences),
+        measures: loadMeasures(notesPerMeasure, measures),
         sample: await decodeStoredSample(audioContext, sampleFileName),
         sampleFileName: sampleFileName
     };
 }
 
-export const loadPatterns = async (audioContext: AudioContext, analyserNode: AnalyserNode, patternData: SavedPatternData[]): Promise<PatternData[]> => {
-    return await Promise.all(patternData!.map(async (pattern, index) => ({
-        index: index,
-        numberOfMeasures: Math.max(1, ...pattern.rhythms.map(r => r.noteSequences.length)),
-        rhythms: await Promise.all(pattern.rhythms.map((rhythm, index) =>
+export const loadPatterns = async (audioContext: AudioContext, analyserNode: AnalyserNode, patternData: StoredPatternData[]): Promise<PatternData[]> => {
+    return await Promise.all(patternData!.map(async (pattern) => ({
+        index: pattern.index,
+        numberOfMeasures: Math.max(1, ...pattern.rhythms.map(r => r.measures.length)),
+        rhythms: await Promise.all(pattern.rhythms.map((rhythm) =>
             loadRhythm(
                 audioContext,
                 analyserNode,
-                index,
+                rhythm.index,
                 rhythm.sampleFileName,
                 rhythm.notesPerMeasure,
-                rhythm.noteSequences,
+                rhythm.measures,
             )
         )),
         name: pattern.name
