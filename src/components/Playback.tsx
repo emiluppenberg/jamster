@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useJamsterContext } from "../Context";
-import type { PatternData, TimelineData } from "../types";
+import type { PatternData, TimelineRowData } from "../types";
 import Equalizer from "./Equalizer";
 import Store from "./Store";
 
@@ -28,7 +28,7 @@ const getNoteGain = (value: string) => {
 
 type PlaybackMode = "timelines" | "pattern";
 
-const getSlotCount = (timelines: TimelineData[]) => (
+const getSlotCount = (timelines: TimelineRowData[]) => (
     Math.max(0, ...timelines.map((timeline) => timeline.slots.length))
 )
 
@@ -39,9 +39,9 @@ const getPatternByIndex = (patterns: PatternData[], patternIndex: number | undef
 
 const getPlaybackTimelines = (
     mode: PlaybackMode | undefined,
-    timelines: TimelineData[],
+    timelines: TimelineRowData[],
     patternIndex: number | undefined,
-): TimelineData[] => {
+): TimelineRowData[] => {
     if (mode === "pattern" && patternIndex !== undefined) {
         return [{ index: 0, slots: [patternIndex] }];
     }
@@ -56,15 +56,16 @@ const getPlaybackTimelines = (
 export type PlaybackRenderProps = {
     isPlaying: boolean;
     playingPosition64?: number;
+    playingSlotIndex?: number;
     getPlayingMeasureIndex: (pattern: PatternData) => number | undefined;
     playPattern: (pattern: PatternData) => void;
 }
 
 export interface PlaybackProps {
     patterns: PatternData[];
-    timelines: TimelineData[];
+    timelines: TimelineRowData[];
     children: (props: PlaybackRenderProps) => ReactNode;
-    onStoreLoaded: (patterns: PatternData[]) => void;
+    onStoreLoaded: (patterns: PatternData[], timelines: TimelineRowData[]) => void;
 }
 
 const Playback = (props: PlaybackProps) => {
@@ -202,6 +203,11 @@ const Playback = (props: PlaybackProps) => {
     }
 
     const playingPosition64 = isPlaying ? cursorTick % positionsPerMeasure : undefined;
+    const playbackTimelines = getPlaybackTimelines(playbackMode, props.timelines, soloPatternIndex);
+    const playbackSlotCount = getSlotCount(playbackTimelines);
+    const playingSlotIndex = isPlaying && playbackSlotCount > 0
+        ? Math.floor(cursorTick / positionsPerMeasure) % playbackSlotCount
+        : undefined;
 
     const getPlayingMeasureIndex = (pattern: PatternData) => {
         if (!isPlaying) return undefined;
@@ -252,6 +258,7 @@ const Playback = (props: PlaybackProps) => {
             {props.children({
                 isPlaying,
                 playingPosition64,
+                playingSlotIndex: playingSlotIndex,
                 getPlayingMeasureIndex,
                 playPattern: (pattern) => {
                     void startPlayback("pattern", pattern.index);

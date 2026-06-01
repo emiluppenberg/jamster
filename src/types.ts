@@ -1,9 +1,9 @@
-export type TimelineData = {
+export type TimelineRowData = {
     index: number;
-    slots: Slot[];
+    slots: PatternIndex[];
 }
 
-export type Slot = number | undefined;
+export type PatternIndex = number | undefined;
 
 export type PatternData = {
     index: number;
@@ -18,6 +18,7 @@ export type RhythmData = {
     notesPerMeasure: number;
     measures: MeasureData[];
     sample?: AudioBuffer;
+    sampleFileName: string;
 }
 
 export type MeasureData = {
@@ -37,7 +38,22 @@ export type SavedPatternData = {
 }
 
 export type SavedRhythmData = {
-    sampleUrl: string;
+    sampleFileName: string;
     notesPerMeasure: number;
     noteSequences: string[];
+}
+
+export type SavedTimelineData = {
+    slots: PatternIndex[];
+}
+
+export type SavedData = {
+    name: string;
+    timelines: SavedTimelineData[],
+    patterns: SavedPatternData[]
+}
+
+export type StoredSample = {
+    sampleFileName: string;
+    arrayBuffer: ArrayBuffer;
 }

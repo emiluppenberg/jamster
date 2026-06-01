@@ -2,7 +2,7 @@ import type { ChangeEvent } from "react";
 import { useJamsterContext } from "../Context";
 
 export interface SampleInputProps {
-    setSample: (sample: AudioBuffer) => void;
+    setSample: (sample: AudioBuffer, fileName: string) => void;
 }
 
 const SampleInput = (props: SampleInputProps) => {
@@ -14,7 +14,7 @@ const SampleInput = (props: SampleInputProps) => {
 
         const arrayBuffer = await file.arrayBuffer();
         const audioBuffer = await context.audioContext.decodeAudioData(arrayBuffer);
-        props.setSample(audioBuffer);
+        props.setSample(audioBuffer, file.name);
     }
     return (
         <label className="sample-input">

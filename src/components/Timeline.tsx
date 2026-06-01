@@ -1,48 +1,46 @@
-import { useState } from "react";
-import type { PatternData, TimelineData, PatternIndex } from "../types";
+import { type SetStateAction } from "react";
+import type { PatternData, TimelineRowData, PatternIndex } from "../types";
 
 export interface TimelineProps {
     patterns: PatternData[];
-    timelines: TimelineData[];
-    onTimelinesChange: (timelines: TimelineData[]) => void;
+    timelineRows: TimelineRowData[];
+    timelineLength: number;
+    setTimelineLength: React.Dispatch<SetStateAction<number>>;
+    onTimelinesChange: (timelines: TimelineRowData[]) => void;
+    playingSlotIndex: number | undefined;
 }
 
-const getSlotCount = (timelines: TimelineData[]) => (
-    Math.max(1, ...timelines.map((timeline) => timeline.slots.length))
-)
-
-const createSlots = (slotCount: number): PatternIndex[] => (
-    Array.from({ length: slotCount }, () => undefined)
+const createSlots = (timelineLength: number): PatternIndex[] => (
+    Array.from({ length: timelineLength }, () => undefined)
 )
 
 const resizeSlots = (
     slots: PatternIndex[],
-    slotCount: number,
+    timelineLength: number,
 ): PatternIndex[] => (
-    Array.from({ length: slotCount }, (_, slotIndex) => slots[slotIndex])
+    Array.from({ length: timelineLength }, (_, slotIndex) => slots[slotIndex])
 )
 
 const Timeline = (props: TimelineProps) => {
-    const [slotCount, setSlotCount] = useState(() => getSlotCount(props.timelines));
 
     const addTimeline = () => {
         props.onTimelinesChange([
-            ...props.timelines,
+            ...props.timelineRows,
             {
-                index: props.timelines.length,
-                slots: createSlots(slotCount),
+                index: props.timelineRows.length,
+                slots: createSlots(props.timelineLength),
             },
         ]);
     }
 
-    const handleSlotCountChange = (value: number) => {
+    const handleTimelineLengthChange = (value: number) => {
         if (!Number.isFinite(value)) return;
 
-        const nextSlotCount = Math.max(0, Math.floor(value));
-        setSlotCount(nextSlotCount);
-        props.onTimelinesChange(props.timelines.map((timeline) => ({
+        const nextTimelineLength = Math.max(0, Math.floor(value));
+        props.setTimelineLength(nextTimelineLength);
+        props.onTimelinesChange(props.timelineRows.map((timeline) => ({
             ...timeline,
-            slots: resizeSlots(timeline.slots, nextSlotCount),
+            slots: resizeSlots(timeline.slots, nextTimelineLength),
         })));
     }
 
@@ -53,10 +51,10 @@ const Timeline = (props: TimelineProps) => {
     ) => {
         const patternIndex = value === "" ? undefined : Number(value);
 
-        props.onTimelinesChange(props.timelines.map((timeline) => {
+        props.onTimelinesChange(props.timelineRows.map((timeline) => {
             if (timeline.index !== timelineDataIndex) return timeline;
 
-            const slots = resizeSlots(timeline.slots, slotCount);
+            const slots = resizeSlots(timeline.slots, props.timelineLength);
             slots[slotIndex] = patternIndex;
 
             return {
@@ -78,19 +76,19 @@ const Timeline = (props: TimelineProps) => {
                             type="number"
                             min={1}
                             step={1}
-                            value={slotCount}
-                            onChange={(e) => handleSlotCountChange(Number(e.target.value))}
+                            value={props.timelineLength}
+                            onChange={(e) => handleTimelineLengthChange(Number(e.target.value))}
                         />
                     </div>
                 </div>
             </div>
             <div className="container timelines">
-                {props.timelines.map((timeline) => (
+                {props.timelineRows.map((timeline) => (
                     <div key={timeline.index} className="timeline">
-                        {Array.from({ length: slotCount }, (_, slotIndex) => (
+                        {Array.from({ length: props.timelineLength }, (_, slotIndex) => (
                             <select
                                 key={slotIndex}
-                                className="slot-pattern"
+                                className={`slot-pattern${slotIndex === props.playingSlotIndex ? " is-playing" : ""}`}
                                 value={timeline.slots[slotIndex] ?? ""}
                                 onChange={(e) => handleSlotChange(timeline.index, slotIndex, e.target.value)}
                             >

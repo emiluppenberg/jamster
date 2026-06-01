@@ -100,10 +100,12 @@ const updateRhythmNoteValue = (
 const updateRhythmSample = (
     rhythm: RhythmData,
     sample: AudioBuffer | undefined,
+    fileName: string
 ): RhythmData => {
     return {
         ...rhythm,
         sample,
+        sampleFileName: fileName
     };
 }
 
@@ -202,6 +204,7 @@ const Pattern = (props: PatternProps) => {
             gainNode,
             notesPerMeasure: 4,
             measures: createMeasures(4),
+            sampleFileName: ""
         };
     }
 
@@ -229,10 +232,10 @@ const Pattern = (props: PatternProps) => {
         }));
     }
 
-    const handleSampleChange = (rhythmIndex: number, sample: AudioBuffer) => {
+    const handleSampleChange = (rhythmIndex: number, sample: AudioBuffer, fileName: string) => {
         updatePatternRhythms(props.pattern.rhythms.map((rhythm) => {
             if (rhythm.index !== rhythmIndex) return rhythm;
-            return updateRhythmSample(rhythm, sample);
+            return updateRhythmSample(rhythm, sample, fileName);
         }));
     }
 
