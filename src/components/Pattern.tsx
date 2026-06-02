@@ -309,6 +309,7 @@ const Pattern = (props: PatternProps) => {
                             }}
                         />
                     </div>
+                    <button className="btn">MCP</button>
                 </div>
             </div>
             {props.pattern.rhythms.map((rhythm) => (

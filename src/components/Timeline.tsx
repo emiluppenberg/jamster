@@ -94,9 +94,7 @@ const Timeline = (props: TimelineProps) => {
                             >
                                 <option value="">-</option>
                                 {props.patterns.map((pattern) => (
-                                    <option key={pattern.index} value={pattern.index}>
-                                        Pattern {pattern.index}
-                                    </option>
+                                    <option key={pattern.index} value={pattern.index}>{pattern.name}</option>
                                 ))}
                             </select>
                         ))}
