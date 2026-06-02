@@ -37,6 +37,7 @@ const Rhythm = (props: RhythmProps) => {
             <button className="btn delete delete-rhythm" onClick={() => props.onDelete(props.rhythm.index)}>-</button>
             <SampleInput
                 setSample={(sample, fileName) => props.onSampleChange(props.rhythm.index, sample, fileName)}
+                sampleFileName={props.rhythm.sampleFileName}
             />
             <select
                 className="notes-per-measure"

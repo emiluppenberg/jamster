@@ -151,6 +151,7 @@ $rhythm-controls-width: 11.5rem;
         background: rgba($blue, 0.14);
         color: $text;
         cursor: pointer;
+        overflow: hidden;
 
         &:hover {
             border-color: rgba($blue, 0.72);

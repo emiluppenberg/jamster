@@ -96,7 +96,7 @@ export const exampleData: StoredData = {
     patterns: examplePatterns
 }
 
-export const eq_fftSize = 512;
+export const eq_fftSize = 1024;
 
 export const getViewportWidthRem = () => {
     if (typeof window === "undefined") return 75;

@@ -70,7 +70,7 @@ const Store = (props: StoreProps) => {
                 className="save-name"
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)} />
-            <button className="btn" onClick={handleSave}>Save</button>
+            <button className="btn" onClick={handleSave} disabled={saveName.length === 0}>Save</button>
         </div>
     )
 }

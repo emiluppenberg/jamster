@@ -4,6 +4,7 @@ import { getSample, saveSample } from "../helpers/db";
 
 export interface SampleInputProps {
     setSample: (sample: AudioBuffer, fileName: string) => void;
+    sampleFileName: string;
 }
 
 const SampleInput = (props: SampleInputProps) => {
@@ -28,7 +29,7 @@ const SampleInput = (props: SampleInputProps) => {
     }
     return (
         <label className="sample-input">
-            Load sample
+            {props.sampleFileName.length > 0 ? props.sampleFileName : "Load sample"}
             <input
                 type="file"
                 accept="audio/*"
