@@ -175,6 +175,11 @@ $rhythm-controls-width: 11.5rem;
         letter-spacing: 0;
     }
 
+    dialog[open] {
+        display: flex;
+        flex-direction: column;
+    }
+
     input,
     select {
         min-height: 2rem;
@@ -184,6 +189,14 @@ $rhythm-controls-width: 11.5rem;
         background: rgba($surface-raised, 0.86);
         color: $text;
         outline: none;
+
+        &.default {
+            width: $space-l;
+            min-width: $space-l;
+            background: $surface;
+            color: $mint;
+            text-align: center;
+        }
 
         &.notes-per-measure {
             width: 2.5rem;
@@ -209,14 +222,6 @@ $rhythm-controls-width: 11.5rem;
                 border-left: 1px solid $border;
                 border-radius: 0%;
             }
-        }
-
-        &.stored-data, &.save-name {
-            width: $space-l;
-            min-width: $space-l;
-            background: $surface;
-            color: $mint;
-            text-align: center;
         }
 
         &.pattern-name {

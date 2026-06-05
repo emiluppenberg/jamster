@@ -140,6 +140,7 @@ export interface PatternProps {
     playingPosition64?: number;
     onPatternChange: (pattern: PatternData) => void;
     onPlayPattern: (pattern: PatternData) => void;
+    onPatternDelete: (pattern: PatternData) => void;
 }
 
 const Pattern = (props: PatternProps) => {
@@ -274,7 +275,7 @@ const Pattern = (props: PatternProps) => {
         <div className="pattern" style={patternStyle}>
             <div className="controls">
                 <div className="anchor">
-                    <button className="btn delete">-</button>
+                    <button className="btn delete" onClick={() => props.onPatternDelete(props.pattern)}>-</button>
                     <input
                         type="text"
                         className="pattern-name"
@@ -309,7 +310,6 @@ const Pattern = (props: PatternProps) => {
                             }}
                         />
                     </div>
-                    <button className="btn">MCP</button>
                 </div>
             </div>
             {props.pattern.rhythms.map((rhythm) => (

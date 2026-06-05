@@ -56,7 +56,7 @@ const Store = (props: StoreProps) => {
         <div className="store">
             <button className="btn" onClick={handleLoad}>Load</button>
             <select
-                className="stored-data"
+                className="default"
                 onChange={(e) => setGetIndex(Number(e.target.value))}
             >
                 {storedData.map((data, index) => (
@@ -67,7 +67,7 @@ const Store = (props: StoreProps) => {
             </select>
             <input
                 type="text"
-                className="save-name"
+                className="default"
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)} />
             <button className="btn" onClick={handleSave} disabled={saveName.length === 0}>Save</button>

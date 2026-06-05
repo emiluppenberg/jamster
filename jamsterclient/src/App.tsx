@@ -42,6 +42,10 @@ const AppContent = () => {
     }));
   }
 
+  const handlePatternDelete = (deletePattern: PatternData) => {
+    setPatterns((currentPatterns) => currentPatterns.filter((pattern) => pattern.index !== deletePattern.index));
+  }
+
   const handleStoreLoaded = (patterns: PatternData[], timelineRows: TimelineRowData[]) => {
     setPatterns(patterns);
     setTimelineLength(getTimelineLength(timelineRows));
@@ -76,6 +80,7 @@ const AppContent = () => {
                   playingPosition64={playingPosition64}
                   onPatternChange={handlePatternChange}
                   onPlayPattern={playPattern}
+                  onPatternDelete={handlePatternDelete}
                 />
               ))}
             </div>

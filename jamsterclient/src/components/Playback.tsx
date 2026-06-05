@@ -3,6 +3,7 @@ import { useJamsterContext } from "../Context";
 import type { PatternData, TimelineRowData } from "../types";
 import Equalizer from "./Equalizer";
 import Store from "./Store";
+import McpSocket from "./McpSocket";
 
 const defaultBpm = 120;
 const beatsPerMeasure = 4;
@@ -253,6 +254,7 @@ const Playback = (props: PlaybackProps) => {
                     }}
                 />
                 <Store patterns={props.patterns} timelineRows={props.timelineRows} onStoreLoaded={props.onStoreLoaded} />
+                <McpSocket patterns={props.patterns} />
                 <Equalizer isPlaying={isPlaying} />
             </div>
             {props.children({
