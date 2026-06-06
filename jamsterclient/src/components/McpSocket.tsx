@@ -93,13 +93,12 @@ const McpSocket = (props: McpSocketProps) => {
     }
 
     return (
-        <div className="mcp pattern-mcp">
+        <div className="mcp">
             <button className="btn" onClick={handleToggle}>MCP</button>
             <dialog className="mcp-dialog" ref={dialogRef} aria-labelledby="mcp-dialog-title">
                 <div className="mcp-dialog-header">
                     <div>
-                        <span className="mcp-dialog-eyebrow">MCP</span>
-                        <h2 id="mcp-dialog-title">Connection</h2>
+                        <h2 id="mcp-dialog-title" className="mcp-dialog-eyebrow">Connection</h2>
                     </div>
                     <button className="btn mcp-dialog-close" type="button" onClick={handleClose} aria-label="Close MCP dialog">
                         X

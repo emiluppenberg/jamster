@@ -49,7 +49,6 @@ $rhythm-controls-width: 11.5rem;
     .menu {
         display: flex;
         align-items: center;
-        gap: $space-s;
         box-sizing: border-box;
         width: 100%;
         padding: $space-m;
@@ -198,11 +197,13 @@ $rhythm-controls-width: 11.5rem;
         }
     }
 
+    .app-dialog,
     .mcp-dialog {
         gap: $space-m;
         padding: 1rem;
         text-align: start;
 
+        .app-dialog-header,
         .mcp-dialog-header {
             display: flex;
             align-items: flex-start;
@@ -212,11 +213,11 @@ $rhythm-controls-width: 11.5rem;
             border-bottom: 1px solid $border;
         }
 
+        .app-dialog-eyebrow,
         .mcp-dialog-eyebrow {
             display: block;
             margin-bottom: 0.2rem;
             color: $green;
-            font-size: 0.75rem;
             font-weight: 700;
             letter-spacing: 0;
         }
@@ -229,6 +230,7 @@ $rhythm-controls-width: 11.5rem;
             letter-spacing: 0;
         }
 
+        .app-dialog-close,
         .mcp-dialog-close {
             display: inline-flex;
             align-items: center;
@@ -316,6 +318,7 @@ $rhythm-controls-width: 11.5rem;
             }
         }
 
+        .app-dialog-hint,
         .mcp-dialog-hint {
             margin: 0;
             color: $muted;
@@ -329,6 +332,86 @@ $rhythm-controls-width: 11.5rem;
 
                 label {
                     margin-top: $space-xs;
+                }
+            }
+        }
+    }
+
+    .store-dialog {
+        max-width: 24rem;
+
+        .store-dialog-list {
+            display: flex;
+            flex-direction: column;
+            gap: $space-s;
+            max-height: min(22rem, calc(100svh - 12rem));
+            overflow-y: auto;
+        }
+
+        .store-dialog-form {
+            display: grid;
+            grid-template-columns: $width-l minmax(0, 1fr) auto;
+            gap: $space-s;
+            align-items: center;
+
+            label {
+                width: auto;
+                padding-right: 0;
+                color: $muted;
+                text-align: start;
+            }
+        }
+
+        .store-dialog-field {
+            width: 100%;
+            min-width: 0;
+            min-height: 2rem;
+            box-sizing: border-box;
+            padding: 0 0.55rem;
+            border: 1px solid $border;
+            border-radius: 6px;
+            background: $surface;
+            color: $mint;
+            font-size: 0.9rem;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            outline: none;
+        }
+
+        button.store-dialog-field {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition:
+                background-color 140ms ease,
+                border-color 140ms ease,
+                color 140ms ease,
+                transform 140ms ease;
+
+            &:hover {
+                border-color: $border-strong;
+                background: rgba($surface-raised, 0.92);
+            }
+
+            &:active {
+                transform: translateY(1px);
+            }
+        }
+
+        .store-dialog-field:focus-visible {
+            border-color: $green;
+            box-shadow: 0 0 0 3px rgba($green, 0.18);
+        }
+
+        @media (max-width: 36rem) {
+            .store-dialog-form {
+                grid-template-columns: 1fr;
+
+                .btn {
+                    width: 100%;
                 }
             }
         }
@@ -364,7 +447,7 @@ $rhythm-controls-width: 11.5rem;
         &.slot-pattern {
             width: 5rem;
             min-width: 5rem;
-            background: $surface;
+            background: $surface-soft;
             color: $mint;
 
             &:first-child {
@@ -408,12 +491,18 @@ $rhythm-controls-width: 11.5rem;
         width: $width-m;
         padding: 0 0.35rem;
         text-align: start;
+
+        &.bpm-input {
+            border-color: rgba($green, 0.32);
+            color: $green;
+            font-weight: 700;
+            width: $width-l;
+        }
     }
 
-    .bpm-input {
-        border-color: rgba($green, 0.32);
-        color: $green;
-        font-weight: 700;
+    .mcp {
+        margin-left: $width-m;
+        margin-right: $space-m;
     }
 
     .controls {
@@ -441,14 +530,15 @@ $rhythm-controls-width: 11.5rem;
         gap: $space-s;
         min-height: 2.4rem;
 
-        div {
-            display: flex;
-            align-items: center;
-        }
+    }
+
+    .flex-row-align-center {
+        display: flex;
+        align-items: center;
     }
 
     .store {
-        margin-left: $space-m;
+        margin-left: $width-m;
         display: flex;
         align-items: center;
         gap: $space-s;
@@ -461,6 +551,12 @@ $rhythm-controls-width: 11.5rem;
 
         &.timelines {
             gap: 0.35rem;
+            padding: 0.75rem;
+            box-sizing: border-box;
+            border: 1px solid $border;
+            border-radius: 8px;
+            background: $surface;
+            box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
         }
 
         &.patterns {

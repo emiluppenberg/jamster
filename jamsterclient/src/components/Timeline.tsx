@@ -70,7 +70,7 @@ const Timeline = (props: TimelineProps) => {
                 <h1>Timeline</h1>
                 <div className="options">
                     <button className="btn" onClick={addTimeline}>Add</button>
-                    <div>
+                    <div className="flex-row-align-center">
                         <label>Length</label>
                         <input
                             type="number"

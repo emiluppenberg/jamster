@@ -21,8 +21,8 @@ const AppContainer = () => {
 }
 
 const AppContent = () => {
-  const [patterns, setPatterns] = useState<PatternData[]>([])
-  const [timelineRows, setTimelineRows] = useState<TimelineRowData[]>([])
+  const [patterns, setPatterns] = useState<PatternData[]>([{ index: 0, name: "Pattern 0", numberOfMeasures: 4, rhythms: [] }])
+  const [timelineRows, setTimelineRows] = useState<TimelineRowData[]>([{ index: 0, slots: [] }])
   const [timelineLength, setTimelineLength] = useState(() => getTimelineLength(timelineRows));
 
   const addPattern = () => setPatterns((currentPatterns) => [

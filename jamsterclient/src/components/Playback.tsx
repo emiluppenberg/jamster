@@ -243,19 +243,22 @@ const Playback = (props: PlaybackProps) => {
                 >
                     {isPlaying ? "Stop" : "Play"}
                 </button>
-                <input
-                    className="bpm-input"
-                    type="number"
-                    min={1}
-                    value={bpm}
-                    onChange={(e) => {
-                        const nextBpm = Number(e.target.value);
-                        if (!Number.isFinite(nextBpm)) return;
-                        setBpm(Math.max(1, nextBpm));
-                    }}
-                />
+                <div className="flex-row-align-center">
+                    <label>BPM</label>
+                    <input
+                        className="bpm-input"
+                        type="number"
+                        min={1}
+                        value={bpm}
+                        onChange={(e) => {
+                            const nextBpm = Number(e.target.value);
+                            if (!Number.isFinite(nextBpm)) return;
+                            setBpm(Math.max(1, nextBpm));
+                        }}
+                    />
+                </div>
                 <Store patterns={props.patterns} timelineRows={props.timelineRows} onStoreLoaded={props.onStoreLoaded} />
-                <McpSocket patterns={props.patterns} onPatternChange={props.onPatternChange}/>
+                <McpSocket patterns={props.patterns} onPatternChange={props.onPatternChange} />
                 <Equalizer isPlaying={isPlaying} />
             </div>
             {props.children({

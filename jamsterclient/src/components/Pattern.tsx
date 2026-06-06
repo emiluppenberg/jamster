@@ -281,7 +281,7 @@ const Pattern = (props: PatternProps) => {
                 </div>
                 <div className="options ">
                     <button className="btn" onClick={() => props.onPlayPattern(props.pattern)}>Play</button>
-                    <div>
+                    <div className="flex-row-align-center">
                         <label>Measures</label>
                         <input
                             type="number"
@@ -294,7 +294,7 @@ const Pattern = (props: PatternProps) => {
                             }}
                         />
                     </div>
-                    <div>
+                    <div className="flex-row-align-center">
                         <label>Zoom</label>
                         <input
                             type="number"
