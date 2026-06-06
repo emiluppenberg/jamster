@@ -4,7 +4,7 @@ import Pattern from './components/Pattern'
 import Playback from './components/Playback';
 import { JamsterProvider } from './Context'
 import type { PatternData, TimelineRowData } from './types';
-import Timeline from './components/Timeline';
+import TimelineRows from './components/TimelineRows';
 
 const getTimelineLength = (timelineRows: TimelineRowData[]) => (
   Math.max(1, ...timelineRows.map((row) => row.slots.length))
@@ -57,12 +57,12 @@ const AppContent = () => {
       <Playback patterns={patterns} timelineRows={timelineRows} onStoreLoaded={handleStoreLoaded} onPatternChange={handlePatternChange}>
         {({ isPlaying, playingPosition64, playingSlotIndex, getPlayingMeasureIndex, playPattern }) => (
           <>
-            <Timeline
+            <TimelineRows
               patterns={patterns}
               timelineRows={timelineRows}
               timelineLength={timelineLength}
               setTimelineLength={setTimelineLength}
-              onTimelinesChange={setTimelineRows}
+              onTimelineRowsChange={setTimelineRows}
               playingSlotIndex={playingSlotIndex}
             />
             <div className="controls">

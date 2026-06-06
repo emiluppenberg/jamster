@@ -449,15 +449,12 @@ $rhythm-controls-width: 11.5rem;
             min-width: 5rem;
             background: $surface-soft;
             color: $mint;
+            border-left: 1px solid $border;
+            border-radius: 0%;
 
-            &:first-child {
-                border-top-right-radius: 0%;
-                border-bottom-right-radius: 0%;
-            }
-
-            &+.slot-pattern {
-                border-left: 1px solid $border;
-                border-radius: 0%;
+            &:last-of-type {
+                border-top-right-radius: 6px;
+                border-bottom-right-radius: 6px;
             }
         }
 

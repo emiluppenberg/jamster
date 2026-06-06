@@ -6,7 +6,7 @@ export interface TimelineProps {
     timelineRows: TimelineRowData[];
     timelineLength: number;
     setTimelineLength: React.Dispatch<SetStateAction<number>>;
-    onTimelinesChange: (timelines: TimelineRowData[]) => void;
+    onTimelineRowsChange: (timelines: TimelineRowData[]) => void;
     playingSlotIndex: number | undefined;
 }
 
@@ -21,10 +21,10 @@ const resizeSlots = (
     Array.from({ length: timelineLength }, (_, slotIndex) => slots[slotIndex])
 )
 
-const Timeline = (props: TimelineProps) => {
+const TimelineRows = (props: TimelineProps) => {
 
-    const addTimeline = () => {
-        props.onTimelinesChange([
+    const addTimelineRow = () => {
+        props.onTimelineRowsChange([
             ...props.timelineRows,
             {
                 index: props.timelineRows.length,
@@ -38,7 +38,7 @@ const Timeline = (props: TimelineProps) => {
 
         const nextTimelineLength = Math.max(0, Math.floor(value));
         props.setTimelineLength(nextTimelineLength);
-        props.onTimelinesChange(props.timelineRows.map((timeline) => ({
+        props.onTimelineRowsChange(props.timelineRows.map((timeline) => ({
             ...timeline,
             slots: resizeSlots(timeline.slots, nextTimelineLength),
         })));
@@ -51,7 +51,7 @@ const Timeline = (props: TimelineProps) => {
     ) => {
         const patternIndex = value === "" ? undefined : Number(value);
 
-        props.onTimelinesChange(props.timelineRows.map((timeline) => {
+        props.onTimelineRowsChange(props.timelineRows.map((timeline) => {
             if (timeline.index !== timelineDataIndex) return timeline;
 
             const slots = resizeSlots(timeline.slots, props.timelineLength);
@@ -64,12 +64,16 @@ const Timeline = (props: TimelineProps) => {
         }));
     }
 
+    const handleDeleteTimelineRow = (deleteTimeline: TimelineRowData) => {
+        props.onTimelineRowsChange(props.timelineRows.filter(timeline => timeline !== deleteTimeline))
+    }
+
     return (
         <>
             <div className="controls">
                 <h1>Timeline</h1>
                 <div className="options">
-                    <button className="btn" onClick={addTimeline}>Add</button>
+                    <button className="btn" onClick={addTimelineRow}>Add</button>
                     <div className="flex-row-align-center">
                         <label>Length</label>
                         <input
@@ -82,15 +86,17 @@ const Timeline = (props: TimelineProps) => {
                     </div>
                 </div>
             </div>
-            <div className="container timelines">
+            {props.timelineRows.length > 0 && (
+                <div className="container timelines">
                 {props.timelineRows.map((timeline) => (
                     <div key={timeline.index} className="timeline">
+                        <button className="btn delete" onClick={() => handleDeleteTimelineRow(timeline)}>-</button>
                         {Array.from({ length: props.timelineLength }, (_, slotIndex) => (
                             <select
-                                key={slotIndex}
-                                className={`slot-pattern${slotIndex === props.playingSlotIndex ? " is-playing" : ""}`}
-                                value={timeline.slots[slotIndex] ?? ""}
-                                onChange={(e) => handleSlotChange(timeline.index, slotIndex, e.target.value)}
+                            key={slotIndex}
+                            className={`slot-pattern${slotIndex === props.playingSlotIndex ? " is-playing" : ""}`}
+                            value={timeline.slots[slotIndex] ?? ""}
+                            onChange={(e) => handleSlotChange(timeline.index, slotIndex, e.target.value)}
                             >
                                 <option value="">-</option>
                                 {props.patterns.map((pattern) => (
@@ -101,8 +107,9 @@ const Timeline = (props: TimelineProps) => {
                     </div>
                 ))}
             </div>
+            )}
         </>
     )
 }
 
-export default Timeline;
+export default TimelineRows;
