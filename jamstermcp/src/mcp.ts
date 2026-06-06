@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { getPatternByNameInputSchema, McpPatternDataSchema, setRhythmMeasureNotesInputSchema } from "./schema.js";
-import type { McpPatternData } from "./schema.js";
+import type { McpMeasureData, McpPatternData, SetRhythmDto } from "./schema.js";
 import WebSocket from "ws"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 
@@ -21,12 +21,36 @@ export const InitializeMcpServer = async (
             inputSchema: setRhythmMeasureNotesInputSchema,
         },
         async (inputs) => {
+            const dto: SetRhythmDto = {
+                patternName: inputs.patternName,
+                rhythm: {
+                    index: inputs.rhythmIndex,
+                    notesPerMeasure: inputs.notesPerMeasure,
+                    measures: inputs.measures
+                }
+            }
+
+            const connection = connections.get(inputs.base.appSessionId);
+
+            if (!connection) {
+                return {
+                    isError: true,
+                    content: [
+                        {
+                            type: "text",
+                            text: `No connection found for AppSessionId: ${inputs.base.appSessionId}`
+                        }
+                    ]
+                }
+            }
+
+            connection.send(JSON.stringify(dto));
 
             return {
                 content: [
                     {
                         type: "text",
-                        text: ""
+                        text: `Rhythm set in AppSessionId: ${inputs.base.appSessionId}`
                     }
                 ]
             }

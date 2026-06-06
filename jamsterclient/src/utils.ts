@@ -109,3 +109,7 @@ export const getViewportWidthRem = () => {
     if (!Number.isFinite(rootFontSize) || rootFontSize <= 0) return 75;
     return window.innerWidth / rootFontSize;
 }
+
+export const getNotePosition64 = (noteIndex: number, notesPerMeasure: number) => (
+    noteIndex * (64 / notesPerMeasure)
+)
