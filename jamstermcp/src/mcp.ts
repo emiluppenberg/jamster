@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { getPatternByNameInputSchema, McpPatternDataSchema, setRhythmMeasureNotesInputSchema } from "./schema.js";
-import type { McpMeasureData, McpPatternData, SetRhythmDto } from "./schema.js";
+import type { McpPatternData, SetRhythmDto } from "./schema.js";
 import WebSocket from "ws"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 

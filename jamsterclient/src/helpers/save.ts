@@ -20,7 +20,7 @@ const storePattern = (pattern: PatternData): StoredPatternData => ({
     rhythms: pattern.rhythms.map((rhythm) => storeRhythm(rhythm))
 })
 
-export const storeData = async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string): Promise<void> => {
+export const storeData = async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string): Promise<StoredData> => {
     const storedPatternData = patterns.map((pattern) => storePattern(pattern));
     const storedTimelineRowsData = timelineRows.map((row) => ({
         slots: row.slots
@@ -33,4 +33,5 @@ export const storeData = async (patterns: PatternData[], timelineRows: TimelineR
     }
 
     await saveData(storedData);
+    return storedData;
 } 

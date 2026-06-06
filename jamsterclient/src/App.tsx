@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './App.css'
 import Pattern from './components/Pattern'
 import Playback from './components/Playback';
-import { JamsterProvider } from './Context'
+import { JamsterProvider } from './Provider'
 import type { PatternData, TimelineRowData } from './types';
 import TimelineRows from './components/TimelineRows';
 

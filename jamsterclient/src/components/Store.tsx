@@ -1,9 +1,7 @@
 import { useJamsterContext } from "../Context";
-import { getData } from "../helpers/db";
 import { loadPatterns } from "../helpers/load";
-import { storeData } from "../helpers/save";
 import type { PatternData, StoredData, TimelineRowData } from "../types";
-import { useEffect, useRef, useState, type SetStateAction } from "react";
+import { useMemo, useRef, useState } from "react";
 
 export interface StoreProps {
     patterns: PatternData[];
@@ -11,31 +9,15 @@ export interface StoreProps {
     onStoreLoaded: (patterns: PatternData[], timeline: TimelineRowData[]) => void;
 }
 
-const getStoredData = async (
-    setStoredData: React.Dispatch<SetStateAction<StoredData[]>>,
-) => {
-    const storedData = await getData();
-    setStoredData(storedData);
-}
-
 const Store = (props: StoreProps) => {
-    const { audioContext, analyserNode } = useJamsterContext();
-    const [initialized, setInitialized] = useState(false);
-    const [storedData, setStoredData] = useState<StoredData[]>([]);
+    const { audioContext, analyserNode, storedSamples, storedData, saveStoredData, deleteStoredData, refreshStoredData } = useJamsterContext();
     const [saveName, setSaveName] = useState("");
     const loadDialogRef = useRef<HTMLDialogElement>(null);
     const saveDialogRef = useRef<HTMLDialogElement>(null);
-
-    useEffect(() => {
-        if (initialized) return;
-
-        void getStoredData(setStoredData);
-
-        setInitialized(true);
-    }, [initialized])
+    const isExistingName = useMemo(() => storedData.some(data => data.name === saveName), [saveName, storedData])
 
     const handleLoad = async (storedData: StoredData): Promise<void> => {
-        const patterns = await loadPatterns(audioContext, analyserNode, storedData.patterns);
+        const patterns = await loadPatterns(audioContext, analyserNode, storedData.patterns, storedSamples);
         const timelines = storedData.timelineRows.map((timeline, index) => ({
             index: index,
             slots: timeline.slots
@@ -49,8 +31,8 @@ const Store = (props: StoreProps) => {
     const handleSave = async (): Promise<void> => {
         if (saveName.length === 0) return;
 
-        await storeData(props.patterns, props.timelineRows, saveName);
-        await getStoredData(setStoredData);
+        await saveStoredData(props.patterns, props.timelineRows, saveName);
+        await refreshStoredData();
 
         saveDialogRef.current?.close();
     }
@@ -63,54 +45,64 @@ const Store = (props: StoreProps) => {
         saveDialogRef.current?.close();
     }
 
+    const handleDeleteStoredData = async (dataName: string) => {
+        await deleteStoredData(dataName);
+        await refreshStoredData();
+    }
+
     return (
         <div className="store">
             <button className="btn" type="button" onClick={() => loadDialogRef.current?.showModal()}>Load</button>
-            <dialog className="app-dialog store-dialog load-dialog" ref={loadDialogRef} aria-labelledby="load-dialog-title">
-                <div className="app-dialog-header">
+            <dialog className="load-dialog" ref={loadDialogRef} >
+                <div className="dialog-header">
                     <div>
-                        <h2 id="load-dialog-title" className="app-dialog-eyebrow">Load</h2>
+                        <h2 className="dialog-eyebrow">Load</h2>
                     </div>
-                    <button className="btn app-dialog-close" type="button" onClick={handleLoadDialogClose} aria-label="Close load dialog">
+                    <button className="btn dialog-close" type="button" onClick={handleLoadDialogClose}>
                         X
                     </button>
                 </div>
-                <div className="store-dialog-list">
+                <div className="dialog-list">
                     {storedData.length > 0 ? storedData.map((data, index) => (
-                        <button
-                            key={index}
-                            className="store-dialog-field store-load-option"
-                            type="button"
-                            onClick={() => void handleLoad(data)}
-                        >
-                            {data.name}
-                        </button>
+                        <div key={index} className="dialog-row">
+                            <button className="btn delete" type="button" onClick={() => handleDeleteStoredData(data.name)}>-</button>
+                            <button
+                                className="dialog-field"
+                                type="button"
+                                onClick={() => void handleLoad(data)}
+                            >
+                                {data.name}
+                            </button>
+                        </div>
                     )) : (
-                        <p className="app-dialog-hint">No saved data yet.</p>
+                        <p className="dialog-hint">No saved data yet.</p>
                     )}
                 </div>
             </dialog>
             <button className="btn" type="button" onClick={() => saveDialogRef.current?.showModal()}>Save</button>
-            <dialog className="app-dialog store-dialog save-dialog" ref={saveDialogRef} aria-labelledby="save-dialog-title">
-                <div className="app-dialog-header">
+            <dialog className="save-dialog" ref={saveDialogRef}>
+                <div className="dialog-header">
                     <div>
-                        <h2 id="save-dialog-title" className="app-dialog-eyebrow">Save</h2>
+                        <h2 className="dialog-eyebrow">Save</h2>
                     </div>
-                    <button className="btn app-dialog-close" type="button" onClick={handleSaveDialogClose} aria-label="Close save dialog">
+                    <button className="btn dialog-close" type="button" onClick={handleSaveDialogClose}>
                         X
                     </button>
                 </div>
-                <div className="store-dialog-form">
+                <div className="dialog-form">
                     <label htmlFor="store-save-name">Name</label>
                     <input
                         id="store-save-name"
                         type="text"
-                        className="store-dialog-field"
+                        className="dialog-field"
                         value={saveName}
                         onChange={(e) => setSaveName(e.target.value)}
                     />
                     <button className="btn" type="button" onClick={() => void handleSave()} disabled={saveName.length === 0}>Save</button>
                 </div>
+                {isExistingName && (
+                    <p className="dialog-hint">Saving will overwrite existing data</p>
+                )}
             </dialog>
         </div>
     )

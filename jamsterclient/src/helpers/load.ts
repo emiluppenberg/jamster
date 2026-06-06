@@ -1,10 +1,9 @@
-import type { MeasureData, PatternData, RhythmData, StoredMeasureData, StoredPatternData } from "../types";
+import type { MeasureData, PatternData, RhythmData, StoredMeasureData, StoredPatternData, StoredSample } from "../types";
 import { getNotePosition64 } from "../utils";
-import { getSample } from "./db";
 
-export const decodeStoredSample = async (audioContext: AudioContext, sampleFileName: string) => {
-    const storedSample = await getSample(sampleFileName);
-    if (!storedSample) throw new Error(`Error loading sample: ${sampleFileName}`)
+export const decodeStoredSample = async (audioContext: AudioContext, sampleFileName: string, storedSamples: StoredSample[]) => {
+    const storedSample = storedSamples.find(stored => stored.sampleFilename === sampleFileName)
+    if (!storedSample) return undefined;
     return audioContext.decodeAudioData(storedSample.arrayBuffer.slice(0));
 }
 
@@ -29,6 +28,7 @@ export const loadMeasures = (
 export const loadRhythm = async (
     audioContext: AudioContext,
     analyserNode: AnalyserNode,
+    storedSamples: StoredSample[],
     index: number,
     name: string,
     sampleFileName: string,
@@ -39,18 +39,20 @@ export const loadRhythm = async (
     gainNode.gain.value = 0;
     gainNode.connect(analyserNode);
 
+    const sample = await decodeStoredSample(audioContext, sampleFileName, storedSamples)
+
     return {
         index: index,
         name: name,
         gainNode: gainNode,
         notesPerMeasure: notesPerMeasure,
         measures: loadMeasures(notesPerMeasure, measures),
-        sample: await decodeStoredSample(audioContext, sampleFileName),
-        sampleFileName: sampleFileName
+        sample: sample,
+        sampleFileName: sample ? sampleFileName : ""
     };
 }
 
-export const loadPatterns = async (audioContext: AudioContext, analyserNode: AnalyserNode, patternData: StoredPatternData[]): Promise<PatternData[]> => {
+export const loadPatterns = async (audioContext: AudioContext, analyserNode: AnalyserNode, patternData: StoredPatternData[], storedSamples: StoredSample[]): Promise<PatternData[]> => {
     return await Promise.all(patternData!.map(async (pattern) => ({
         index: pattern.index,
         numberOfMeasures: Math.max(1, ...pattern.rhythms.map(r => r.measures.length)),
@@ -58,6 +60,7 @@ export const loadPatterns = async (audioContext: AudioContext, analyserNode: Ana
             loadRhythm(
                 audioContext,
                 analyserNode,
+                storedSamples,
                 rhythm.index,
                 rhythm.name,
                 rhythm.sampleFileName,

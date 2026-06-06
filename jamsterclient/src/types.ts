@@ -63,6 +63,6 @@ export type StoredData = {
 }
 
 export type StoredSample = {
-    sampleFileName: string;
+    sampleFilename: string;
     arrayBuffer: ArrayBuffer;
 }

@@ -128,34 +128,26 @@ $rhythm-controls-width: 11.5rem;
                 border-bottom-right-radius: 0;
             }
         }
-    }
 
-    input[type="file"] {
-        display: none;
-    }
-
-    .sample-input {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 2rem;
-        width: calc($space-l - $width-m);
-        margin-right: 0.5rem;
-        padding: 0;
-        box-sizing: border-box;
-        border: 1px solid rgba($blue, 0.45);
-        border-radius: 4px;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        background: rgba($blue, 0.14);
-        color: $text;
-        cursor: pointer;
-        overflow: hidden;
-
-        &:hover {
-            border-color: rgba($blue, 0.72);
-            background: rgba($blue, 0.24);
-            color: $mint;
+        &.load-sample {
+            width: calc($space-l - $width-m);
+            margin-right: 0.5rem;
+            margin-left: calc($space-l - 0.75rem);
+            padding: 0 0.5rem;
+            box-sizing: border-box;
+            border: 1px solid rgba($blue, 0.45);
+            border-radius: 4px;
+            background: $surface-soft;
+            color: $green;
+            cursor: pointer;
+            overflow: hidden;
+            font-size: 0.6rem;
+    
+            &:hover {
+                border-color: rgba($blue, 0.72);
+                background: rgba($blue, 0.24);
+                color: $mint;
+            }
         }
     }
 
@@ -179,12 +171,19 @@ $rhythm-controls-width: 11.5rem;
         max-width: 28rem;
         box-sizing: border-box;
         margin: auto;
-        padding: 0;
+        padding: 1rem;
         border: 1px solid $border-strong;
         border-radius: 8px;
         background: $surface;
         color: $text;
+        gap: $space-m;
+        text-align: start;
         box-shadow: 0 24px 64px rgba(0, 0, 0, 0.46);
+
+        &.load-dialog,
+        &.save-dialog {
+            max-width: 24rem;
+        }
 
         &::backdrop {
             background: rgba($ink, 0.72);
@@ -195,16 +194,8 @@ $rhythm-controls-width: 11.5rem;
             display: flex;
             flex-direction: column;
         }
-    }
 
-    .app-dialog,
-    .mcp-dialog {
-        gap: $space-m;
-        padding: 1rem;
-        text-align: start;
-
-        .app-dialog-header,
-        .mcp-dialog-header {
+        .dialog-header {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
@@ -213,8 +204,7 @@ $rhythm-controls-width: 11.5rem;
             border-bottom: 1px solid $border;
         }
 
-        .app-dialog-eyebrow,
-        .mcp-dialog-eyebrow {
+        .dialog-eyebrow {
             display: block;
             margin-bottom: 0.2rem;
             color: $green;
@@ -230,8 +220,7 @@ $rhythm-controls-width: 11.5rem;
             letter-spacing: 0;
         }
 
-        .app-dialog-close,
-        .mcp-dialog-close {
+        .dialog-close {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -242,105 +231,14 @@ $rhythm-controls-width: 11.5rem;
             font-weight: 700;
         }
 
-        .mcp-dialog-status {
-            display: flex;
-            align-items: center;
-            gap: $space-s;
-            box-sizing: border-box;
-            min-height: 2rem;
-            padding: 0.45rem 0.6rem;
-            border: 1px solid $border;
-            border-radius: 6px;
-            background: rgba($surface-raised, 0.88);
-            color: $muted;
-            font-size: 0.9rem;
-
-            &.is-connected {
-                border-color: rgba($green, 0.42);
-                background: rgba($green, 0.1);
-                color: $text;
-
-                .mcp-dialog-status-dot {
-                    background: $green;
-                    box-shadow: 0 0 0 4px rgba($green, 0.14);
-                }
-            }
-
-            &.is-closed {
-                border-color: rgba($blue, 0.34);
-                background: rgba($blue, 0.1);
-
-                .mcp-dialog-status-dot {
-                    background: $blue;
-                    box-shadow: 0 0 0 4px rgba($blue, 0.12);
-                }
-            }
-
-            &.is-error {
-                border-color: rgba($danger, 0.48);
-                background: rgba($danger, 0.12);
-                color: $text;
-
-                .mcp-dialog-status-dot {
-                    background: $danger;
-                    box-shadow: 0 0 0 4px rgba($danger, 0.14);
-                }
-            }
-        }
-
-        .mcp-dialog-status-dot {
-            width: 0.55rem;
-            height: 0.55rem;
-            flex: 0 0 0.55rem;
-            border-radius: 50%;
-        }
-
-        .mcp-dialog-fields {
-            display: grid;
-            grid-template-columns: 7rem minmax(0, 1fr);
-            gap: $space-s;
-            align-items: center;
-
-            label {
-                width: auto;
-                padding-right: 0;
-                color: $muted;
-                text-align: start;
-            }
-
-            input {
-                width: 100%;
-                min-width: 0;
-                padding: 0 0.55rem;
-                font-size: 0.9rem;
-                color: $mint;
-                text-overflow: ellipsis;
-            }
-        }
-
-        .app-dialog-hint,
-        .mcp-dialog-hint {
+        .dialog-hint {
             margin: 0;
             color: $muted;
             font-size: 0.85rem;
             font-style: italic;
         }
 
-        @media (max-width: 36rem) {
-            .mcp-dialog-fields {
-                grid-template-columns: 1fr;
-
-                label {
-                    margin-top: $space-xs;
-                }
-            }
-        }
-    }
-
-    .store-dialog {
-        max-width: 24rem;
-
-        .store-dialog-list {
+        .dialog-list {
             display: flex;
             flex-direction: column;
             gap: $space-s;
@@ -348,7 +246,21 @@ $rhythm-controls-width: 11.5rem;
             overflow-y: auto;
         }
 
-        .store-dialog-form {
+        .dialog-row {
+            display: flex;
+            align-items: stretch;
+
+            .delete {
+                flex: 0 0 auto;
+            }
+
+            .delete+.dialog-field {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+        }
+
+        .dialog-form {
             display: grid;
             grid-template-columns: $width-l minmax(0, 1fr) auto;
             gap: $space-s;
@@ -362,7 +274,7 @@ $rhythm-controls-width: 11.5rem;
             }
         }
 
-        .store-dialog-field {
+        .dialog-field {
             width: 100%;
             min-width: 0;
             min-height: 2rem;
@@ -380,10 +292,11 @@ $rhythm-controls-width: 11.5rem;
             outline: none;
         }
 
-        button.store-dialog-field {
+        button.dialog-field {
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 0.35rem;
             cursor: pointer;
             transition:
                 background-color 140ms ease,
@@ -401,17 +314,105 @@ $rhythm-controls-width: 11.5rem;
             }
         }
 
-        .store-dialog-field:focus-visible {
+        .dialog-field:focus-visible {
             border-color: $green;
             box-shadow: 0 0 0 3px rgba($green, 0.18);
         }
 
+        &.mcp-dialog {
+            .mcp-dialog-status {
+                display: flex;
+                align-items: center;
+                gap: $space-s;
+                box-sizing: border-box;
+                min-height: 2rem;
+                padding: 0.45rem 0.6rem;
+                border: 1px solid $border;
+                border-radius: 6px;
+                background: rgba($surface-raised, 0.88);
+                color: $muted;
+                font-size: 0.9rem;
+
+                &.is-connected {
+                    border-color: rgba($green, 0.42);
+                    background: rgba($green, 0.1);
+                    color: $text;
+
+                    .mcp-dialog-status-dot {
+                        background: $green;
+                        box-shadow: 0 0 0 4px rgba($green, 0.14);
+                    }
+                }
+
+                &.is-closed {
+                    border-color: rgba($blue, 0.34);
+                    background: rgba($blue, 0.1);
+
+                    .mcp-dialog-status-dot {
+                        background: $blue;
+                        box-shadow: 0 0 0 4px rgba($blue, 0.12);
+                    }
+                }
+
+                &.is-error {
+                    border-color: rgba($danger, 0.48);
+                    background: rgba($danger, 0.12);
+                    color: $text;
+
+                    .mcp-dialog-status-dot {
+                        background: $danger;
+                        box-shadow: 0 0 0 4px rgba($danger, 0.14);
+                    }
+                }
+            }
+
+            .mcp-dialog-status-dot {
+                width: 0.55rem;
+                height: 0.55rem;
+                flex: 0 0 0.55rem;
+                border-radius: 50%;
+            }
+
+            .mcp-dialog-fields {
+                display: grid;
+                grid-template-columns: 7rem minmax(0, 1fr);
+                gap: $space-s;
+                align-items: center;
+
+                label {
+                    width: auto;
+                    padding-right: 0;
+                    color: $muted;
+                    text-align: start;
+                }
+
+                input {
+                    width: 100%;
+                    min-width: 0;
+                    padding: 0 0.55rem;
+                    font-size: 0.9rem;
+                    color: $mint;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+
         @media (max-width: 36rem) {
-            .store-dialog-form {
+            .dialog-form {
                 grid-template-columns: 1fr;
 
                 .btn {
                     width: 100%;
+                }
+            }
+
+            &.mcp-dialog {
+                .mcp-dialog-fields {
+                    grid-template-columns: 1fr;
+
+                    label {
+                        margin-top: $space-xs;
+                    }
                 }
             }
         }
@@ -503,6 +504,10 @@ $rhythm-controls-width: 11.5rem;
             font-weight: 700;
             width: $width-l;
         }
+    }
+
+    input[type="file"] {
+        display: none;
     }
 
     .mcp {

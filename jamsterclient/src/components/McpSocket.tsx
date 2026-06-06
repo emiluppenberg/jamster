@@ -95,17 +95,17 @@ const McpSocket = (props: McpSocketProps) => {
     return (
         <div className="mcp">
             <button className="btn" onClick={handleToggle}>MCP</button>
-            <dialog className="mcp-dialog" ref={dialogRef} aria-labelledby="mcp-dialog-title">
-                <div className="mcp-dialog-header">
+            <dialog className="mcp-dialog" ref={dialogRef}>
+                <div className="dialog-header">
                     <div>
-                        <h2 id="mcp-dialog-title" className="mcp-dialog-eyebrow">Connection</h2>
+                        <h2 className="dialog-eyebrow">Connection</h2>
                     </div>
-                    <button className="btn mcp-dialog-close" type="button" onClick={handleClose} aria-label="Close MCP dialog">
+                    <button className="btn dialog-close" type="button" onClick={handleClose}>
                         X
                     </button>
                 </div>
                 <div className={`mcp-dialog-status ${status.className}`}>
-                    <span className="mcp-dialog-status-dot" aria-hidden="true"></span>
+                    <span className="mcp-dialog-status-dot"></span>
                     <span>{status.text}</span>
                 </div>
                 <div className="mcp-dialog-fields">
@@ -124,7 +124,7 @@ const McpSocket = (props: McpSocketProps) => {
                         value={mcpUrl}
                     />
                 </div>
-                <p className="mcp-dialog-hint">Provide AppSessionId with your prompt.</p>
+                <p className="dialog-hint">Provide AppSessionId with your prompt.</p>
             </dialog>
         </div>
     )

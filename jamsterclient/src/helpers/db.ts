@@ -17,12 +17,12 @@ const seedExampleSamples = async (db: IDBDatabase): Promise<void> => {
         snare2Url,
     ];
 
-    const samples = await Promise.all(urls.map(async (sampleUrl) => {
+    const samples: StoredSample[] = await Promise.all(urls.map(async (sampleUrl) => {
         const response = await fetch(sampleUrl);
         const arrayBuffer = await response.arrayBuffer();
 
         return {
-            sampleFileName: sampleUrl,
+            sampleFilename: sampleUrl,
             arrayBuffer,
         };
     }));
@@ -59,7 +59,7 @@ export const openJamsterDB = async (): Promise<IDBDatabase> => (
             const db = request.result;
 
             if (!db.objectStoreNames.contains("samples")) {
-                db.createObjectStore("samples", { keyPath: "sampleFileName" });
+                db.createObjectStore("samples", { keyPath: "sampleFilename" });
                 shouldSeed = true;
             }
 
@@ -79,7 +79,7 @@ export const openJamsterDB = async (): Promise<IDBDatabase> => (
         request.onerror = () => reject(request.error);
     })
 )
-export const getSample = async (sampleFileName: string): Promise<StoredSample | undefined> => {
+export const getSample = async (sampleFileName: string): Promise<StoredSample> => {
     const db = await openJamsterDB();
 
     return new Promise((resolve, reject) => {
@@ -87,6 +87,20 @@ export const getSample = async (sampleFileName: string): Promise<StoredSample | 
         const store = transaction.objectStore("samples");
 
         const request = store.get(sampleFileName);
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    })
+}
+
+export const getAllSamples = async (): Promise<StoredSample[]> => {
+    const db = await openJamsterDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("samples", "readonly");
+        const store = transaction.objectStore("samples");
+
+        const request = store.getAll();
 
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
@@ -101,6 +115,20 @@ export const saveSample = async (sample: StoredSample): Promise<void> => {
         const store = transaction.objectStore("samples");
 
         store.put(sample);
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+    })
+}
+
+export const deleteSample = async (sampleFilename: string): Promise<void> => {
+    const db = await openJamsterDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("samples", "readwrite");
+        const store = transaction.objectStore("samples");
+
+        store.delete(sampleFilename);
 
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
@@ -129,6 +157,20 @@ export const saveData = async (data: StoredData): Promise<void> => {
         const store = transaction.objectStore("data");
 
         store.put(data);
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+    })
+}
+
+export const deleteData = async (dataName: string): Promise<void> => {
+    const db = await openJamsterDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("data", "readwrite");
+        const store = transaction.objectStore("data");
+
+        store.delete(dataName);
 
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
