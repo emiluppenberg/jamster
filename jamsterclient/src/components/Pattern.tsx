@@ -2,17 +2,13 @@ import Rhythm from "./Rhythm";
 import { useJamsterContext } from "../Context";
 import type { MeasureData, NoteData, PatternData, RhythmData } from "../types";
 import { useEffect, useState, type CSSProperties } from "react";
-import { getViewportWidthRem } from "../utils";
+import { getNotePosition64, getViewportWidthRem } from "../utils";
 
 const positionsPerMeasure = 64;
 const defaultMeasuresAtScreenWidth = 4;
 const defaultMeasuresScreenRatio = 0.75;
 const minimumZoomLevel = 0.25;
 const noteValueWidthRem = 0.6;
-
-const getNotePosition64 = (noteIndex: number, notesPerMeasure: number) => (
-    noteIndex * (positionsPerMeasure / notesPerMeasure)
-)
 
 const createNotes = (notesPerMeasure: number): NoteData[] => (
     Array.from({ length: notesPerMeasure }, (_, noteIndex) => ({

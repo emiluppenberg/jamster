@@ -67,6 +67,7 @@ export interface PlaybackProps {
     timelineRows: TimelineRowData[];
     children: (props: PlaybackRenderProps) => ReactNode;
     onStoreLoaded: (patterns: PatternData[], timelines: TimelineRowData[]) => void;
+    onPatternChange: (pattern: PatternData) => void;
 }
 
 const Playback = (props: PlaybackProps) => {
@@ -254,7 +255,7 @@ const Playback = (props: PlaybackProps) => {
                     }}
                 />
                 <Store patterns={props.patterns} timelineRows={props.timelineRows} onStoreLoaded={props.onStoreLoaded} />
-                <McpSocket patterns={props.patterns} />
+                <McpSocket patterns={props.patterns} onPatternChange={props.onPatternChange}/>
                 <Equalizer isPlaying={isPlaying} />
             </div>
             {props.children({

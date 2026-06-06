@@ -16,6 +16,7 @@ export const McpMeasureDataSchema = z.object({
 
 export const McpRhythmDataSchema = z.object({
     index: z.number().describe("Index of the rhythm"),
+    notesPerMeasure: z.number().describe("4, 8, 16, 32 or 64"),
     measures: z.array(McpMeasureDataSchema)
 })
 
@@ -28,7 +29,8 @@ export const setRhythmMeasureNotesInputSchema = {
     base: baseInputSchema,
     patternName: z.string().describe("Name of the pattern which owns the rhythm"),
     rhythmIndex: z.number().describe("Index of the rhythm"),
-    measures: McpMeasureDataSchema
+    notesPerMeasure: z.number().describe("4, 8, 16, 32 or 64"),
+    measures: z.array(McpMeasureDataSchema)
 }
 
 export const getPatternByNameInputSchema = {
@@ -40,3 +42,8 @@ export type McpNoteData = z.infer<typeof McpNoteDataSchema>;
 export type McpMeasureData = z.infer<typeof McpMeasureDataSchema>;
 export type McpRhythmData = z.infer<typeof McpRhythmDataSchema>;
 export type McpPatternData = z.infer<typeof McpPatternDataSchema>;
+
+export type SetRhythmDto = {
+    patternName: string;
+    rhythm: McpRhythmData;
+}

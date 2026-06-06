@@ -1,9 +1,6 @@
 import type { MeasureData, PatternData, RhythmData, StoredMeasureData, StoredPatternData } from "../types";
+import { getNotePosition64 } from "../utils";
 import { getSample } from "./db";
-
-export const getNotePosition64 = (noteIndex: number, notesPerMeasure: number) => (
-    noteIndex * (64 / notesPerMeasure)
-)
 
 export const decodeStoredSample = async (audioContext: AudioContext, sampleFileName: string) => {
     const storedSample = await getSample(sampleFileName);
