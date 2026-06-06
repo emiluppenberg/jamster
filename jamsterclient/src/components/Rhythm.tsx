@@ -17,6 +17,7 @@ export interface RhythmProps {
     onSampleChange: (rhythmIndex: number, sample: AudioBuffer, fileName: string) => void;
     onNotesPerMeasureChange: (rhythmIndex: number, notesPerMeasure: number) => void;
     onDelete: (rhytmIndex: number) => void;
+    onNameChange: (rhythmIndex: number, newName: string) => void;
 }
 
 const Rhythm = (props: RhythmProps) => {
@@ -34,7 +35,15 @@ const Rhythm = (props: RhythmProps) => {
 
     return (
         <div className="rhythm">
-            <button className="btn delete delete-rhythm" onClick={() => props.onDelete(props.rhythm.index)}>-</button>
+            <div className="anchor">
+                <button className="btn delete delete-rhythm" onClick={() => props.onDelete(props.rhythm.index)}>-</button>
+                <input
+                    type="text"
+                    className="rhythm-name"
+                    value={props.rhythm.name}
+                    onChange={(e) => props.onNameChange(props.rhythm.index, e.target.value)}
+                />
+            </div>
             <SampleInput
                 setSample={(sample, fileName) => props.onSampleChange(props.rhythm.index, sample, fileName)}
                 sampleFileName={props.rhythm.sampleFileName}

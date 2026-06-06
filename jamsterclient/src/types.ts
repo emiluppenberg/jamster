@@ -14,6 +14,7 @@ export type PatternData = {
 
 export type RhythmData = {
     index: number;
+    name: string;
     gainNode: GainNode;
     notesPerMeasure: number;
     measures: MeasureData[];
@@ -40,6 +41,7 @@ export type StoredPatternData = {
 
 export type StoredRhythmData = {
     index: number;
+    name: string;
     sampleFileName: string;
     notesPerMeasure: number;
     measures: StoredMeasureData[];

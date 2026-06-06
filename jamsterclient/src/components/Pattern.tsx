@@ -197,8 +197,9 @@ const Pattern = (props: PatternProps) => {
         gainNode.connect(analyserNode);
 
         return {
-            index,
-            gainNode,
+            index: index,
+            name: `Rhythm ${index}`,
+            gainNode: gainNode,
             notesPerMeasure: 4,
             measures: createMeasures(4),
             sampleFileName: ""
@@ -260,11 +261,24 @@ const Pattern = (props: PatternProps) => {
         })
     }
 
-    const handlePatternNameChange = (name: string) => {
+    const handlePatternNameChange = (newName: string) => {
         props.onPatternChange({
             ...props.pattern,
-            name,
+            name: newName,
         });
+    }
+
+    const handleRhythmNameChange = (rhythmIndex: number, newName: string) => {
+        props.onPatternChange({
+            ...props.pattern,
+            rhythms: props.pattern.rhythms.map((rhythm) => {
+                if (rhythm.index !== rhythmIndex) return rhythm;
+                return {
+                    ...rhythm,
+                    name: newName
+                }
+            })
+        })
     }
 
     return (
@@ -318,6 +332,7 @@ const Pattern = (props: PatternProps) => {
                     onSampleChange={handleSampleChange}
                     onNotesPerMeasureChange={handleNotesPerMeasureChange}
                     onDelete={handleDeleteRhythm}
+                    onNameChange={handleRhythmNameChange}
                 />
             ))}
             <div className="add-rhythm">

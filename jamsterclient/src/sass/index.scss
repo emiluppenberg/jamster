@@ -458,14 +458,23 @@ $rhythm-controls-width: 11.5rem;
             }
         }
 
-        &.pattern-name {
+        &.pattern-name,
+        &.rhythm-name {
             width: calc($space-l - $width-m);
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
-            background: rgba($surface-raised, 0.92);
-            color: $mint;
             font-weight: 700;
             text-align: center;
+            
+            &.pattern-name {
+                background: rgba($surface-raised, 0.92);
+                color: $mint;
+            }
+
+            &.rhythm-name {
+                background: $surface-soft;
+                color: $green;
+            }
         }
 
         &:hover {
@@ -491,7 +500,6 @@ $rhythm-controls-width: 11.5rem;
 
         &.bpm-input {
             border-color: rgba($green, 0.32);
-            color: $green;
             font-weight: 700;
             width: $width-l;
         }
@@ -518,7 +526,6 @@ $rhythm-controls-width: 11.5rem;
     .anchor {
         display: flex;
         position: absolute;
-        padding-left: $space-xs;
     }
 
     .options {
@@ -589,8 +596,9 @@ $rhythm-controls-width: 11.5rem;
         box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
 
         >.controls {
-            margin-top: 0;
             position: relative;
+            margin-top: 0;
+            padding-left: $space-xs;
 
             >.options {
                 padding-left: calc($space-l - 0.75rem);
@@ -650,6 +658,7 @@ $rhythm-controls-width: 11.5rem;
                 min-width: 0;
                 background: rgba($deep, 0.26);
                 align-items: center;
+                box-sizing: border-box;
 
                 &+.measure {
                     border-left: 2px solid $group-border;

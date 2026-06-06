@@ -30,6 +30,7 @@ export const loadRhythm = async (
     audioContext: AudioContext,
     analyserNode: AnalyserNode,
     index: number,
+    name: string,
     sampleFileName: string,
     notesPerMeasure: number,
     measures: StoredMeasureData[],
@@ -39,9 +40,10 @@ export const loadRhythm = async (
     gainNode.connect(analyserNode);
 
     return {
-        index,
-        gainNode,
-        notesPerMeasure,
+        index: index,
+        name: name,
+        gainNode: gainNode,
+        notesPerMeasure: notesPerMeasure,
         measures: loadMeasures(notesPerMeasure, measures),
         sample: await decodeStoredSample(audioContext, sampleFileName),
         sampleFileName: sampleFileName
@@ -57,6 +59,7 @@ export const loadPatterns = async (audioContext: AudioContext, analyserNode: Ana
                 audioContext,
                 analyserNode,
                 rhythm.index,
+                rhythm.name,
                 rhythm.sampleFileName,
                 rhythm.notesPerMeasure,
                 rhythm.measures,
