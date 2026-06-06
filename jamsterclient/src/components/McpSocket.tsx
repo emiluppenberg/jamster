@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useJamsterContext } from "../Context";
 import type { PatternData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
@@ -13,8 +13,13 @@ interface McpSocketProps {
 const McpSocket = (props: McpSocketProps) => {
     const { appSessionId } = useJamsterContext();
     const dialogRef = useRef<HTMLDialogElement>(null);
-    const { sendJsonMessage, getWebSocket } = useWebSocket(wssUrl, { queryParams: { appSessionId } });
-    const ws = getWebSocket()
+    const [isSocketOpen, setIsSocketOpen] = useState(false);
+    const [isSocketError, setIsSocketError] = useState(false);
+    const status = isSocketError
+        ? { className: "is-error", text: "Could not connect to MCP" }
+        : isSocketOpen
+            ? { className: "is-connected", text: "Connected via WebSocket" }
+            : { className: "is-closed", text: "MCP connection closed" };
 
     const handleSocketMessage = (event: MessageEvent) => {
         const dto = JSON.parse(event.data) as SetRhythmDto;
@@ -45,7 +50,10 @@ const McpSocket = (props: McpSocketProps) => {
     const { sendJsonMessage } = useWebSocket(wssUrl, {
         queryParams: { appSessionId },
         onMessage: handleSocketMessage,
-        onOpen: () => setIsSocketOpen(true),
+        onOpen: () => {
+            setIsSocketOpen(true);
+            setIsSocketError(false);
+        },
         onClose: () => setIsSocketOpen(false),
         onError: () => setIsSocketError(true)
     });
@@ -80,16 +88,44 @@ const McpSocket = (props: McpSocketProps) => {
         }
     }
 
+    const handleClose = () => {
+        dialogRef.current?.close();
+    }
+
     return (
         <div className="mcp pattern-mcp">
             <button className="btn" onClick={handleToggle}>MCP</button>
-            <dialog ref={dialogRef}>
-                <label>AppSessionId</label>
-                <input
-                    type="text"
-                    disabled={true}
-                    value={appSessionId}
-                />
+            <dialog className="mcp-dialog" ref={dialogRef} aria-labelledby="mcp-dialog-title">
+                <div className="mcp-dialog-header">
+                    <div>
+                        <span className="mcp-dialog-eyebrow">MCP</span>
+                        <h2 id="mcp-dialog-title">Connection</h2>
+                    </div>
+                    <button className="btn mcp-dialog-close" type="button" onClick={handleClose} aria-label="Close MCP dialog">
+                        X
+                    </button>
+                </div>
+                <div className={`mcp-dialog-status ${status.className}`}>
+                    <span className="mcp-dialog-status-dot" aria-hidden="true"></span>
+                    <span>{status.text}</span>
+                </div>
+                <div className="mcp-dialog-fields">
+                    <label htmlFor="mcp-app-session-id">AppSessionId</label>
+                    <input
+                        id="mcp-app-session-id"
+                        type="text"
+                        readOnly={true}
+                        value={appSessionId}
+                    />
+                    <label htmlFor="mcp-url">MCP Url</label>
+                    <input
+                        id="mcp-url"
+                        type="text"
+                        readOnly={true}
+                        value={mcpUrl}
+                    />
+                </div>
+                <p className="mcp-dialog-hint">Provide AppSessionId with your prompt.</p>
             </dialog>
         </div>
     )

@@ -175,9 +175,163 @@ $rhythm-controls-width: 11.5rem;
         letter-spacing: 0;
     }
 
-    dialog[open] {
-        display: flex;
-        flex-direction: column;
+    dialog {
+        width: calc(100vw - 2rem);
+        max-width: 28rem;
+        box-sizing: border-box;
+        margin: auto;
+        padding: 0;
+        border: 1px solid $border-strong;
+        border-radius: 8px;
+        background: $surface;
+        color: $text;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.46);
+
+        &::backdrop {
+            background: rgba($ink, 0.72);
+            backdrop-filter: blur(2px);
+        }
+
+        &[open] {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .mcp-dialog {
+        gap: $space-m;
+        padding: 1rem;
+        text-align: start;
+
+        .mcp-dialog-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: $space-m;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid $border;
+        }
+
+        .mcp-dialog-eyebrow {
+            display: block;
+            margin-bottom: 0.2rem;
+            color: $green;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        h2 {
+            margin: 0;
+            color: $text;
+            font-size: 1.15rem;
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        .mcp-dialog-close {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            min-width: 2rem;
+            min-height: 2rem;
+            padding: 0;
+            font-weight: 700;
+        }
+
+        .mcp-dialog-status {
+            display: flex;
+            align-items: center;
+            gap: $space-s;
+            box-sizing: border-box;
+            min-height: 2rem;
+            padding: 0.45rem 0.6rem;
+            border: 1px solid $border;
+            border-radius: 6px;
+            background: rgba($surface-raised, 0.88);
+            color: $muted;
+            font-size: 0.9rem;
+
+            &.is-connected {
+                border-color: rgba($green, 0.42);
+                background: rgba($green, 0.1);
+                color: $text;
+
+                .mcp-dialog-status-dot {
+                    background: $green;
+                    box-shadow: 0 0 0 4px rgba($green, 0.14);
+                }
+            }
+
+            &.is-closed {
+                border-color: rgba($blue, 0.34);
+                background: rgba($blue, 0.1);
+
+                .mcp-dialog-status-dot {
+                    background: $blue;
+                    box-shadow: 0 0 0 4px rgba($blue, 0.12);
+                }
+            }
+
+            &.is-error {
+                border-color: rgba($danger, 0.48);
+                background: rgba($danger, 0.12);
+                color: $text;
+
+                .mcp-dialog-status-dot {
+                    background: $danger;
+                    box-shadow: 0 0 0 4px rgba($danger, 0.14);
+                }
+            }
+        }
+
+        .mcp-dialog-status-dot {
+            width: 0.55rem;
+            height: 0.55rem;
+            flex: 0 0 0.55rem;
+            border-radius: 50%;
+        }
+
+        .mcp-dialog-fields {
+            display: grid;
+            grid-template-columns: 7rem minmax(0, 1fr);
+            gap: $space-s;
+            align-items: center;
+
+            label {
+                width: auto;
+                padding-right: 0;
+                color: $muted;
+                text-align: start;
+            }
+
+            input {
+                width: 100%;
+                min-width: 0;
+                padding: 0 0.55rem;
+                font-size: 0.9rem;
+                color: $mint;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .mcp-dialog-hint {
+            margin: 0;
+            color: $muted;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        @media (max-width: 36rem) {
+            .mcp-dialog-fields {
+                grid-template-columns: 1fr;
+
+                label {
+                    margin-top: $space-xs;
+                }
+            }
+        }
     }
 
     input,

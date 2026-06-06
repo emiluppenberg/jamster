@@ -98,6 +98,7 @@ export const exampleData: StoredData = {
 
 export const eq_fftSize = 1024;
 export const wssUrl = "ws://localhost:8000"
+export const mcpUrl = "http://localhost:8000/mcp"
 
 export const getViewportWidthRem = () => {
     if (typeof window === "undefined") return 75;
