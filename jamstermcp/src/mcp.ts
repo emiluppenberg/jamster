@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
-import { getPatternByNameInputSchema, McpPatternDataSchema, setRhythmMeasureNotesInputSchema } from "./schema.js";
-import type { McpPatternData, SetRhythmDto } from "./schema.js";
+import { getPatternByNameInputSchema, setRhythmMeasureNotesInputSchema } from "./schema.js";
+import { type McpSocketMessage, type McpPatternData, type SetRhythmDto, McpPatternDataSchema } from "@jamster/shared";
 import WebSocket from "ws"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 
@@ -44,7 +44,12 @@ export const InitializeMcpServer = async (
                 }
             }
 
-            connection.send(JSON.stringify(dto));
+            const message: McpSocketMessage = {
+                type: "setRhythmMeasureNotes",
+                payload: dto
+            }
+
+            connection.send(JSON.stringify(message));
 
             return {
                 content: [

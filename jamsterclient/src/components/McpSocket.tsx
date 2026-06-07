@@ -3,7 +3,8 @@ import { useJamsterContext } from "../Context";
 import type { PatternData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
-import type { McpPatternData, SetRhythmDto } from "../../../jamstermcp/src/schema"
+import { McpSocketMessageSchema } from "@jamster/shared"
+import type { McpPatternData, SetRhythmDto } from "@jamster/shared"
 
 interface McpSocketProps {
     patterns: PatternData[];
@@ -21,9 +22,7 @@ const McpSocket = (props: McpSocketProps) => {
             ? { className: "is-connected", text: "Connected via WebSocket" }
             : { className: "is-closed", text: "MCP connection closed" };
 
-    const handleSocketMessage = (event: MessageEvent) => {
-        const dto = JSON.parse(event.data) as SetRhythmDto;
-
+    const handleSetRhythmMeasureNotes = (dto: SetRhythmDto) => {
         const pattern = props.patterns.find((pattern) => pattern.name === dto.patternName);
         if (!pattern) return;
 
@@ -45,6 +44,17 @@ const McpSocket = (props: McpSocketProps) => {
                 };
             }),
         });
+    };
+
+    const handleSocketMessage = (event: MessageEvent) => {
+        const parsed = McpSocketMessageSchema.safeParse(JSON.parse(event.data));
+        if (!parsed.success) return;
+
+        switch (parsed.data.type) {
+            case "setRhythmMeasureNotes":
+                handleSetRhythmMeasureNotes(parsed.data.payload);
+                break;
+        }
     };
 
     const { sendJsonMessage } = useWebSocket(wssUrl, {

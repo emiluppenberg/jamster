@@ -1,6 +1,6 @@
 import { Server } from "node:http";
 import WebSocket, { WebSocketServer } from "ws";
-import type { McpPatternData } from "./schema.js";
+import type { McpPatternData } from "@jamster/shared"
 
 export const clientPort = 5173;
 
