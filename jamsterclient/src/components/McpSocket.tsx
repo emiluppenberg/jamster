@@ -2,17 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { useJamsterContext } from "../Context";
 import type { PatternData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
-import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
+import { createRhythm, getNotePosition64, mcpUrl, wssUrl } from "../utils";
 import { McpSocketMessageSchema } from "@jamster/shared"
-import type { McpPatternData, SetRhythmDto } from "@jamster/shared"
+import type { CreatePatternDto, McpPatternData, SetRhythmDto } from "@jamster/shared"
 
 interface McpSocketProps {
     patterns: PatternData[];
     onPatternChange: (pattern: PatternData) => void;
+    onPatternAdded: (pattern: PatternData) => void;
 }
 
 const McpSocket = (props: McpSocketProps) => {
-    const { appSessionId } = useJamsterContext();
+    const { audioContext, analyserNode, appSessionId } = useJamsterContext();
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [isSocketOpen, setIsSocketOpen] = useState(false);
     const [isSocketError, setIsSocketError] = useState(false);
@@ -22,14 +23,14 @@ const McpSocket = (props: McpSocketProps) => {
             ? { className: "is-connected", text: "Connected via WebSocket" }
             : { className: "is-closed", text: "MCP connection closed" };
 
-    const handleSetRhythmMeasureNotes = (dto: SetRhythmDto) => {
+    const handleSetRhythm = (dto: SetRhythmDto) => {
         const pattern = props.patterns.find((pattern) => pattern.name === dto.patternName);
         if (!pattern) return;
 
         props.onPatternChange({
             ...pattern,
             rhythms: pattern.rhythms.map((rhythm) => {
-                if (rhythm.index !== dto.rhythm.index) return rhythm;
+                if (rhythm.name !== dto.rhythm.name) return rhythm;
 
                 return {
                     ...rhythm,
@@ -46,13 +47,45 @@ const McpSocket = (props: McpSocketProps) => {
         });
     };
 
+    const handleCreatePattern = (dto: CreatePatternDto) => {
+        props.onPatternAdded({
+            index: props.patterns.length,
+            name: dto.patternName,
+            numberOfMeasures: dto.numberOfMeasures,
+            rhythms: dto.rhythms.map((rhythm, index) => {
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = 0;
+                gainNode.connect(analyserNode);
+
+                return {
+                    index: index,
+                    name: rhythm.name,
+                    notesPerMeasure: rhythm.notesPerMeasure,
+                    gainNode: gainNode,
+                    sample: undefined,
+                    sampleFilename: "",
+                    measures: rhythm.measures.map((measure) => ({
+                        ...measure,
+                        notes: measure.notes.map((note) => ({
+                            ...note,
+                            position64: getNotePosition64(note.index, rhythm.notesPerMeasure),
+                        })),
+                    }))
+                }
+            })
+        })
+    }
+
     const handleSocketMessage = (event: MessageEvent) => {
         const parsed = McpSocketMessageSchema.safeParse(JSON.parse(event.data));
         if (!parsed.success) return;
 
         switch (parsed.data.type) {
-            case "setRhythmMeasureNotes":
-                handleSetRhythmMeasureNotes(parsed.data.payload);
+            case "setRhythm":
+                handleSetRhythm(parsed.data.payload);
+                break;
+            case "createPattern":
+                handleCreatePattern(parsed.data.payload);
                 break;
         }
     };
@@ -72,7 +105,7 @@ const McpSocket = (props: McpSocketProps) => {
         const data: McpPatternData[] = props.patterns.map((pattern) => ({
             patternName: pattern.name,
             rhythms: pattern.rhythms.map((rhythm) => ({
-                index: rhythm.index,
+                name: rhythm.name,
                 notesPerMeasure: rhythm.notesPerMeasure,
                 measures: rhythm.measures.map((measure) => ({
                     index: measure.index,

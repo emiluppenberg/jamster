@@ -9,7 +9,7 @@ const storeMeasure = (measure: MeasureData): StoredMeasureData => ({
 const storeRhythm = (rhythm: RhythmData): StoredRhythmData => ({
     index: rhythm.index,
     name: rhythm.name,
-    sampleFileName: rhythm.sampleFileName,
+    sampleFileName: rhythm.sampleFilename,
     notesPerMeasure: rhythm.notesPerMeasure,
     measures: rhythm.measures.map((measure) => storeMeasure(measure))
 })

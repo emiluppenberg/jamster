@@ -11,7 +11,7 @@ export const McpMeasureDataSchema = z.object({
 })
 
 export const McpRhythmDataSchema = z.object({
-    index: z.number().describe("Index of the rhythm"),
+    name: z.string().describe("Name of the rhythm"),
     notesPerMeasure: z.number().describe("4, 8, 16, 32 or 64"),
     measures: z.array(McpMeasureDataSchema)
 })
@@ -26,10 +26,20 @@ export const SetRhythmDtoSchema = z.object({
     rhythm: McpRhythmDataSchema
 })
 
+export const CreatePatternDtoSchema = z.object({
+    patternName: z.string().describe("Name of the pattern"),
+    numberOfMeasures: z.number().describe("Number of measures for every rhythm"),
+    rhythms: z.array(McpRhythmDataSchema)
+})
+
 export const McpSocketMessageSchema = z.discriminatedUnion("type", [
     z.object({
-        type: z.literal("setRhythmMeasureNotes"),
+        type: z.literal("setRhythm"),
         payload: SetRhythmDtoSchema
+    }),
+    z.object({
+        type: z.literal("createPattern"),
+        payload: CreatePatternDtoSchema
     })
 ])
 
@@ -37,5 +47,8 @@ export type McpNoteData = z.infer<typeof McpNoteDataSchema>;
 export type McpMeasureData = z.infer<typeof McpMeasureDataSchema>;
 export type McpRhythmData = z.infer<typeof McpRhythmDataSchema>;
 export type McpPatternData = z.infer<typeof McpPatternDataSchema>;
+
 export type SetRhythmDto = z.infer<typeof SetRhythmDtoSchema>;
+export type CreatePatternDto = z.infer<typeof CreatePatternDtoSchema>;
+
 export type McpSocketMessage = z.infer<typeof McpSocketMessageSchema>;

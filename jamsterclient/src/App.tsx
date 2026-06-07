@@ -35,6 +35,12 @@ const AppContent = () => {
     },
   ])
 
+  const handlePatternAdded = (newPattern: PatternData) => {
+    setPatterns(currentPatterns => [
+      ...currentPatterns, newPattern
+    ])
+  }
+
   const handlePatternChange = (newPattern: PatternData) => {
     setPatterns((currentPatterns) => currentPatterns.map((pattern) => {
       if (pattern.index !== newPattern.index) return pattern;
@@ -54,7 +60,7 @@ const AppContent = () => {
 
   return (
     <div className='app'>
-      <Playback patterns={patterns} timelineRows={timelineRows} onStoreLoaded={handleStoreLoaded} onPatternChange={handlePatternChange}>
+      <Playback patterns={patterns} timelineRows={timelineRows} onStoreLoaded={handleStoreLoaded} onPatternChange={handlePatternChange} onPatternAdded={handlePatternAdded}>
         {({ isPlaying, playingPosition64, playingSlotIndex, getPlayingMeasureIndex, playPattern }) => (
           <>
             <TimelineRows

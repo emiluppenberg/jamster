@@ -46,7 +46,7 @@ const Rhythm = (props: RhythmProps) => {
             </div>
             <SampleInput
                 setSample={(sample, fileName) => props.onSampleChange(props.rhythm.index, sample, fileName)}
-                sampleFileName={props.rhythm.sampleFileName}
+                sampleFileName={props.rhythm.sampleFilename}
             />
             <select
                 className="notes-per-measure"

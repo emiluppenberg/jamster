@@ -1,9 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
-import { getPatternByNameInputSchema, setRhythmMeasureNotesInputSchema } from "./schema.js";
-import { type McpSocketMessage, type McpPatternData, type SetRhythmDto, McpPatternDataSchema } from "@jamster/shared";
+import { type McpSocketMessage, type McpPatternData, type SetRhythmDto, McpPatternDataSchema, CreatePatternDtoSchema, SetRhythmDtoSchema, CreatePatternDto } from "@jamster/shared";
 import WebSocket from "ws"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import z from "zod";
 
 export const InitializeMcpServer = async (
     connections: Map<string, WebSocket>,
@@ -15,22 +15,25 @@ export const InitializeMcpServer = async (
     })
 
     mcpServer.registerTool(
-        "setRhythmMeasureNotes",
+        "setRhythm",
         {
             description: "Set the notes for each measure of a specified rhythm within a specified pattern",
-            inputSchema: setRhythmMeasureNotesInputSchema,
+            inputSchema: {
+                appSessionId: z.string().describe("uuid identifying the users client-app-instance"),
+                dto: SetRhythmDtoSchema
+            },
         },
         async (inputs) => {
             const dto: SetRhythmDto = {
-                patternName: inputs.patternName,
+                patternName: inputs.dto.patternName,
                 rhythm: {
-                    index: inputs.rhythmIndex,
-                    notesPerMeasure: inputs.notesPerMeasure,
-                    measures: inputs.measures
+                    name: inputs.dto.rhythm.name,
+                    notesPerMeasure: inputs.dto.rhythm.notesPerMeasure,
+                    measures: inputs.dto.rhythm.measures
                 }
             }
 
-            const connection = connections.get(inputs.base.appSessionId);
+            const connection = connections.get(inputs.appSessionId);
 
             if (!connection) {
                 return {
@@ -38,14 +41,14 @@ export const InitializeMcpServer = async (
                     content: [
                         {
                             type: "text",
-                            text: `No connection found for AppSessionId: ${inputs.base.appSessionId}`
+                            text: `No connection found for AppSessionId: ${inputs.appSessionId}`
                         }
                     ]
                 }
             }
 
             const message: McpSocketMessage = {
-                type: "setRhythmMeasureNotes",
+                type: "setRhythm",
                 payload: dto
             }
 
@@ -55,7 +58,59 @@ export const InitializeMcpServer = async (
                 content: [
                     {
                         type: "text",
-                        text: `Rhythm set in AppSessionId: ${inputs.base.appSessionId}`
+                        text: `Rhythm set in AppSessionId: ${inputs.appSessionId}`
+                    }
+                ]
+            }
+        }
+    )
+
+    mcpServer.registerTool(
+        "createPattern",
+        {
+            description: "Create a new pattern",
+            inputSchema: {
+                appSessionId: z.string().describe("uuid identifying the users client-app-instance"),
+                dto: CreatePatternDtoSchema
+            }
+        },
+        async (inputs) => {
+            const dto: CreatePatternDto = {
+                patternName: inputs.dto.patternName,
+                numberOfMeasures: inputs.dto.numberOfMeasures,
+                rhythms: inputs.dto.rhythms.map(rhythm => ({
+                    name: rhythm.name,
+                    notesPerMeasure: rhythm.notesPerMeasure,
+                    measures: rhythm.measures
+                }))
+            }
+
+            const connection = connections.get(inputs.appSessionId);
+
+            if (!connection) {
+                return {
+                    isError: true,
+                    content: [
+                        {
+                            type: "text",
+                            text: `No connection found for AppSessionId: ${inputs.appSessionId}`
+                        }
+                    ]
+                }
+            }
+
+            const message: McpSocketMessage = {
+                type: "createPattern",
+                payload: dto
+            }
+
+            connection.send(JSON.stringify(message));
+
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `Created pattern ${inputs.dto.patternName} in AppSessionId: ${inputs.appSessionId}`
                     }
                 ]
             }
@@ -66,11 +121,14 @@ export const InitializeMcpServer = async (
         "getPatternByName",
         {
             description: "Get a specified pattern",
-            inputSchema: getPatternByNameInputSchema,
+            inputSchema: {
+                appSessionId: z.string().describe("uuid identifying the users client-app-instance"),
+                patternName: z.string().describe("Name of the pattern to get")
+            },
             outputSchema: McpPatternDataSchema
         },
         async (inputs) => {
-            const session = sessionData.get(inputs.base.appSessionId);
+            const session = sessionData.get(inputs.appSessionId);
 
             if (!session) {
                 return {
@@ -78,7 +136,7 @@ export const InitializeMcpServer = async (
                     content: [
                         {
                             type: "text",
-                            text: `No data found for AppSessionId: ${inputs.base.appSessionId}`
+                            text: `No data found for AppSessionId: ${inputs.appSessionId}`
                         }
                     ]
                 }

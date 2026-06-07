@@ -19,7 +19,7 @@ export type RhythmData = {
     notesPerMeasure: number;
     measures: MeasureData[];
     sample?: AudioBuffer;
-    sampleFileName: string;
+    sampleFilename: string;
 }
 
 export type MeasureData = {

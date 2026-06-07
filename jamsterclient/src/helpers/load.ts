@@ -48,7 +48,7 @@ export const loadRhythm = async (
         notesPerMeasure: notesPerMeasure,
         measures: loadMeasures(notesPerMeasure, measures),
         sample: sample,
-        sampleFileName: sample ? sampleFileName : ""
+        sampleFilename: sample ? sampleFileName : ""
     };
 }
 
