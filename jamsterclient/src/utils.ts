@@ -152,7 +152,7 @@ export const createNotes = (notesPerMeasure: number): NoteData[] => (
     Array.from({ length: notesPerMeasure }, (_, noteIndex) => ({
         index: noteIndex,
         position64: getNotePosition64(noteIndex, notesPerMeasure),
-        value: "",
+        value: "-",
     }))
 )
 

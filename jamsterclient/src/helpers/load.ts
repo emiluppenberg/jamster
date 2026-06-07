@@ -19,7 +19,7 @@ export const loadMeasures = (
             return {
                 index: noteIndex,
                 position64: getNotePosition64(noteIndex, notesPerMeasure),
-                value: value === "-" ? "" : value
+                value: value
             }
         })
     }))

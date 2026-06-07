@@ -21,16 +21,44 @@ export interface RhythmProps {
 }
 
 const Rhythm = (props: RhythmProps) => {
-    const noteInputRefs = useRef<Array<HTMLInputElement | null>>([]);
+    const noteInputRefs = useRef<Array<HTMLInputElement | undefined>>([]);
+
+    const focusAndSelectNote = (input: HTMLInputElement | undefined) => {
+        if (input === undefined) {
+            return;
+        }
+
+        input.focus();
+        requestAnimationFrame(() => {
+            input.focus();
+            input.select();
+        });
+    }
 
     const focusNextNote = (measureIndex: number, noteIndex: number) => {
         const currentInputIndex = measureIndex * props.rhythm.notesPerMeasure + noteIndex;
-        noteInputRefs.current[currentInputIndex + 1]?.focus();
+        const nextInput = noteInputRefs.current[currentInputIndex + 1];
+
+        if (nextInput === undefined){
+            const currentInput = noteInputRefs.current[currentInputIndex]
+            focusAndSelectNote(currentInput);
+            return;
+        }
+
+        focusAndSelectNote(nextInput);
     }
 
     const focusPreviousNote = (measureIndex: number, noteIndex: number) => {
         const currentInputIndex = measureIndex * props.rhythm.notesPerMeasure + noteIndex;
-        noteInputRefs.current[currentInputIndex - 1]?.focus();
+        const previousInput = noteInputRefs.current[currentInputIndex - 1];
+
+        if (previousInput === undefined){
+            const currentInput = noteInputRefs.current[currentInputIndex]
+            focusAndSelectNote(currentInput);
+            return;
+        }
+
+        focusAndSelectNote(previousInput);
     }
 
     return (
@@ -71,28 +99,33 @@ const Rhythm = (props: RhythmProps) => {
                             <input
                                 key={note.index}
                                 ref={(input) => {
-                                    noteInputRefs.current[measure.index * props.rhythm.notesPerMeasure + note.index] = input;
+                                    noteInputRefs.current[measure.index * props.rhythm.notesPerMeasure + note.index] = input === null ? undefined : input;
                                 }}
                                 className={`note${measure.index === props.playingMeasureIndex && note.position64 === props.playingPosition64 ? " is-playing" : ""}`}
                                 type="text"
                                 inputMode="numeric"
                                 maxLength={1}
-                                pattern="[0-9]"
-                                placeholder="-"
+                                pattern="[0-9\\-]"
                                 value={note.value}
-                                onChange={(e) => {
-                                    const numberValue = e.target.value.replace(/\D/g, "");
+                                onFocus={(e) => e.currentTarget.select()}
+                                onInput={(e) => {
+                                    let value = e.currentTarget.value.replace(/[^0-9-]/g, "");
+
+                                    const isEmpty = value.length === 0;
+                                    const isNumber = Number.isInteger(value)
+
+                                    value = isEmpty ? "-" : value;
 
                                     props.onNoteChange(
                                         props.rhythm.index,
                                         measure.index,
                                         note.index,
-                                        numberValue,
+                                        value,
                                     );
 
-                                    if (numberValue !== "") {
+                                    if (!isEmpty || isNumber) {
                                         focusNextNote(measure.index, note.index);
-                                    } else if (note.value !== "") {
+                                    } else if (isEmpty || !isNumber) {
                                         focusPreviousNote(measure.index, note.index);
                                     }
                                 }}

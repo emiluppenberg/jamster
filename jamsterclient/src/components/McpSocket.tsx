@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useJamsterContext } from "../Context";
 import type { PatternData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
-import { createRhythm, getNotePosition64, mcpUrl, wssUrl } from "../utils";
+import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
 import { McpSocketMessageSchema } from "@jamster/shared"
 import type { CreatePatternDto, McpPatternData, SetRhythmDto } from "@jamster/shared"
 
