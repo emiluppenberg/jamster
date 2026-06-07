@@ -4,7 +4,8 @@ import type { PatternData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
 import { McpSocketMessageSchema } from "@jamster/shared"
-import type { CreatePatternDto, McpPatternData, SetRhythmDto } from "@jamster/shared"
+import type { AppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto } from "@jamster/shared"
+import { decodeStoredSample } from "../helpers/load";
 
 interface McpSocketProps {
     patterns: PatternData[];
@@ -13,7 +14,7 @@ interface McpSocketProps {
 }
 
 const McpSocket = (props: McpSocketProps) => {
-    const { audioContext, analyserNode, appSessionId } = useJamsterContext();
+    const { audioContext, analyserNode, appSessionId, storedSamples } = useJamsterContext();
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [isSocketOpen, setIsSocketOpen] = useState(false);
     const [isSocketError, setIsSocketError] = useState(false);
@@ -50,33 +51,35 @@ const McpSocket = (props: McpSocketProps) => {
         });
     };
 
-    const handleCreatePattern = (dto: CreatePatternDto) => {
+    const handleCreatePattern = async (dto: CreatePatternDto) => {
         props.onPatternAdded({
             index: props.patterns.length,
             name: dto.patternName,
             numberOfMeasures: dto.numberOfMeasures,
-            rhythms: dto.rhythms.map((rhythm, index) => {
+            rhythms: await Promise.all(dto.rhythms.map(async (rhythm, index) => {
                 const gainNode = audioContext.createGain();
                 gainNode.gain.value = 0;
                 gainNode.connect(analyserNode);
+
+                const sample = await decodeStoredSample(audioContext, rhythm.sampleFilename, storedSamples);
 
                 return {
                     index: index,
                     name: rhythm.name,
                     notesPerMeasure: rhythm.notesPerMeasure,
                     gainNode: gainNode,
-                    sample: undefined,
-                    sampleFilename: "",
+                    sampleFilename: rhythm.sampleFilename,
+                    sample: sample,
                     measures: rhythm.measures.map((measure) => ({
                         ...measure,
                         notes: Array.from(measure.notes, (note, index) => ({
                             index: index,
-                            position64: getNotePosition64(index, dto.numberOfMeasures),
+                            position64: getNotePosition64(index, rhythm.notesPerMeasure),
                             value: note
                         })),
                     }))
                 }
-            })
+            }))
         })
     }
 
@@ -106,11 +109,12 @@ const McpSocket = (props: McpSocketProps) => {
     });
 
     useEffect(() => {
-        const data: McpPatternData[] = props.patterns.map((pattern) => ({
+        const patternData: McpPatternData[] = props.patterns.map((pattern) => ({
             patternName: pattern.name,
             rhythms: pattern.rhythms.map((rhythm) => ({
                 name: rhythm.name,
                 notesPerMeasure: rhythm.notesPerMeasure,
+                sampleFilename: rhythm.sampleFilename,
                 measures: rhythm.measures.map((measure) => ({
                     index: measure.index,
                     notes: measure.notes.map((note) => note.value).join("")
@@ -118,8 +122,17 @@ const McpSocket = (props: McpSocketProps) => {
             }))
         }));
 
-        sendJsonMessage(data);
-    }, [props.patterns])
+        const sampleFilenames = storedSamples.map(sample => sample.sampleFilename);
+
+        const appSessionData: AppSessionData = {
+            patternData: patternData,
+            sampleFilenames: sampleFilenames
+        }
+
+        console.log(appSessionData)
+
+        sendJsonMessage(appSessionData);
+    }, [props.patterns, storedSamples])
 
     const handleToggle = () => {
         const dialog = dialogRef.current;

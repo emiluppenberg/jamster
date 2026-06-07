@@ -1,17 +1,17 @@
 import { Server } from "node:http";
 import WebSocket, { WebSocketServer } from "ws";
-import type { McpPatternData } from "@jamster/shared"
+import type { AppSessionData, McpPatternData } from "@jamster/shared"
 
 export const clientPort = 5173;
 
 export const InitializeWebSocketServer = (server: Server) => {
     const wss = new WebSocketServer({ server });
     const connections = new Map<string, WebSocket>();
-    const sessionData = new Map<string, McpPatternData[]>();
+    const sessionData = new Map<string, AppSessionData>();
 
     const handleMessage = (appSessionId: string, message: WebSocket.RawData) => {
-        const patterns = JSON.parse(message.toString()) as McpPatternData[];
-        sessionData.set(appSessionId, patterns);
+        const appSessionData = JSON.parse(message.toString()) as AppSessionData;
+        sessionData.set(appSessionId, appSessionData);
     }
 
     const handleCloseConnection = (appSessionId: string) => {

@@ -1,13 +1,13 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
-import { type McpSocketMessage, type McpPatternData, type SetRhythmDto, McpPatternDataSchema, CreatePatternDtoSchema, SetRhythmDtoSchema, CreatePatternDto } from "@jamster/shared";
+import { type McpSocketMessage, type SetRhythmDto, McpPatternDataSchema, CreatePatternDtoSchema, SetRhythmDtoSchema, CreatePatternDto, AppSessionData } from "@jamster/shared";
 import WebSocket from "ws"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import z from "zod";
 
 export const InitializeMcpServer = async (
     connections: Map<string, WebSocket>,
-    sessionData: Map<string, McpPatternData[]>
+    sessionData: Map<string, AppSessionData>
 ) => {
     const mcpServer = new McpServer({
         name: "jamster",
@@ -29,6 +29,7 @@ export const InitializeMcpServer = async (
                 rhythm: {
                     name: inputs.dto.rhythm.name,
                     notesPerMeasure: inputs.dto.rhythm.notesPerMeasure,
+                    sampleFilename: inputs.dto.rhythm.sampleFilename,
                     measures: inputs.dto.rhythm.measures
                 }
             }
@@ -81,6 +82,7 @@ export const InitializeMcpServer = async (
                 rhythms: inputs.dto.rhythms.map(rhythm => ({
                     name: rhythm.name,
                     notesPerMeasure: rhythm.notesPerMeasure,
+                    sampleFilename: rhythm.sampleFilename,
                     measures: rhythm.measures
                 }))
             }
@@ -118,19 +120,21 @@ export const InitializeMcpServer = async (
     )
 
     mcpServer.registerTool(
-        "getPatternByName",
+        "getAppSessionData",
         {
-            description: "Get a specified pattern",
+            description: "Get current patterns and available sampleFilenames for a specified AppSessionId",
             inputSchema: {
-                appSessionId: z.string().describe("uuid identifying the users client-app-instance"),
-                patternName: z.string().describe("Name of the pattern to get")
+                appSessionId: z.string().describe("uuid identifying the users client-app-instance")
             },
-            outputSchema: McpPatternDataSchema
+            outputSchema: {
+                patternData: z.array(McpPatternDataSchema),
+                sampleFilenames: z.array(z.string())
+            }
         },
         async (inputs) => {
-            const session = sessionData.get(inputs.appSessionId);
+            const appSessionData = sessionData.get(inputs.appSessionId);
 
-            if (!session) {
+            if (!appSessionData) {
                 return {
                     isError: true,
                     content: [
@@ -142,26 +146,12 @@ export const InitializeMcpServer = async (
                 }
             }
 
-            const pattern = session.find(pattern => pattern.patternName === inputs.patternName);
-
-            if (!pattern) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: `No pattern found with name: ${inputs.patternName}`
-                        }
-                    ]
-                }
-            }
-
             return {
-                structuredContent: pattern,
+                structuredContent: appSessionData,
                 content: [
                     {
                         type: "text",
-                        text: JSON.stringify(pattern)
+                        text: JSON.stringify(appSessionData)
                     }
                 ]
             }

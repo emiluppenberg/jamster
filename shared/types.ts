@@ -8,6 +8,7 @@ export const McpMeasureDataSchema = z.object({
 export const McpRhythmDataSchema = z.object({
     name: z.string().describe("Name of the rhythm"),
     notesPerMeasure: z.number().describe("4, 8, 16, 32 or 64"),
+    sampleFilename: z.string().describe("Filename of sample used for this rhythm"),
     measures: z.array(McpMeasureDataSchema)
 })
 
@@ -46,3 +47,8 @@ export type SetRhythmDto = z.infer<typeof SetRhythmDtoSchema>;
 export type CreatePatternDto = z.infer<typeof CreatePatternDtoSchema>;
 
 export type McpSocketMessage = z.infer<typeof McpSocketMessageSchema>;
+
+export type AppSessionData = {
+    patternData: McpPatternData[],
+    sampleFilenames: string[]
+}

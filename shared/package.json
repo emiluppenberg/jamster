@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./schema.ts"
+    ".": "./types.ts"
   },
   "dependencies": {
     "zod": "^4.4.3"
