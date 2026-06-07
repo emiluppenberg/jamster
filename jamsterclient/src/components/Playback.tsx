@@ -127,6 +127,7 @@ const Playback = (props: PlaybackProps) => {
 
             const note = measure.notes.find((note) => note.position64 === position64);
             if (!note) return;
+            if (note.value === "-") return;
 
             const gain = getNoteGain(note.value);
             rhythm.gainNode.gain.setValueAtTime(gain, time);
