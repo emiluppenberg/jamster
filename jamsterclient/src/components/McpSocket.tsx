@@ -25,10 +25,12 @@ const McpSocket = (props: McpSocketProps) => {
 
     const handleSetRhythm = (dto: SetRhythmDto) => {
         const pattern = props.patterns.find((pattern) => pattern.name === dto.patternName);
+        const numberOfMeasures = dto.rhythm.measures.length;
         if (!pattern) return;
 
         props.onPatternChange({
             ...pattern,
+            numberOfMeasures: numberOfMeasures,
             rhythms: pattern.rhythms.map((rhythm) => {
                 if (rhythm.name !== dto.rhythm.name) return rhythm;
 
