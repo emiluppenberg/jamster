@@ -2,8 +2,9 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useJamsterContext } from "../Context";
 import type { PatternData, TimelineRowData } from "../types";
 import Equalizer from "./Equalizer";
-import Store from "./Store";
 import McpSocket from "./McpSocket";
+import LoadPresetDialog from "./menu/LoadPresetDialog";
+import SavePresetDialog from "./menu/SavePresetDialog";
 
 const defaultBpm = 120;
 const beatsPerMeasure = 4;
@@ -259,7 +260,10 @@ const Playback = (props: PlaybackProps) => {
                         }}
                     />
                 </div>
-                <Store patterns={props.patterns} timelineRows={props.timelineRows} onStoreLoaded={props.onStoreLoaded} />
+                <div className="store">
+                    <LoadPresetDialog onStoreLoaded={props.onStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
+                    <SavePresetDialog onStoreLoaded={props.onStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
+                </div>
                 <McpSocket patterns={props.patterns} onPatternChange={props.onPatternChange} onPatternAdded={props.onPatternAdded}/>
                 <Equalizer isPlaying={isPlaying} />
             </div>
