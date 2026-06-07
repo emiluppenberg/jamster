@@ -1,47 +1,44 @@
-import { useRef, type ChangeEvent } from "react";
-import { useJamsterContext } from "../Context";
-import type { StoredSample } from "../types";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useJamsterContext } from "../../Context";
 
-export interface SampleInputProps {
-    setSample: (sample: AudioBuffer, fileName: string) => void;
-    sampleFileName: string;
+interface UploadSamplesDialogProps {
+    onPlaySample: (sample: AudioBuffer, time: number, destination: AudioNode) => void;
 }
 
-const SampleInput = (props: SampleInputProps) => {
-    const { audioContext, storedSamples, saveStoredSample, deleteStoredSample, refreshStoredSamples } = useJamsterContext();
-    const sampleDialogRef = useRef<HTMLDialogElement>(null);
+const UploadSamplesDialog = (props: UploadSamplesDialogProps) => {
+    const { audioContext, analyserNode, samples, saveStoredSample, deleteStoredSample, refreshStoredSamples, refreshSamples } = useJamsterContext();
+    const dialogRef = useRef<HTMLDialogElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [gainNode] = useState(audioContext.createGain())
+    const [initialized, setInitialized] = useState(false);
 
-    const handleStoredSampleLoad = async (storedSample: StoredSample): Promise<void> => {
-        const audioBuffer = await audioContext.decodeAudioData(storedSample.arrayBuffer.slice(0));
+    useEffect(() => {
+        if (initialized) return;
 
-        props.setSample(audioBuffer, storedSample.sampleFilename);
-        sampleDialogRef.current?.close();
-    }
+        gainNode.connect(analyserNode);
+        setInitialized(true);
+    })
 
-    const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        let audioBuffer: AudioBuffer;
-        const storedSample = storedSamples.find((stored) => stored.sampleFilename === file.name)
+        const isStored = samples.some((stored) => stored.sampleFilename === file.name)
 
-        if (storedSample) {
-            audioBuffer = await audioContext.decodeAudioData(storedSample.arrayBuffer.slice(0));
+        if (isStored) {
+            return;
         } else {
             const arrayBuffer = await file.arrayBuffer();
             await saveStoredSample({ sampleFilename: file.name, arrayBuffer: arrayBuffer, })
             await refreshStoredSamples();
-            audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+            await refreshSamples();
         }
 
-        props.setSample(audioBuffer, file.name);
-        sampleDialogRef.current?.close();
         e.target.value = "";
     }
 
     const handleDialogClose = () => {
-        sampleDialogRef.current?.close();
+        dialogRef.current?.close();
     }
 
     const handleFileSampleClick = () => {
@@ -51,17 +48,16 @@ const SampleInput = (props: SampleInputProps) => {
     const handleDeleteStoredSample = async (sampleFilename: string) => {
         await deleteStoredSample(sampleFilename);
         await refreshStoredSamples();
+        await refreshSamples();
     }
 
     return (
         <>
-            <button className="btn load-sample" type="button" onClick={() => sampleDialogRef.current?.showModal()}>
-                {props.sampleFileName.length > 0 ? props.sampleFileName : "No sample"}
-            </button>
-            <dialog className="load-dialog" ref={sampleDialogRef} >
+            <button className="btn" type="button" onClick={() => dialogRef.current?.showModal()}>Upload samples</button>
+            <dialog className="load-dialog" ref={dialogRef} >
                 <div className="dialog-header">
                     <div>
-                        <h2 className="dialog-eyebrow">Load sample</h2>
+                        <h2 className="dialog-eyebrow">Upload samples</h2>
                     </div>
                     <button className="btn dialog-close" type="button" onClick={handleDialogClose}>
                         X
@@ -75,15 +71,15 @@ const SampleInput = (props: SampleInputProps) => {
                         ref={fileInputRef}
                         type="file"
                         accept="audio/*"
-                        onChange={(e) => void handleChange(e)}
+                        onChange={(e) => void handleUpload(e)}
                     />
-                    {storedSamples.length > 0 ? storedSamples.map((sample) => (
+                    {samples.length > 0 ? samples.map((sample) => (
                         <div key={sample.sampleFilename} className="dialog-row">
                             <button className="btn delete" type="button" onClick={() => handleDeleteStoredSample(sample.sampleFilename)}>-</button>
                             <button
                                 className="dialog-field"
                                 type="button"
-                                onClick={() => void handleStoredSampleLoad(sample)}
+                                onClick={() => props.onPlaySample(sample.audioBuffer, audioContext.currentTime, gainNode)}
                             >
                                 {sample.sampleFilename}
                             </button>
@@ -97,4 +93,4 @@ const SampleInput = (props: SampleInputProps) => {
     )
 }
 
-export default SampleInput;
+export default UploadSamplesDialog;

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import SampleInput from "./SampleInput";
+import RhythmSampleDialog from "./RhytmSampleDialog";
 import type { RhythmData } from "../types";
 
 const notesPerMeasureOptions = [4, 8, 16, 32, 64];
@@ -72,9 +72,10 @@ const Rhythm = (props: RhythmProps) => {
                     onChange={(e) => props.onNameChange(props.rhythm.index, e.target.value)}
                 />
             </div>
-            <SampleInput
+            <RhythmSampleDialog
                 setSample={(sample, fileName) => props.onSampleChange(props.rhythm.index, sample, fileName)}
                 sampleFileName={props.rhythm.sampleFilename}
+                rhythm={props.rhythm}
             />
             <select
                 className="notes-per-measure"

@@ -71,6 +71,10 @@ $rhythm-controls-width: 11.5rem;
         }
     }
 
+    button {
+        user-select: none;
+    }
+
     button,
     input,
     select {
@@ -142,7 +146,7 @@ $rhythm-controls-width: 11.5rem;
             cursor: pointer;
             overflow: hidden;
             font-size: 0.6rem;
-    
+
             &:hover {
                 border-color: rgba($blue, 0.72);
                 background: rgba($blue, 0.24);
@@ -466,7 +470,7 @@ $rhythm-controls-width: 11.5rem;
             border-bottom-left-radius: 0;
             font-weight: 700;
             text-align: center;
-            
+
             &.pattern-name {
                 background: rgba($surface-raised, 0.92);
                 color: $mint;

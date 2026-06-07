@@ -36,7 +36,7 @@ const LoadPresetDialog = (props: LoadPresetDialogProps) => {
 
     return (
         <>
-            <button className="btn" type="button" onClick={() => loadDialogRef.current?.showModal()}>Load</button>
+            <button className="btn" type="button" onClick={() => loadDialogRef.current?.showModal()}>Load preset</button>
             <dialog className="load-dialog" ref={loadDialogRef} >
                 <div className="dialog-header">
                     <div>

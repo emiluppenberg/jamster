@@ -30,7 +30,7 @@ const SavePresetDialog = (props: SavePresetDialogProps) => {
 
     return (
         <>
-            <button className="btn" type="button" onClick={() => saveDialogRef.current?.showModal()}>Save</button>
+            <button className="btn" type="button" onClick={() => saveDialogRef.current?.showModal()}>Save preset</button>
             <dialog className="save-dialog" ref={saveDialogRef}>
                 <div className="dialog-header">
                     <div>

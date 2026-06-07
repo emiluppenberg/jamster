@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState, type PropsWithChildren } from "react"
+import { useCallback, useState, type PropsWithChildren } from "react"
 import { eq_fftSize } from "./utils";
 import { deleteData, deleteSample, getAllSamples, getData, saveSample } from "./helpers/db";
-import type { PatternData, StoredData, StoredSample, TimelineRowData } from "./types";
+import type { PatternData, SampleData, StoredData, StoredSample, TimelineRowData } from "./types";
 import { storeData } from "./helpers/save";
 import { JamsterContext } from "./Context";
 
@@ -10,6 +10,10 @@ const audioContext = new AudioContext();
 const analyserNode = audioContext.createAnalyser();
 const initialStoredData = await getData();
 const initialStoredSamples = await getAllSamples();;
+const initialSamples = await Promise.all(initialStoredSamples.map(async (sample) => ({
+    audioBuffer: await audioContext.decodeAudioData(sample.arrayBuffer.slice(0)),
+    sampleFilename: sample.sampleFilename
+})));
 
 analyserNode.fftSize = eq_fftSize;
 analyserNode.connect(audioContext.destination);
@@ -17,13 +21,24 @@ analyserNode.connect(audioContext.destination);
 export const JamsterProvider = ({ children }: PropsWithChildren) => {
     const [storedData, setStoredData] = useState<StoredData[]>(initialStoredData);
     const [storedSamples, setStoredSamples] = useState<StoredSample[]>(initialStoredSamples);
+    const [samples, setSamples] = useState<SampleData[]>(initialSamples);
 
     const refreshStoredData = useCallback(async () => {
         setStoredData(await getData());
     }, []);
 
     const refreshStoredSamples = useCallback(async () => {
-        setStoredSamples(await getAllSamples())
+        setStoredSamples(await getAllSamples());
+    }, [])
+
+    const refreshSamples = useCallback(async () => {
+        const latestStoredSamples = await getAllSamples();
+        const sampleData: SampleData[] = await Promise.all(latestStoredSamples.map(async (sample) => ({
+            audioBuffer: await audioContext.decodeAudioData(sample.arrayBuffer.slice(0)),
+            sampleFilename: sample.sampleFilename
+        })));
+
+        setSamples(sampleData)
     }, [])
 
     const saveStoredData = useCallback(async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string) => {
@@ -62,8 +77,10 @@ export const JamsterProvider = ({ children }: PropsWithChildren) => {
             analyserNode,
             storedData,
             storedSamples,
+            samples,
             refreshStoredData,
             refreshStoredSamples,
+            refreshSamples,
             saveStoredData,
             saveStoredSample,
             deleteStoredData,

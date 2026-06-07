@@ -66,3 +66,8 @@ export type StoredSample = {
     sampleFilename: string;
     arrayBuffer: ArrayBuffer;
 }
+
+export type SampleData = {
+    audioBuffer: AudioBuffer;
+    sampleFilename: string;
+}
