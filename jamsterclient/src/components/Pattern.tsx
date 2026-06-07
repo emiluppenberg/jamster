@@ -1,71 +1,13 @@
 import Rhythm from "./Rhythm";
 import { useJamsterContext } from "../Context";
-import type { MeasureData, NoteData, PatternData, RhythmData } from "../types";
+import type { PatternData, RhythmData } from "../types";
 import { useEffect, useState, type CSSProperties } from "react";
-import { getNotePosition64, getViewportWidthRem } from "../utils";
+import { createMeasure, createRhythm, getViewportWidthRem, resizeMeasureNotes } from "../utils";
 
-const positionsPerMeasure = 64;
 const defaultMeasuresAtScreenWidth = 4;
 const defaultMeasuresScreenRatio = 0.75;
 const minimumZoomLevel = 0.25;
 const noteValueWidthRem = 0.6;
-
-const createNotes = (notesPerMeasure: number): NoteData[] => (
-    Array.from({ length: notesPerMeasure }, (_, noteIndex) => ({
-        index: noteIndex,
-        position64: getNotePosition64(noteIndex, notesPerMeasure),
-        value: "",
-    }))
-)
-
-const createMeasure = (index: number, notesPerMeasure: number): MeasureData => ({
-    index,
-    notes: createNotes(notesPerMeasure),
-})
-
-const findClosestAvailableNoteIndex = (notes: NoteData[], noteIndex: number): number | undefined => {
-    if (notes[noteIndex]?.value === "") return noteIndex;
-
-    for (let offset = 1; offset < notes.length; offset++) {
-        const nextIndex = noteIndex + offset;
-        const previousIndex = noteIndex - offset;
-
-        if (notes[nextIndex]?.value === "") return nextIndex;
-        if (notes[previousIndex]?.value === "") return previousIndex
-    }
-}
-
-const resizeMeasureNotes = (
-    measure: MeasureData,
-    previousNotesPerMeasure: number,
-    nextNotesPerMeasure: number,
-): MeasureData => {
-    const notes = createNotes(nextNotesPerMeasure);
-
-    measure.notes.forEach((note) => {
-        if (note.value === "") return;
-
-        const position64 = note.position64 ?? getNotePosition64(note.index, previousNotesPerMeasure);
-        const rhythmicPosition = position64 / positionsPerMeasure;
-        const noteIndex = Math.min(
-            nextNotesPerMeasure - 1,
-            Math.round(rhythmicPosition * nextNotesPerMeasure),
-        );
-        const availableIndex = findClosestAvailableNoteIndex(notes, noteIndex);
-
-        if (availableIndex === undefined) return;
-
-        notes[availableIndex] = {
-            ...notes[availableIndex],
-            value: note.value,
-        };
-    });
-
-    return {
-        ...measure,
-        notes,
-    };
-}
 
 const updateRhythmNoteValue = (
     rhythm: RhythmData,
@@ -101,7 +43,7 @@ const updateRhythmSample = (
     return {
         ...rhythm,
         sample,
-        sampleFileName: fileName
+        sampleFilename: fileName
     };
 }
 
@@ -185,27 +127,6 @@ const Pattern = (props: PatternProps) => {
         setZoomLevel(Math.max(minimumZoomLevel, value));
     }
 
-    const createMeasures = (notesPerMeasure: number): MeasureData[] => (
-        Array.from({ length: props.pattern.numberOfMeasures }, (_, measureIndex) => (
-            createMeasure(measureIndex, notesPerMeasure)
-        ))
-    )
-
-    const createRhythm = (index: number): RhythmData => {
-        const gainNode = audioContext.createGain();
-        gainNode.gain.value = 0;
-        gainNode.connect(analyserNode);
-
-        return {
-            index: index,
-            name: `Rhythm ${index}`,
-            gainNode: gainNode,
-            notesPerMeasure: 4,
-            measures: createMeasures(4),
-            sampleFileName: ""
-        };
-    }
-
     const updatePatternRhythms = (rhythms: RhythmData[]) => {
         props.onPatternChange({
             ...props.pattern,
@@ -215,7 +136,7 @@ const Pattern = (props: PatternProps) => {
 
     const addRhythm = () => updatePatternRhythms([
         ...props.pattern.rhythms,
-        createRhythm(props.pattern.rhythms.length),
+        createRhythm(props.pattern.rhythms.length, props.pattern.numberOfMeasures, audioContext, analyserNode),
     ])
 
     const handleNoteChange = (
