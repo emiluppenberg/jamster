@@ -37,9 +37,10 @@ const McpSocket = (props: McpSocketProps) => {
                     notesPerMeasure: dto.rhythm.notesPerMeasure,
                     measures: dto.rhythm.measures.map((measure) => ({
                         ...measure,
-                        notes: measure.notes.map((note) => ({
-                            ...note,
-                            position64: getNotePosition64(note.index, dto.rhythm.notesPerMeasure),
+                        notes: Array.from(measure.notes, (note, index) => ({
+                            index: index,
+                            position64: getNotePosition64(index, dto.rhythm.notesPerMeasure),
+                            value: note,
                         })),
                     })),
                 };
@@ -66,9 +67,10 @@ const McpSocket = (props: McpSocketProps) => {
                     sampleFilename: "",
                     measures: rhythm.measures.map((measure) => ({
                         ...measure,
-                        notes: measure.notes.map((note) => ({
-                            ...note,
-                            position64: getNotePosition64(note.index, rhythm.notesPerMeasure),
+                        notes: Array.from(measure.notes, (note, index) => ({
+                            index: index,
+                            position64: getNotePosition64(index, dto.numberOfMeasures),
+                            value: note
                         })),
                     }))
                 }
@@ -109,10 +111,7 @@ const McpSocket = (props: McpSocketProps) => {
                 notesPerMeasure: rhythm.notesPerMeasure,
                 measures: rhythm.measures.map((measure) => ({
                     index: measure.index,
-                    notes: measure.notes.map((note) => ({
-                        index: note.index,
-                        value: note.value
-                    }))
+                    notes: measure.notes.map((note) => note.value).join("")
                 }))
             }))
         }));
