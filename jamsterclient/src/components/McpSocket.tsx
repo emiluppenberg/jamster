@@ -4,7 +4,7 @@ import type { PatternData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
 import { McpSocketMessageSchema } from "@jamster/shared"
-import type { AppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto } from "@jamster/shared"
+import type { McpAppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto, McpSampleData } from "@jamster/shared"
 import { decodeStoredSample } from "../helpers/load";
 
 interface McpSocketProps {
@@ -122,14 +122,15 @@ const McpSocket = (props: McpSocketProps) => {
             }))
         }));
 
-        const sampleFilenames = storedSamples.map(sample => sample.sampleFilename);
+        const sampleData: McpSampleData[] = storedSamples.map(sample => ({
+            description: sample.mcpDescription,
+            filename: sample.sampleFilename
+        }));
 
-        const appSessionData: AppSessionData = {
+        const appSessionData: McpAppSessionData = {
             patternData: patternData,
-            sampleFilenames: sampleFilenames
+            sampleData: sampleData
         }
-
-        console.log(appSessionData)
 
         sendJsonMessage(appSessionData);
     }, [props.patterns, storedSamples])

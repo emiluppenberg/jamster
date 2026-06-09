@@ -39,6 +39,11 @@ export const McpSocketMessageSchema = z.discriminatedUnion("type", [
     })
 ])
 
+export const McpSampleDataSchema = z.object({
+    filename: z.string().describe("Filename of the sample"),
+    description: z.string().describe("Description of the sample")
+})
+
 export type McpMeasureData = z.infer<typeof McpMeasureDataSchema>;
 export type McpRhythmData = z.infer<typeof McpRhythmDataSchema>;
 export type McpPatternData = z.infer<typeof McpPatternDataSchema>;
@@ -48,7 +53,9 @@ export type CreatePatternDto = z.infer<typeof CreatePatternDtoSchema>;
 
 export type McpSocketMessage = z.infer<typeof McpSocketMessageSchema>;
 
-export type AppSessionData = {
+export type McpSampleData = z.infer<typeof McpSampleDataSchema>;
+
+export type McpAppSessionData = {
     patternData: McpPatternData[],
-    sampleFilenames: string[]
+    sampleData: McpSampleData[]
 }

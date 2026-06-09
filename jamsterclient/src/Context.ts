@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react"
-import type { PatternData, SampleData, StoredData, StoredSample, TimelineRowData } from "./types";
+import type { PatternData, StoredData, StoredSample, TimelineRowData } from "./types";
 
 export type JamsterState = {
     appSessionId: string;
@@ -7,10 +7,8 @@ export type JamsterState = {
     analyserNode: AnalyserNode;
     storedData: StoredData[];
     storedSamples: StoredSample[];
-    samples: SampleData[];
     refreshStoredData: () => Promise<void>;
     refreshStoredSamples: () => Promise<void>;
-    refreshSamples: () => Promise<void>;
     saveStoredData: (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string) => Promise<void>;
     saveStoredSample: (sample: StoredSample) => Promise<void>;
     deleteStoredData: (dataName: string) => Promise<void>;

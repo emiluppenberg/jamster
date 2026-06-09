@@ -8,21 +8,22 @@ import type { StoredData, StoredSample } from "../types";
 import { exampleData } from '../utils';
 
 const seedExampleSamples = async (db: IDBDatabase): Promise<void> => {
-    const urls = [
-        hihat1Url,
-        kick1Url,
-        snare1Url,
-        hihat2Url,
-        kick2Url,
-        snare2Url,
+    const stockSamples = [
+        { url: hihat1Url, description: "Basic hihat" },
+        {url: kick1Url, description: "Basic kick"},
+        {url: snare1Url, description: "Basic snare"},
+        {url: hihat2Url, description: "Basic hihat"},
+        {url: kick2Url, description: "Basic kick"},
+        {url: snare2Url, description: "Basic snare"},
     ];
 
-    const samples: StoredSample[] = await Promise.all(urls.map(async (sampleUrl) => {
-        const response = await fetch(sampleUrl);
+    const samples: StoredSample[] = await Promise.all(stockSamples.map(async (sample) => {
+        const response = await fetch(sample.url);
         const arrayBuffer = await response.arrayBuffer();
 
         return {
-            sampleFilename: sampleUrl,
+            sampleFilename: sample.url,
+            mcpDescription: sample.description,
             arrayBuffer,
         };
     }));
@@ -113,7 +114,6 @@ export const saveSample = async (sample: StoredSample): Promise<void> => {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction("samples", "readwrite");
         const store = transaction.objectStore("samples");
-
         store.put(sample);
 
         transaction.oncomplete = () => resolve();

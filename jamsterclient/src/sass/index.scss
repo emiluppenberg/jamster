@@ -254,13 +254,14 @@ $rhythm-controls-width: 11.5rem;
             display: flex;
             align-items: stretch;
 
-            .delete {
-                flex: 0 0 auto;
-            }
 
             .delete+.dialog-field {
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
+            }
+
+            .mcp-description {
+                margin-left: $space-s;
             }
         }
 
@@ -294,6 +295,10 @@ $rhythm-controls-width: 11.5rem;
             white-space: nowrap;
             overflow: hidden;
             outline: none;
+
+            &.selected-sample {
+                background: $surface-soft;
+            }
         }
 
         button.dialog-field {
@@ -561,6 +566,7 @@ $rhythm-controls-width: 11.5rem;
         display: flex;
         flex-direction: column;
         box-sizing: border-box;
+        width: 100%;
 
         &.timelines {
             gap: 0.35rem;
@@ -593,8 +599,8 @@ $rhythm-controls-width: 11.5rem;
         display: inline-flex;
         flex-direction: column;
         align-items: flex-start;
-        width: max-content;
-        max-width: calc(100vw - 2.5rem);
+        width: 100%;
+        // max-width: calc(100vw - 2.5rem);
         height: max-content;
         box-sizing: border-box;
         padding: 0.75rem;
@@ -620,7 +626,9 @@ $rhythm-controls-width: 11.5rem;
     }
 
     .add-rhythm {
-        width: calc((var(--measure-width) * var(--number-of-measures)) + $rhythm-controls-width);
+        position: relative;
+        box-sizing: border-box;
+        width: max(100%, calc((var(--measure-width) * var(--number-of-measures)) + $rhythm-controls-width));
         padding: 0 $space-xs 0 $space-xs;
         margin-top: $space-s;
 

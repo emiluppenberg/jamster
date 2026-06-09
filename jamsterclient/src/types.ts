@@ -64,10 +64,7 @@ export type StoredData = {
 
 export type StoredSample = {
     sampleFilename: string;
+    mcpDescription: string;
     arrayBuffer: ArrayBuffer;
-}
-
-export type SampleData = {
-    audioBuffer: AudioBuffer;
-    sampleFilename: string;
+    audioBuffer?: AudioBuffer;
 }

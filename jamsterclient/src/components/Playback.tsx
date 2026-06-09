@@ -5,7 +5,7 @@ import Equalizer from "./Equalizer";
 import McpSocket from "./McpSocket";
 import LoadPresetDialog from "./menu/LoadPresetDialog";
 import SavePresetDialog from "./menu/SavePresetDialog";
-import UploadSamplesDialog from "./menu/UploadSamplesDialog";
+import ManageSamplesDialog from "./menu/ManageSamplesDialog";
 
 const defaultBpm = 120;
 const beatsPerMeasure = 4;
@@ -264,7 +264,7 @@ const Playback = (props: PlaybackProps) => {
                 <div className="store">
                     <LoadPresetDialog onStoreLoaded={props.onStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
                     <SavePresetDialog onStoreLoaded={props.onStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
-                    <UploadSamplesDialog onPlaySample={playSample} />
+                    <ManageSamplesDialog onPlaySample={playSample} />
                 </div>
                 <McpSocket patterns={props.patterns} onPatternChange={props.onPatternChange} onPatternAdded={props.onPatternAdded}/>
                 <Equalizer isPlaying={isPlaying} />

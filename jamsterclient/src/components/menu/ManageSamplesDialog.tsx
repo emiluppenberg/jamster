@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useJamsterContext } from "../../Context";
 
-interface UploadSamplesDialogProps {
+interface ManageSamplesDialogProps {
     onPlaySample: (sample: AudioBuffer, time: number, destination: AudioNode) => void;
 }
 
-const UploadSamplesDialog = (props: UploadSamplesDialogProps) => {
-    const { audioContext, analyserNode, samples, saveStoredSample, deleteStoredSample, refreshStoredSamples, refreshSamples } = useJamsterContext();
+const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
+    const { audioContext, analyserNode, storedSamples, saveStoredSample, deleteStoredSample, refreshStoredSamples } = useJamsterContext();
     const dialogRef = useRef<HTMLDialogElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [gainNode] = useState(audioContext.createGain())
@@ -23,15 +23,14 @@ const UploadSamplesDialog = (props: UploadSamplesDialogProps) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const isStored = samples.some((stored) => stored.sampleFilename === file.name)
+        const isStored = storedSamples.some((stored) => stored.sampleFilename === file.name)
 
         if (isStored) {
             return;
         } else {
             const arrayBuffer = await file.arrayBuffer();
-            await saveStoredSample({ sampleFilename: file.name, arrayBuffer: arrayBuffer, })
+            await saveStoredSample({ sampleFilename: file.name, arrayBuffer: arrayBuffer, mcpDescription: "" })
             await refreshStoredSamples();
-            await refreshSamples();
         }
 
         e.target.value = "";
@@ -48,16 +47,15 @@ const UploadSamplesDialog = (props: UploadSamplesDialogProps) => {
     const handleDeleteStoredSample = async (sampleFilename: string) => {
         await deleteStoredSample(sampleFilename);
         await refreshStoredSamples();
-        await refreshSamples();
     }
 
     return (
         <>
-            <button className="btn" type="button" onClick={() => dialogRef.current?.showModal()}>Upload samples</button>
+            <button className="btn" type="button" onClick={() => dialogRef.current?.showModal()}>Manage samples</button>
             <dialog className="load-dialog" ref={dialogRef} >
                 <div className="dialog-header">
                     <div>
-                        <h2 className="dialog-eyebrow">Upload samples</h2>
+                        <h2 className="dialog-eyebrow">Manage samples</h2>
                     </div>
                     <button className="btn dialog-close" type="button" onClick={handleDialogClose}>
                         X
@@ -73,16 +71,23 @@ const UploadSamplesDialog = (props: UploadSamplesDialogProps) => {
                         accept="audio/*"
                         onChange={(e) => void handleUpload(e)}
                     />
-                    {samples.length > 0 ? samples.map((sample) => (
+                    {storedSamples.length > 0 ? storedSamples.map((sample) => (
                         <div key={sample.sampleFilename} className="dialog-row">
                             <button className="btn delete" type="button" onClick={() => handleDeleteStoredSample(sample.sampleFilename)}>-</button>
                             <button
                                 className="dialog-field"
                                 type="button"
-                                onClick={() => props.onPlaySample(sample.audioBuffer, audioContext.currentTime, gainNode)}
+                                onClick={() => sample.audioBuffer && props.onPlaySample(sample.audioBuffer, audioContext.currentTime, gainNode)}
                             >
                                 {sample.sampleFilename}
                             </button>
+                            <input
+                                type="text"
+                                className="dialog-field mcp-description"
+                                value={sample.mcpDescription}
+                                placeholder="MCP Description"
+                                onChange={async (e) => await saveStoredSample({ ...sample, mcpDescription: e.target.value, audioBuffer: undefined })}
+                            />
                         </div>
                     )) : (
                         <p className="dialog-hint">No saved samples yet.</p>
@@ -93,4 +98,4 @@ const UploadSamplesDialog = (props: UploadSamplesDialogProps) => {
     )
 }
 
-export default UploadSamplesDialog;
+export default ManageSamplesDialog;
