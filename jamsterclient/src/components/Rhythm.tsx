@@ -35,30 +35,20 @@ const Rhythm = (props: RhythmProps) => {
         });
     }
 
-    const focusNextNote = (measureIndex: number, noteIndex: number) => {
+    const focusNote = (
+        measureIndex: number,
+        noteIndex: number,
+        target?: "next" | "previous") => {
         const currentInputIndex = measureIndex * props.rhythm.notesPerMeasure + noteIndex;
-        const nextInput = noteInputRefs.current[currentInputIndex + 1];
 
-        if (nextInput === undefined){
-            const currentInput = noteInputRefs.current[currentInputIndex]
-            focusAndSelectNote(currentInput);
-            return;
-        }
-
-        focusAndSelectNote(nextInput);
-    }
-
-    const focusPreviousNote = (measureIndex: number, noteIndex: number) => {
-        const currentInputIndex = measureIndex * props.rhythm.notesPerMeasure + noteIndex;
-        const previousInput = noteInputRefs.current[currentInputIndex - 1];
-
-        if (previousInput === undefined){
-            const currentInput = noteInputRefs.current[currentInputIndex]
-            focusAndSelectNote(currentInput);
-            return;
-        }
-
-        focusAndSelectNote(previousInput);
+        const targetInputIndex = target === "next"
+            ? currentInputIndex + 1
+            : target === "previous"
+                ? currentInputIndex - 1
+                : currentInputIndex;
+        
+        const targetInput = noteInputRefs.current[targetInputIndex] ?? noteInputRefs.current[currentInputIndex];
+        focusAndSelectNote(targetInput);
     }
 
     return (
@@ -106,28 +96,31 @@ const Rhythm = (props: RhythmProps) => {
                                 type="text"
                                 inputMode="numeric"
                                 maxLength={1}
-                                pattern="[0-9\\-]"
+                                pattern={"[0-9\\-]"}
                                 value={note.value}
                                 onFocus={(e) => e.currentTarget.select()}
                                 onInput={(e) => {
-                                    let value = e.currentTarget.value.replace(/[^0-9-]/g, "");
-
+                                    let value = e.currentTarget.value;
                                     const isEmpty = value.length === 0;
-                                    const isNumber = Number.isInteger(value)
-
-                                    value = isEmpty ? "-" : value;
-
+                                    const isNumber = /^[0-9]$/.test(value);
+                                    const inputType = (e.nativeEvent as InputEvent).inputType;
+                                    const isDeletion = inputType.startsWith("delete") || isEmpty;
+                                    
+                                    value = isNumber ? value : "-";
+                                    
                                     props.onNoteChange(
                                         props.rhythm.index,
                                         measure.index,
                                         note.index,
                                         value,
                                     );
-
-                                    if (!isEmpty || isNumber) {
-                                        focusNextNote(measure.index, note.index);
-                                    } else if (isEmpty || !isNumber) {
-                                        focusPreviousNote(measure.index, note.index);
+                                    
+                                    if (isNumber) {
+                                        focusNote(measure.index, note.index, "next");
+                                    } else if (isDeletion) {
+                                        focusNote(measure.index, note.index, "previous");
+                                    } else {
+                                        focusNote(measure.index, note.index)
                                     }
                                 }}
                             />
