@@ -71,6 +71,10 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
                         accept="audio/*"
                         onChange={(e) => void handleUpload(e)}
                     />
+                    <div className="dialog-row dialog-column-labels">
+                        <label>Filename</label>
+                        <label>Describe to MCP</label>
+                    </div>
                     {storedSamples.length > 0 ? storedSamples.map((sample) => (
                         <div key={sample.sampleFilename} className="dialog-row">
                             <button className="btn delete" type="button" onClick={() => handleDeleteStoredSample(sample.sampleFilename)}>-</button>

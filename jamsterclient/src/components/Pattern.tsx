@@ -74,11 +74,13 @@ const updateRhythmNumberOfMeasures = (
 
 export interface PatternProps {
     pattern: PatternData;
+    isPlaying: boolean;
     playingMeasureIndex?: number;
     playingPosition64?: number;
     onPatternChange: (pattern: PatternData) => void;
-    onPlayPattern: (pattern: PatternData) => void;
     onPatternDelete: (pattern: PatternData) => void;
+    onPlayPattern: (pattern: PatternData) => void;
+    onStopPlayback: () => void;
 }
 
 const Pattern = (props: PatternProps) => {
@@ -202,6 +204,17 @@ const Pattern = (props: PatternProps) => {
         })
     }
 
+    const handleTogglePlay = () => {
+        if (props.isPlaying) {
+            props.onStopPlayback()
+            return;
+        }
+        if (!props.isPlaying) {
+            props.onPlayPattern(props.pattern)
+            return;
+        }
+    }
+
     return (
         <div className="pattern" style={patternStyle}>
             <div className="controls">
@@ -215,7 +228,7 @@ const Pattern = (props: PatternProps) => {
                     />
                 </div>
                 <div className="options ">
-                    <button className="btn" onClick={() => props.onPlayPattern(props.pattern)}>Play</button>
+                    <button className="btn" onClick={handleTogglePlay}>{props.isPlaying ? "Stop" : "Play"}</button>
                     <div className="flex-row-align-center">
                         <label>Measures</label>
                         <input
@@ -256,7 +269,7 @@ const Pattern = (props: PatternProps) => {
                     onNameChange={handleRhythmNameChange}
                 />
             ))}
-            <div className="add-rhythm">
+            <div className="add">
                 <button className="btn" onClick={addRhythm}>Add rhythm</button>
             </div>
         </div>

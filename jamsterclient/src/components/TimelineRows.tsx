@@ -2,12 +2,17 @@ import { type SetStateAction } from "react";
 import type { PatternData, TimelineRowData, PatternIndex } from "../types";
 
 export interface TimelineProps {
+    isPlaying: boolean;
+    bpm: number;
+    setBpm: React.Dispatch<SetStateAction<number>>;
     patterns: PatternData[];
     timelineRows: TimelineRowData[];
     timelineLength: number;
     setTimelineLength: React.Dispatch<SetStateAction<number>>;
     onTimelineRowsChange: (timelines: TimelineRowData[]) => void;
     playingSlotIndex: number | undefined;
+    onPlayTimeline: () => void;
+    onStopPlayback: () => void;
 }
 
 const createSlots = (timelineLength: number): PatternIndex[] => (
@@ -65,48 +70,79 @@ const TimelineRows = (props: TimelineProps) => {
     }
 
     const handleDeleteTimelineRow = (deleteTimeline: TimelineRowData) => {
+        if (props.timelineRows.length === 1) return;
         props.onTimelineRowsChange(props.timelineRows.filter(timeline => timeline !== deleteTimeline))
+    }
+
+    const handleTogglePlay = () => {
+        if (props.isPlaying) {
+            props.onStopPlayback()
+            return;
+        }
+        if (!props.isPlaying) {
+            props.onPlayTimeline()
+            return;
+        }
     }
 
     return (
         <>
-            <div className="controls">
-                <h1>Timeline</h1>
-                <div className="options">
-                    <button className="btn" onClick={addTimelineRow}>Add</button>
-                    <div className="flex-row-align-center">
-                        <label>Length</label>
-                        <input
-                            type="number"
-                            min={1}
-                            step={1}
-                            value={props.timelineLength}
-                            onChange={(e) => handleTimelineLengthChange(Number(e.target.value))}
-                        />
-                    </div>
-                </div>
-            </div>
             {props.timelineRows.length > 0 && (
                 <div className="container timelines">
-                {props.timelineRows.map((timeline) => (
-                    <div key={timeline.index} className="timeline">
-                        <button className="btn delete" onClick={() => handleDeleteTimelineRow(timeline)}>-</button>
-                        {Array.from({ length: props.timelineLength }, (_, slotIndex) => (
-                            <select
-                            key={slotIndex}
-                            className={`slot-pattern${slotIndex === props.playingSlotIndex ? " is-playing" : ""}`}
-                            value={timeline.slots[slotIndex] ?? ""}
-                            onChange={(e) => handleSlotChange(timeline.index, slotIndex, e.target.value)}
-                            >
-                                <option value="">-</option>
-                                {props.patterns.map((pattern) => (
-                                    <option key={pattern.index} value={pattern.index}>{pattern.name}</option>
-                                ))}
-                            </select>
-                        ))}
+                    <div className="controls">
+                        <h1>Timeline</h1>
+                        <div className="options">
+                            <div className="flex-row-align-center">
+                                <button className="btn" onClick={handleTogglePlay}>{props.isPlaying ? "Stop" : "Play"}</button>
+                                <div className="flex-row-align-center">
+                                    <label>Measures</label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        step={1}
+                                        value={props.timelineLength}
+                                        onChange={(e) => handleTimelineLengthChange(Number(e.target.value))}
+                                    />
+                                </div>
+                                <div className="flex-row-align-center">
+                                    <label>BPM</label>
+                                    <input
+                                        className="bpm-input"
+                                        type="number"
+                                        min={1}
+                                        value={props.bpm}
+                                        onChange={(e) => {
+                                            const nextBpm = Number(e.target.value);
+                                            if (!Number.isFinite(nextBpm)) return;
+                                            props.setBpm(Math.max(1, nextBpm));
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                ))}
-            </div>
+                    {props.timelineRows.map((timeline) => (
+                        <div key={timeline.index} className="timeline">
+                            <button className="btn delete" onClick={() => handleDeleteTimelineRow(timeline)}>-</button>
+                            {Array.from({ length: props.timelineLength }, (_, slotIndex) => (
+                                <select
+                                    key={slotIndex}
+                                    className={`slot-pattern${slotIndex === props.playingSlotIndex ? " is-playing" : ""}`}
+                                    value={timeline.slots[slotIndex] ?? ""}
+                                    onChange={(e) => handleSlotChange(timeline.index, slotIndex, e.target.value)}
+                                >
+                                    <option value="">-</option>
+                                    {props.patterns.map((pattern) => (
+                                        <option key={pattern.index} value={pattern.index}>{pattern.name}</option>
+                                    ))}
+                                </select>
+                            ))}
+                        </div>
+                    ))}
+                    <div className="add">
+                        <button className="btn" onClick={addTimelineRow}>Add track</button>
+                    </div>
+                </div>
             )}
         </>
     )

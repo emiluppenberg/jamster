@@ -156,7 +156,7 @@ const McpSocket = (props: McpSocketProps) => {
             <dialog className="mcp-dialog" ref={dialogRef}>
                 <div className="dialog-header">
                     <div>
-                        <h2 className="dialog-eyebrow">Connection</h2>
+                        <h2 className="dialog-eyebrow">MCP</h2>
                     </div>
                     <button className="btn dialog-close" type="button" onClick={handleClose}>
                         X

@@ -254,6 +254,40 @@ $rhythm-controls-width: 11.5rem;
             display: flex;
             align-items: stretch;
 
+            &.dialog-column-labels {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: 1.5rem minmax(0, 1fr) $space-s minmax(0, 1fr);
+                align-items: center;
+                padding: $space-xs 0;
+                background: $surface;
+                color: $muted;
+                font-size: 0.7rem;
+                font-weight: 700;
+                text-transform: uppercase;
+
+                &::before {
+                    content: "";
+                    grid-column: 1;
+                }
+
+                label {
+                    width: auto;
+                    padding-right: 0;
+                    text-align: center;
+                }
+
+                label:first-child {
+                    grid-column: 2;
+                }
+
+                label:last-child {
+                    grid-column: 4;
+                }
+            }
+
 
             .delete+.dialog-field {
                 border-top-left-radius: 0;
@@ -455,8 +489,8 @@ $rhythm-controls-width: 11.5rem;
         }
 
         &.slot-pattern {
-            width: 5rem;
-            min-width: 5rem;
+            width: calc($space-l - $width-m);
+            min-width: calc($space-l - $width-m);
             background: $surface-soft;
             color: $mint;
             border-left: 1px solid $border;
@@ -504,14 +538,13 @@ $rhythm-controls-width: 11.5rem;
     }
 
     input[type="number"] {
-        width: $width-m;
+        width: $width-l;
         padding: 0 0.35rem;
         text-align: start;
 
         &.bpm-input {
             border-color: rgba($green, 0.32);
             font-weight: 700;
-            width: $width-l;
         }
     }
 
@@ -521,7 +554,7 @@ $rhythm-controls-width: 11.5rem;
 
     .mcp {
         margin-left: $width-m;
-        margin-right: $space-m;
+        margin-right: $width-m;
     }
 
     .controls {
@@ -530,9 +563,10 @@ $rhythm-controls-width: 11.5rem;
         align-items: center;
         min-height: 2.4rem;
         margin-top: $space-m;
+        padding-left: $space-xs;
 
         h1 {
-            width: $space-l;
+            width: calc($space-l - 0.75rem);
             text-align: start;
         }
     }
@@ -545,7 +579,6 @@ $rhythm-controls-width: 11.5rem;
     .options {
         display: flex;
         align-items: center;
-        gap: $space-s;
         min-height: 2.4rem;
 
     }
@@ -556,7 +589,6 @@ $rhythm-controls-width: 11.5rem;
     }
 
     .store {
-        margin-left: $width-m;
         display: flex;
         align-items: center;
         gap: $space-s;
@@ -569,13 +601,14 @@ $rhythm-controls-width: 11.5rem;
         width: 100%;
 
         &.timelines {
-            gap: 0.35rem;
             padding: 0.75rem;
             box-sizing: border-box;
             border: 1px solid $border;
             border-radius: 8px;
             background: $surface;
             box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+            
+
         }
 
         &.patterns {
@@ -588,12 +621,17 @@ $rhythm-controls-width: 11.5rem;
         display: flex;
         flex-direction: row;
         width: max-content;
+        margin-top: 3px;
         border: 1px solid $border;
         border-radius: 6px;
         overflow: hidden;
         background: rgba($surface, 0.9);
 
+        &:nth-child(1 of .timeline) {
+            margin-top: $space-m;
+        }
     }
+
 
     .pattern {
         display: inline-flex;
@@ -613,7 +651,6 @@ $rhythm-controls-width: 11.5rem;
         >.controls {
             position: relative;
             margin-top: 0;
-            padding-left: $space-xs;
 
             >.options {
                 padding-left: calc($space-l - 0.75rem);
@@ -625,10 +662,12 @@ $rhythm-controls-width: 11.5rem;
         }
     }
 
-    .add-rhythm {
-        position: relative;
+    .add {
+        position: sticky;
+        top: 0;
+        left: 0;
         box-sizing: border-box;
-        width: max(100%, calc((var(--measure-width) * var(--number-of-measures)) + $rhythm-controls-width));
+        width: 100%;
         padding: 0 $space-xs 0 $space-xs;
         margin-top: $space-s;
 

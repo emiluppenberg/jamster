@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type SetStateAction } from "react";
 import { useJamsterContext } from "../Context";
 import type { PatternData, TimelineRowData } from "../types";
 import Equalizer from "./Equalizer";
@@ -58,10 +58,14 @@ const getPlaybackTimelines = (
 
 export type PlaybackRenderProps = {
     isPlaying: boolean;
+    bpm: number;
+    setBpm: React.Dispatch<SetStateAction<number>>;
     playingPosition64?: number;
     playingSlotIndex?: number;
     getPlayingMeasureIndex: (pattern: PatternData) => number | undefined;
     playPattern: (pattern: PatternData) => void;
+    playTimeline: () => void;
+    stopPlayback: () => void;
 }
 
 export interface PlaybackProps {
@@ -234,49 +238,26 @@ const Playback = (props: PlaybackProps) => {
     return (
         <div className="playback">
             <div className="menu">
-                <button
-                    className="btn"
-                    onClick={() => {
-                        if (isPlaying) {
-                            stopPlayback();
-                            return;
-                        }
-
-                        void startPlayback("timelines");
-                    }}
-                >
-                    {isPlaying ? "Stop" : "Play"}
-                </button>
-                <div className="flex-row-align-center">
-                    <label>BPM</label>
-                    <input
-                        className="bpm-input"
-                        type="number"
-                        min={1}
-                        value={bpm}
-                        onChange={(e) => {
-                            const nextBpm = Number(e.target.value);
-                            if (!Number.isFinite(nextBpm)) return;
-                            setBpm(Math.max(1, nextBpm));
-                        }}
-                    />
-                </div>
                 <div className="store">
                     <LoadPresetDialog onStoreLoaded={props.onStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
                     <SavePresetDialog onStoreLoaded={props.onStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
                     <ManageSamplesDialog onPlaySample={playSample} />
                 </div>
-                <McpSocket patterns={props.patterns} onPatternChange={props.onPatternChange} onPatternAdded={props.onPatternAdded}/>
+                <McpSocket patterns={props.patterns} onPatternChange={props.onPatternChange} onPatternAdded={props.onPatternAdded} />
                 <Equalizer isPlaying={isPlaying} />
             </div>
             {props.children({
                 isPlaying,
+                bpm,
+                setBpm,
                 playingPosition64,
                 playingSlotIndex: playingSlotIndex,
                 getPlayingMeasureIndex,
                 playPattern: (pattern) => {
                     void startPlayback("pattern", pattern.index);
                 },
+                playTimeline: () => void startPlayback("timelines"),
+                stopPlayback: stopPlayback
             })}
         </div>
     )

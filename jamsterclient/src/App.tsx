@@ -61,34 +61,38 @@ const AppContent = () => {
   return (
     <div className='app'>
       <Playback patterns={patterns} timelineRows={timelineRows} onStoreLoaded={handleStoreLoaded} onPatternChange={handlePatternChange} onPatternAdded={handlePatternAdded}>
-        {({ isPlaying, playingPosition64, playingSlotIndex, getPlayingMeasureIndex, playPattern }) => (
+        {({ isPlaying, bpm, setBpm, playingPosition64, playingSlotIndex, getPlayingMeasureIndex, playPattern, playTimeline, stopPlayback }) => (
           <>
             <TimelineRows
+              isPlaying={isPlaying}
+              bpm={bpm}
+              setBpm={setBpm}
               patterns={patterns}
               timelineRows={timelineRows}
               timelineLength={timelineLength}
               setTimelineLength={setTimelineLength}
               onTimelineRowsChange={setTimelineRows}
               playingSlotIndex={playingSlotIndex}
+              onPlayTimeline={playTimeline}
+              onStopPlayback={stopPlayback}
             />
-            <div className="controls">
-              <h1>Patterns</h1>
-              <div className="options">
-                <button className="btn" onClick={addPattern}>Add</button>
-              </div>
-            </div>
             <div className="container patterns">
               {patterns.map((pattern) => (
                 <Pattern
                   key={pattern.index}
+                  isPlaying={isPlaying}
                   pattern={pattern}
                   playingMeasureIndex={isPlaying ? getPlayingMeasureIndex(pattern) : undefined}
                   playingPosition64={playingPosition64}
                   onPatternChange={handlePatternChange}
-                  onPlayPattern={playPattern}
                   onPatternDelete={handlePatternDelete}
+                  onPlayPattern={playPattern}
+                  onStopPlayback={stopPlayback}
                 />
               ))}
+              <div className="add">
+                <button className="btn" onClick={addPattern}>Add pattern</button>
+              </div>
             </div>
           </>
         )}

@@ -79,6 +79,10 @@ const RhythmSampleDialog = (props: SampleInputProps) => {
                         accept="audio/*"
                         onChange={(e) => void handleChange(e)}
                     />
+                    <div className="dialog-row dialog-column-labels">
+                        <label>Filename</label>
+                        <label>Describe to MCP</label>
+                    </div>
                     {storedSamples.length > 0 ? storedSamples.map((sample) => (
                         <div key={sample.sampleFilename} className="dialog-row">
                             <button className="btn delete" type="button" onClick={() => handleDeleteStoredSample(sample.sampleFilename)}>-</button>
