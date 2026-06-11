@@ -18,9 +18,9 @@ const getPositionDurationSeconds = (bpm: number) => (
     60 / bpm / (positionsPerMeasure / beatsPerMeasure)
 )
 
-const getMeasureIndex = (cursorTick: number, pattern: PatternData) => {
+const getMeasureIndex = (cursorTick: number, pattern: PatternData, slotCount: number) => {
     if (pattern.numberOfMeasures <= 0) return undefined;
-    return Math.floor(cursorTick / positionsPerMeasure) % pattern.numberOfMeasures;
+    return Math.floor(cursorTick / positionsPerMeasure) % Math.min(pattern.numberOfMeasures, slotCount);
 }
 
 const getNoteGain = (value: string) => {
@@ -54,6 +54,20 @@ const getPlaybackTimelines = (
     }
 
     return [];
+}
+
+const getPlaybackState = (
+    mode: PlaybackMode | undefined,
+    timelines: TimelineRowData[],
+    patternIndex: number | undefined,
+) => {
+    const playbackTimelines = getPlaybackTimelines(mode, timelines, patternIndex);
+    const playbackSlotCount = getSlotCount(playbackTimelines);
+
+    return {
+        timelines: playbackTimelines,
+        slotCount: playbackSlotCount,
+    };
 }
 
 export type PlaybackRenderProps = {
@@ -122,8 +136,9 @@ const Playback = (props: PlaybackProps) => {
     }
 
     const schedulePattern = (pattern: PatternData, cursorTick: number, time: number) => {
+        const { slotCount } = getPlaybackState(playbackModeRef.current, timelineRowsRef.current, soloPatternIndexRef.current)
         const position64 = cursorTick % positionsPerMeasure;
-        const measureIndex = getMeasureIndex(cursorTick, pattern);
+        const measureIndex = getMeasureIndex(cursorTick, pattern, slotCount);
         if (measureIndex === undefined) return;
 
         pattern.rhythms.forEach((rhythm) => {
@@ -144,17 +159,10 @@ const Playback = (props: PlaybackProps) => {
     }
 
     const scheduleTick = (cursorTick: number, time: number) => {
-        const timelineRows = getPlaybackTimelines(
-            playbackModeRef.current,
-            timelineRowsRef.current,
-            soloPatternIndexRef.current,
-        );
-        const slotCount = getSlotCount(timelineRows);
-        if (slotCount <= 0) return;
-
+        const { timelines, slotCount } = getPlaybackState(playbackModeRef.current, timelineRowsRef.current, soloPatternIndexRef.current)
         const slotIndex = Math.floor(cursorTick / positionsPerMeasure) % slotCount;
 
-        timelineRows.forEach((timeline) => {
+        timelines.forEach((timeline) => {
             const pattern = getPatternByIndex(patternsRef.current, timeline.slots[slotIndex]);
             if (!pattern) return;
             schedulePattern(pattern, cursorTick, time);
@@ -172,9 +180,6 @@ const Playback = (props: PlaybackProps) => {
     }
 
     const startPlayback = async (mode: PlaybackMode, patternIndex?: number) => {
-        const timelines = getPlaybackTimelines(mode, props.timelineRows, patternIndex);
-        if (getSlotCount(timelines) <= 0) return;
-
         if (schedulerTimerRef.current !== undefined) {
             window.clearInterval(schedulerTimerRef.current);
             schedulerTimerRef.current = undefined;
@@ -212,18 +217,14 @@ const Playback = (props: PlaybackProps) => {
         setIsPlaying(false);
     }
 
+    const { timelines, slotCount } = getPlaybackState(playbackMode, props.timelineRows, soloPatternIndex)
     const playingPosition64 = isPlaying ? cursorTick % positionsPerMeasure : undefined;
-    const playbackTimelines = getPlaybackTimelines(playbackMode, props.timelineRows, soloPatternIndex);
-    const playbackSlotCount = getSlotCount(playbackTimelines);
-    const playingSlotIndex = isPlaying && playbackSlotCount > 0
-        ? Math.floor(cursorTick / positionsPerMeasure) % playbackSlotCount
+    const playingSlotIndex = isPlaying && slotCount > 0
+        ? Math.floor(cursorTick / positionsPerMeasure) % slotCount
         : undefined;
 
     const getPlayingMeasureIndex = (pattern: PatternData) => {
         if (!isPlaying) return undefined;
-
-        const timelines = getPlaybackTimelines(playbackMode, props.timelineRows, soloPatternIndex);
-        const slotCount = getSlotCount(timelines);
         if (slotCount <= 0) return undefined;
 
         const slotIndex = Math.floor(cursorTick / positionsPerMeasure) % slotCount;
@@ -232,7 +233,7 @@ const Playback = (props: PlaybackProps) => {
         ));
 
         if (!isPatternPlaying) return undefined;
-        return getMeasureIndex(cursorTick, pattern);
+        return getMeasureIndex(cursorTick, pattern, slotCount);
     }
 
     return (
