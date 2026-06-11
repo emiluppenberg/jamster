@@ -174,10 +174,12 @@ $rhythm-controls-width: 11.5rem;
 
     h1 {
         margin: 0;
+        width: 100%;
         color: $mint;
         font-size: 1.5rem;
         font-weight: 700;
         letter-spacing: 0;
+        text-align: center;
     }
 
     dialog {
@@ -572,12 +574,10 @@ $rhythm-controls-width: 11.5rem;
         flex-direction: row;
         align-items: center;
         min-height: 2.4rem;
-        margin-top: $space-m;
         padding-left: $space-xs;
 
         h1 {
             width: calc($space-l - 0.75rem);
-            text-align: start;
         }
     }
 
