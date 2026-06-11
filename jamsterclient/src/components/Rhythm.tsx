@@ -85,7 +85,7 @@ const Rhythm = (props: RhythmProps) => {
                 }}
             >
                 {notesPerMeasureOptions.map((notesPerMeasure) => (
-                    <option key={notesPerMeasure} value={notesPerMeasure}>
+                    <option key={`${props.rhythm.name}-notes-per-measure-${notesPerMeasure}`} value={notesPerMeasure}>
                         /{notesPerMeasure}
                     </option>
                 ))}
@@ -93,12 +93,12 @@ const Rhythm = (props: RhythmProps) => {
             <div className="measures">
                 {props.rhythm.measures.map((measure) => (
                     <div
-                        key={measure.index}
+                        key={`${props.rhythm.name}-measure-${measure.index}`}
                         className={`measure${measure.index === props.playingMeasureIndex ? " is-playing" : ""}`}
                     >
                         {measure.notes.map((note) => (
                             <input
-                                key={note.index}
+                                key={`${props.rhythm.name}-measure-${measure.index}-note-${note.index}`}
                                 ref={(input) => {
                                     noteInputRefs.current[measure.index * props.rhythm.notesPerMeasure + note.index] = input === null ? undefined : input;
                                 }}

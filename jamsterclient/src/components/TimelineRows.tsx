@@ -93,7 +93,7 @@ const TimelineRows = (props: TimelineProps) => {
                         <h1>Timeline</h1>
                         <div className="options">
                             <div className="flex-row-align-center">
-                                <button className="btn" onClick={handleTogglePlay}>{props.isPlaying ? "Stop" : "Play"}</button>
+                                <button className={`btn ${props.isPlaying ? "stop" : "play"}`} onClick={handleTogglePlay}>{props.isPlaying ? "Stop" : "Play"}</button>
                                 <div className="flex-row-align-center">
                                     <label>Measures</label>
                                     <input
@@ -122,18 +122,18 @@ const TimelineRows = (props: TimelineProps) => {
                         </div>
                     </div>
                     {props.timelineRows.map((timeline) => (
-                        <div key={timeline.index} className="timeline">
+                        <div key={`timeline-${timeline.index}`} className="timeline">
                             <button className="btn delete" onClick={() => handleDeleteTimelineRow(timeline)}>-</button>
                             {Array.from({ length: props.timelineLength }, (_, slotIndex) => (
                                 <select
-                                    key={slotIndex}
+                                    key={`timeline-${timeline.index}-slot-${slotIndex}`}
                                     className={`slot-pattern${slotIndex === props.playingSlotIndex ? " is-playing" : ""}`}
                                     value={timeline.slots[slotIndex] ?? ""}
                                     onChange={(e) => handleSlotChange(timeline.index, slotIndex, e.target.value)}
                                 >
                                     <option value="">-</option>
                                     {props.patterns.map((pattern) => (
-                                        <option key={pattern.index} value={pattern.index}>{pattern.name}</option>
+                                        <option key={`timeline-${timeline.index}-option-${pattern.index}`} value={pattern.index}>{pattern.name}</option>
                                     ))}
                                 </select>
                             ))}

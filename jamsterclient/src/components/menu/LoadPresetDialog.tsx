@@ -48,7 +48,7 @@ const LoadPresetDialog = (props: LoadPresetDialogProps) => {
                 </div>
                 <div className="dialog-list">
                     {storedData.length > 0 ? storedData.map((data, index) => (
-                        <div key={index} className="dialog-row">
+                        <div key={`load-stored-data-${index}`} className="dialog-row">
                             <button className="btn delete" type="button" onClick={() => handleDeleteStoredData(data.name)}>-</button>
                             <button
                                 className="dialog-field"

@@ -228,7 +228,7 @@ const Pattern = (props: PatternProps) => {
                     />
                 </div>
                 <div className="options ">
-                    <button className="btn" onClick={handleTogglePlay}>{props.isPlaying ? "Stop" : "Play"}</button>
+                    <button className={`btn ${props.isPlaying ? "stop" : "play"}`} onClick={handleTogglePlay}>{props.isPlaying ? "Stop" : "Play"}</button>
                     <div className="flex-row-align-center">
                         <label>Measures</label>
                         <input
@@ -258,7 +258,7 @@ const Pattern = (props: PatternProps) => {
             </div>
             {props.pattern.rhythms.map((rhythm) => (
                 <Rhythm
-                    key={rhythm.index}
+                    key={`${props.pattern.name}-rhythm-${rhythm.index}`}
                     rhythm={rhythm}
                     playingMeasureIndex={props.playingMeasureIndex}
                     playingPosition64={props.playingPosition64}

@@ -79,7 +79,7 @@ const AppContent = () => {
             <div className="container patterns">
               {patterns.map((pattern) => (
                 <Pattern
-                  key={pattern.index}
+                  key={`pattern-${pattern.index}`}
                   isPlaying={isPlaying}
                   pattern={pattern}
                   playingMeasureIndex={isPlaying ? getPlayingMeasureIndex(pattern) : undefined}
