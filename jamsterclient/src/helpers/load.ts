@@ -11,8 +11,8 @@ export const loadMeasures = (
     notesPerMeasure: number,
     measures: StoredMeasureData[],
 ): MeasureData[] => {
-    return measures.map((measure) => ({
-        index: measure.index,
+    return measures.map((measure, measureIndex) => ({
+        index: measureIndex,
         notes: Array.from({ length: notesPerMeasure }, (_, noteIndex) => {
             const value = measure.noteSequence[noteIndex] ?? "-";
 
@@ -53,15 +53,15 @@ export const loadRhythm = async (
 }
 
 export const loadPatterns = async (audioContext: AudioContext, analyserNode: AnalyserNode, patternData: StoredPatternData[], storedSamples: StoredSample[]): Promise<PatternData[]> => {
-    return await Promise.all(patternData!.map(async (pattern) => ({
-        index: pattern.index,
+    return await Promise.all(patternData!.map(async (pattern, patternIndex) => ({
+        index: patternIndex,
         numberOfMeasures: Math.max(1, ...pattern.rhythms.map(r => r.measures.length)),
-        rhythms: await Promise.all(pattern.rhythms.map((rhythm) =>
+        rhythms: await Promise.all(pattern.rhythms.map((rhythm, rhythmIndex) =>
             loadRhythm(
                 audioContext,
                 analyserNode,
                 storedSamples,
-                rhythm.index,
+                rhythmIndex,
                 rhythm.name,
                 rhythm.sampleFileName,
                 rhythm.notesPerMeasure,
