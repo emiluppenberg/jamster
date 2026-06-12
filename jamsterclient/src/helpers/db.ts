@@ -4,17 +4,19 @@ import snare1Url from '../assets/snare1.wav';
 import hihat2Url from '../assets/hihat2.wav';
 import kick2Url from '../assets/kick2.wav';
 import snare2Url from '../assets/snare2.wav';
+import shaker1Url from '../assets/shaker1.wav';
 import type { StoredData, StoredSample } from "../types";
 import { exampleData } from '../utils';
 
 const seedExampleSamples = async (db: IDBDatabase): Promise<void> => {
     const stockSamples = [
         { url: hihat1Url, description: "Basic hihat" },
-        {url: kick1Url, description: "Basic kick"},
-        {url: snare1Url, description: "Basic snare"},
+        {url: kick1Url, description: "Hard kick"},
+        {url: snare1Url, description: "Ghost snare"},
         {url: hihat2Url, description: "Basic hihat"},
-        {url: kick2Url, description: "Basic kick"},
-        {url: snare2Url, description: "Basic snare"},
+        {url: kick2Url, description: "Dull kick"},
+        {url: snare2Url, description: "Hard snare"},
+        {url: shaker1Url, description: "One hit shaker"}
     ];
 
     const samples: StoredSample[] = await Promise.all(stockSamples.map(async (sample) => {
