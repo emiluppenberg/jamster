@@ -34,7 +34,7 @@ $rhythm-controls-width: 11.5rem;
     min-height: 100svh;
     box-sizing: border-box;
     padding: 1.25rem;
-    overflow-x: auto;
+    overflow-x: clip;
     background: $ink;
     color: $text;
 
@@ -45,8 +45,11 @@ $rhythm-controls-width: 11.5rem;
         gap: 1rem;
         width: 100%;
     }
-
+    
     .menu {
+        position: sticky;
+        top: 1.25rem;
+        z-index: 10;
         display: flex;
         align-items: center;
         box-sizing: border-box;
@@ -613,6 +616,7 @@ $rhythm-controls-width: 11.5rem;
         &.timelines {
             padding: 0.75rem;
             box-sizing: border-box;
+            overflow-x: auto;
             border: 1px solid $border;
             border-radius: 8px;
             background: $surface;
