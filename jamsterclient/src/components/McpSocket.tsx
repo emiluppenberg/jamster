@@ -182,7 +182,9 @@ const McpSocket = (props: McpSocketProps) => {
                         value={mcpUrl}
                     />
                 </div>
-                <p className="dialog-hint">Provide AppSessionId with your prompt.</p>
+                <p className="dialog-hint">
+                    Example - "Create a 2 measure funk beat using available samples in appsessionid XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+                </p>
             </dialog>
         </div>
     )

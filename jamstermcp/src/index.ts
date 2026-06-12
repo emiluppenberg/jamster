@@ -2,7 +2,7 @@ import * as http from "node:http"
 import { InitializeWebSocketServer } from "./websocket-server.js";
 import { InitializeMcpServer } from "./mcp.js";
 
-export const serverPort = 8000;
+export const serverPort = 3000;
 
 const server = http.createServer();
 server.listen(serverPort)
@@ -16,3 +16,4 @@ server.on("request", async (request, response) => {
         return;
     }
 })
+

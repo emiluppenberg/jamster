@@ -1,0 +1,35 @@
+# Keep Fly deploys small and avoid copying local-only files into the image.
+.git
+
+# Dependencies
+**/node_modules
+
+# Build output
+**/dist
+**/dist-ssr
+**/build
+
+# Environment files
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
+# Logs and caches
+**/logs
+**/*.log
+**/.eslintcache
+**/.stylelintcache
+**/.parcel-cache
+**/.vite
+**/.turbo
+
+# Unused for the MCP server image
+jamsterclient
+
+# Editor and OS files
+**/.vscode/*
+!**/.vscode/extensions.json
+**/.idea
+**/.DS_Store
+**/Thumbs.db

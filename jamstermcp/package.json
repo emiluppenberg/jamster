@@ -13,6 +13,7 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10",
     "@types/node": "^25.9.1",
     "@types/ws": "^8.18.1",
     "typescript": "^6.0.3"
