@@ -1,7 +1,6 @@
 import z from "zod/v4";
 
 export const McpMeasureDataSchema = z.object({
-    index: z.number().describe("Index of the measure"),
     notes: z.string().describe("Notation for the measure. The length should match notesPerMeasure of parent rhythm. Characters are singular notes which can be either '-' or a number between 0-9 representing velocity.")
 })
 

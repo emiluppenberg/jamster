@@ -32,14 +32,15 @@ const McpSocket = (props: McpSocketProps) => {
         props.onPatternChange({
             ...pattern,
             numberOfMeasures: numberOfMeasures,
-            rhythms: pattern.rhythms.map((rhythm) => {
+            rhythms: pattern.rhythms.map((rhythm, rhythmIndex) => {
                 if (rhythm.name !== dto.rhythm.name) return rhythm;
 
                 return {
                     ...rhythm,
+                    index: rhythmIndex,
                     notesPerMeasure: dto.rhythm.notesPerMeasure,
-                    measures: dto.rhythm.measures.map((measure) => ({
-                        ...measure,
+                    measures: dto.rhythm.measures.map((measure, measureIndex) => ({
+                        index: measureIndex,
                         notes: Array.from(measure.notes, (note, index) => ({
                             index: index,
                             position64: getNotePosition64(index, dto.rhythm.notesPerMeasure),
@@ -52,11 +53,13 @@ const McpSocket = (props: McpSocketProps) => {
     };
 
     const handleCreatePattern = async (dto: CreatePatternDto) => {
+        const nextIndex = Math.max(...props.patterns.map(pattern => pattern.index)) + 1
+
         props.onPatternAdded({
-            index: props.patterns.length,
+            index: nextIndex,
             name: dto.patternName,
             numberOfMeasures: dto.numberOfMeasures,
-            rhythms: await Promise.all(dto.rhythms.map(async (rhythm, index) => {
+            rhythms: await Promise.all(dto.rhythms.map(async (rhythm, rhythmIndex) => {
                 const gainNode = audioContext.createGain();
                 gainNode.gain.value = 0;
                 gainNode.connect(analyserNode);
@@ -64,14 +67,14 @@ const McpSocket = (props: McpSocketProps) => {
                 const sample = await decodeStoredSample(audioContext, rhythm.sampleFilename, storedSamples);
 
                 return {
-                    index: index,
+                    index: rhythmIndex,
                     name: rhythm.name,
                     notesPerMeasure: rhythm.notesPerMeasure,
                     gainNode: gainNode,
                     sampleFilename: rhythm.sampleFilename,
                     sample: sample,
-                    measures: rhythm.measures.map((measure) => ({
-                        ...measure,
+                    measures: rhythm.measures.map((measure, measureIndex) => ({
+                        index: measureIndex,
                         notes: Array.from(measure.notes, (note, index) => ({
                             index: index,
                             position64: getNotePosition64(index, rhythm.notesPerMeasure),
@@ -116,7 +119,6 @@ const McpSocket = (props: McpSocketProps) => {
                 notesPerMeasure: rhythm.notesPerMeasure,
                 sampleFilename: rhythm.sampleFilename,
                 measures: rhythm.measures.map((measure) => ({
-                    index: measure.index,
                     notes: measure.notes.map((note) => note.value).join("")
                 }))
             }))

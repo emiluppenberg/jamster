@@ -34,13 +34,11 @@ export type NoteData = {
 }
 
 export type StoredPatternData = {
-    index: number;
     rhythms: StoredRhythmData[];
     name: string;
 }
 
 export type StoredRhythmData = {
-    index: number;
     name: string;
     sampleFileName: string;
     notesPerMeasure: number;
@@ -48,7 +46,6 @@ export type StoredRhythmData = {
 }
 
 export type StoredMeasureData = {
-    index: number;
     noteSequence: string;
 }
 
