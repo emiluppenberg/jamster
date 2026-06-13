@@ -496,13 +496,13 @@ export const stockPatternsDnB: StoredPatternData[] = [
                             noteSequence: "----"
                         },
                         {
+                            noteSequence: "----"
+                        },
+                        {
+                            noteSequence: "----"
+                        },
+                        {
                             noteSequence: "--50"
-                        },
-                        {
-                            noteSequence: "----"
-                        },
-                        {
-                            noteSequence: "----"
                         }
                     ]
                 },
@@ -512,16 +512,16 @@ export const stockPatternsDnB: StoredPatternData[] = [
                     notesPerMeasure: 4,
                     measures: [
                         {
-                            noteSequence: "----"
-                        },
-                        {
-                            noteSequence: "---5"
-                        },
-                        {
                             noteSequence: "0---"
                         },
                         {
                             noteSequence: "----"
+                        },
+                        {
+                            noteSequence: "----"
+                        },
+                        {
+                            noteSequence: "---5"
                         }
                     ]
                 }
@@ -536,7 +536,7 @@ export const stockTimelineDnB: StoredTimelineRowData[] = [
 ]
 
 export const stockPresetDnB: StoredPreset = {
-    name: "DnB5",
+    name: "DnB",
     bpm: 150,
     timelineRows: stockTimelineDnB,
     patterns: stockPatternsDnB
