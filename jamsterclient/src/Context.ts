@@ -1,16 +1,15 @@
 import { createContext, useContext } from "react"
-import type { PatternData, StoredData, StoredSample, TimelineRowData } from "./types";
+import type { PatternData, StoredPreset, StoredSample, StoredSampleArrayBuffer, StoredSampleMcpDescription, TimelineRowData } from "./types";
 
 export type JamsterState = {
     appSessionId: string;
     audioContext: AudioContext;
     analyserNode: AnalyserNode;
-    storedData: StoredData[];
+    storedData: StoredPreset[];
     storedSamples: StoredSample[];
-    refreshStoredData: () => Promise<void>;
-    refreshStoredSamples: () => Promise<void>;
     saveStoredData: (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string) => Promise<void>;
-    saveStoredSample: (sample: StoredSample) => Promise<void>;
+    saveStoredSampleArrayBuffer: (sample: StoredSampleArrayBuffer) => Promise<void>;
+    saveStoredSampleMcpDescription: (sample: StoredSampleMcpDescription) => Promise<void>;
     deleteStoredData: (dataName: string) => Promise<void>;
     deleteStoredSample: (sampleFilename: string) => Promise<void>;
 }

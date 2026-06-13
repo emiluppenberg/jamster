@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useJamsterContext } from "../../Context";
+import type { StoredSample } from "../../types";
 
 interface ManageSamplesDialogProps {
     onPlaySample: (sample: AudioBuffer, time: number, destination: AudioNode) => void;
 }
 
 const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
-    const { audioContext, analyserNode, storedSamples, saveStoredSample, deleteStoredSample, refreshStoredSamples } = useJamsterContext();
+    const { audioContext, analyserNode, storedSamples, saveStoredSampleArrayBuffer, saveStoredSampleMcpDescription, deleteStoredSample } = useJamsterContext();
     const dialogRef = useRef<HTMLDialogElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [gainNode] = useState(audioContext.createGain())
@@ -25,15 +26,11 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
 
         const isStored = storedSamples.some((stored) => stored.sampleFilename === file.name)
 
-        if (isStored) {
-            return;
-        } else {
+        if (!isStored) {
             const arrayBuffer = await file.arrayBuffer();
-            await saveStoredSample({ sampleFilename: file.name, arrayBuffer: arrayBuffer, mcpDescription: "" })
-            await refreshStoredSamples();
+            await saveStoredSampleArrayBuffer({ sampleFilename: file.name, arrayBuffer: arrayBuffer })
+            e.target.value = "";
         }
-
-        e.target.value = "";
     }
 
     const handleDialogClose = () => {
@@ -46,7 +43,10 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
 
     const handleDeleteStoredSample = async (sampleFilename: string) => {
         await deleteStoredSample(sampleFilename);
-        await refreshStoredSamples();
+    }
+
+    const handleChangeMcpDescription = async (e: ChangeEvent<HTMLInputElement>, sample: StoredSample) => {
+        await saveStoredSampleMcpDescription({ sampleFilename: sample.sampleFilename, mcpDescription: e.target.value })
     }
 
     return (
@@ -90,7 +90,7 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
                                 className="dialog-field mcp-description"
                                 value={sample.mcpDescription}
                                 placeholder="MCP Description"
-                                onChange={async (e) => await saveStoredSample({ ...sample, mcpDescription: e.target.value, audioBuffer: undefined })}
+                                onChange={(e) => handleChangeMcpDescription(e, sample)}
                             />
                         </div>
                     )) : (

@@ -9,7 +9,7 @@ interface SavePresetDialogProps {
 }
 
 const SavePresetDialog = (props: SavePresetDialogProps) => {
-    const { storedData, saveStoredData, refreshStoredData } = useJamsterContext();
+    const { storedData, saveStoredData } = useJamsterContext();
     const [saveName, setSaveName] = useState("");
 
     const saveDialogRef = useRef<HTMLDialogElement>(null);
@@ -19,7 +19,6 @@ const SavePresetDialog = (props: SavePresetDialogProps) => {
         if (saveName.length === 0) return;
 
         await saveStoredData(props.patterns, props.timelineRows, saveName);
-        await refreshStoredData();
 
         saveDialogRef.current?.close();
     }

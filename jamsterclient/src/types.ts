@@ -56,7 +56,7 @@ export type StoredTimelineRowData = {
     slots: PatternIndex[];
 }
 
-export type StoredData = {
+export type StoredPreset = {
     name: string;
     timelineRows: StoredTimelineRowData[],
     patterns: StoredPatternData[]
@@ -66,5 +66,15 @@ export type StoredSample = {
     sampleFilename: string;
     mcpDescription: string;
     arrayBuffer: ArrayBuffer;
-    audioBuffer?: AudioBuffer;
+    audioBuffer: AudioBuffer;
+}
+
+export type StoredSampleArrayBuffer = {
+    sampleFilename: string;
+    arrayBuffer: ArrayBuffer;
+}
+
+export type StoredSampleMcpDescription = {
+    sampleFilename: string;
+    mcpDescription: string;
 }

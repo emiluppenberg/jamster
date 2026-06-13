@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useJamsterContext } from "../../Context";
-import type { PatternData, StoredData, TimelineRowData } from "../../types";
+import type { PatternData, StoredPreset, TimelineRowData } from "../../types";
 import { loadPatterns } from "../../helpers/load";
 
 interface LoadPresetDialogProps {
@@ -10,10 +10,10 @@ interface LoadPresetDialogProps {
 }
 
 const LoadPresetDialog = (props: LoadPresetDialogProps) => {
-    const { audioContext, analyserNode, storedSamples, storedData, deleteStoredData, refreshStoredData } = useJamsterContext();
+    const { audioContext, analyserNode, storedSamples, storedData, deleteStoredData } = useJamsterContext();
     const loadDialogRef = useRef<HTMLDialogElement>(null);
 
-    const handleLoad = async (storedData: StoredData): Promise<void> => {
+    const handleLoad = async (storedData: StoredPreset): Promise<void> => {
         const patterns = await loadPatterns(audioContext, analyserNode, storedData.patterns, storedSamples);
         const timelines = storedData.timelineRows.map((timeline, index) => ({
             index: index,
@@ -31,7 +31,6 @@ const LoadPresetDialog = (props: LoadPresetDialogProps) => {
 
     const handleDeleteStoredData = async (dataName: string) => {
         await deleteStoredData(dataName);
-        await refreshStoredData();
     }
 
     return (

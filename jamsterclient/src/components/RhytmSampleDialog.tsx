@@ -9,15 +9,13 @@ export interface SampleInputProps {
 }
 
 const RhythmSampleDialog = (props: SampleInputProps) => {
-    const { audioContext, storedSamples, saveStoredSample, deleteStoredSample, refreshStoredSamples } = useJamsterContext();
+    const { audioContext, storedSamples, saveStoredSampleArrayBuffer, saveStoredSampleMcpDescription, deleteStoredSample } = useJamsterContext();
     const dialogRef = useRef<HTMLDialogElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedSampleFilename, setSelectedSampleFilename] = useState(props.sampleFileName)
 
     const handleStoredSampleLoad = async (storedSample: StoredSample): Promise<void> => {
-        const audioBuffer = await audioContext.decodeAudioData(storedSample.arrayBuffer.slice(0));
-
-        props.setSample(audioBuffer, storedSample.sampleFilename);
+        props.setSample(storedSample.audioBuffer, storedSample.sampleFilename);
         setSelectedSampleFilename(storedSample.sampleFilename);
     }
 
@@ -25,19 +23,19 @@ const RhythmSampleDialog = (props: SampleInputProps) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        let audioBuffer: AudioBuffer;
         const storedSample = storedSamples.find((stored) => stored.sampleFilename === file.name)
 
-        if (storedSample) {
-            audioBuffer = await audioContext.decodeAudioData(storedSample.arrayBuffer.slice(0));
-        } else {
+        if (!storedSample) {
             const arrayBuffer = await file.arrayBuffer();
-            await saveStoredSample({ sampleFilename: file.name, arrayBuffer: arrayBuffer, mcpDescription: "" })
-            await refreshStoredSamples();
-            audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+            await saveStoredSampleArrayBuffer({ sampleFilename: file.name, arrayBuffer: arrayBuffer })
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+            props.setSample(audioBuffer, file.name);
+            setSelectedSampleFilename(file.name)
+            e.target.value = "";
+            return;
         }
 
-        props.setSample(audioBuffer, file.name);
+        props.setSample(storedSample.audioBuffer, file.name);
         setSelectedSampleFilename(file.name)
         e.target.value = "";
     }
@@ -52,7 +50,6 @@ const RhythmSampleDialog = (props: SampleInputProps) => {
 
     const handleDeleteStoredSample = async (sampleFilename: string) => {
         await deleteStoredSample(sampleFilename);
-        await refreshStoredSamples();
     }
 
     return (
@@ -98,7 +95,7 @@ const RhythmSampleDialog = (props: SampleInputProps) => {
                                 className={`dialog-field ${selectedSampleFilename === sample.sampleFilename ? "selected-sample" : ""} mcp-description`}
                                 value={sample.mcpDescription}
                                 placeholder="MCP Description"
-                                onChange={async (e) => await saveStoredSample({ ...sample, mcpDescription: e.target.value, audioBuffer: undefined })}
+                                onChange={async (e) => await saveStoredSampleMcpDescription({ ...sample, mcpDescription: e.target.value })}
                             />
                         </div>
                     )) : (

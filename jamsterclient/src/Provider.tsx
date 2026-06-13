@@ -1,63 +1,82 @@
 import { useCallback, useState, type PropsWithChildren } from "react"
 import { eq_fftSize } from "./utils";
-import { deleteData, deleteSample, getAllSamples, getData, saveSample } from "./helpers/db";
-import type { PatternData, StoredData, StoredSample, TimelineRowData } from "./types";
+import {
+    deletePreset,
+    deleteSampleArrayBuffer,
+    deleteSampleMcpDescription,
+    getAllSamplesArrayBuffers,
+    getAllSamplesMcpDescriptions,
+    getPreset,
+    saveSampleArrayBuffer,
+    saveSampleMcpDescription
+} from "./helpers/db";
+import type { PatternData, StoredPreset, StoredSample, StoredSampleArrayBuffer, StoredSampleMcpDescription, TimelineRowData } from "./types";
 import { storeData } from "./helpers/save";
 import { JamsterContext } from "./Context";
 
-const decodeStoredSamples = async () => {
-    return await getAllSamples().then(async (samples) =>
-        await Promise.all(samples.map(async (sample) =>
-            ({ ...sample, audioBuffer: await audioContext.decodeAudioData(sample.arrayBuffer.slice(0)) }))));
+const constructStoredSamples = async (): Promise<StoredSample[]> => {
+    const [withMcpDescriptions, withArrayBuffers] = await Promise.all([
+        getAllSamplesMcpDescriptions(),
+        getAllSamplesArrayBuffers()
+    ]);
+    const descriptionsByFilename = new Map(
+        withMcpDescriptions.map((sample) => [sample.sampleFilename, sample.mcpDescription])
+    );
+
+    return await Promise.all(withArrayBuffers.map(async (sample) => ({
+        ...sample,
+        mcpDescription: descriptionsByFilename.get(sample.sampleFilename) ?? "",
+        audioBuffer: await audioContext.decodeAudioData(sample.arrayBuffer.slice(0))
+    })));
 }
+
 const appSessionId = crypto.randomUUID();
 const audioContext = new AudioContext();
 const analyserNode = audioContext.createAnalyser();
-const initialStoredData = await getData();
-const initialStoredSamples = await decodeStoredSamples();
+const initialStoredData = await getPreset();
+const initialStoredSamples = await constructStoredSamples();
 
 analyserNode.fftSize = eq_fftSize;
 analyserNode.connect(audioContext.destination);
 
 export const JamsterProvider = ({ children }: PropsWithChildren) => {
-    const [storedData, setStoredData] = useState<StoredData[]>(initialStoredData);
+    const [storedData, setStoredData] = useState<StoredPreset[]>(initialStoredData);
     const [storedSamples, setStoredSamples] = useState<StoredSample[]>(initialStoredSamples);
 
     const refreshStoredData = useCallback(async () => {
-        setStoredData(await getData());
+        setStoredData(await getPreset());
     }, []);
 
     const refreshStoredSamples = useCallback(async () => {
-        setStoredSamples(await decodeStoredSamples());
+        setStoredSamples(await constructStoredSamples());
     }, [])
 
     const saveStoredData = useCallback(async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string) => {
-        const saved = await storeData(patterns, timelineRows, saveName);
-
-        setStoredData((current) => [
-            saved,
-            ...current.filter((item) => item.name !== saved.name),
-        ]);
+        await storeData(patterns, timelineRows, saveName)
+        await refreshStoredData();
     }, []);
 
-    const saveStoredSample = useCallback(async (sample: StoredSample) => {
-        await saveSample(sample)
-        setStoredSamples((current) => [
-            sample,
-            ...current.filter((storedSample) => storedSample.sampleFilename !== sample.sampleFilename)
-        ])
+    const saveStoredSampleArrayBuffer = useCallback(async (sample: StoredSampleArrayBuffer) => {
+        await saveSampleArrayBuffer(sample)
+        await refreshStoredSamples();
+    }, [])
+
+    const saveStoredSampleMcpDescription = useCallback(async (sample: StoredSampleMcpDescription) => {
+        await saveSampleMcpDescription(sample)
+        await refreshStoredSamples();
     }, [])
 
     const deleteStoredData = useCallback(async (dataName: string) => {
-        await deleteData(dataName)
-
-        setStoredData((current) => current.filter((data) => data.name !== dataName))
+        await deletePreset(dataName)
+        await refreshStoredData();
     }, [])
 
     const deleteStoredSample = useCallback(async (sampleFilename: string) => {
-        await deleteSample(sampleFilename)
-
-        setStoredSamples((current) => current.filter((sample) => sample.sampleFilename !== sampleFilename))
+        await Promise.all([
+            deleteSampleArrayBuffer(sampleFilename),
+            deleteSampleMcpDescription(sampleFilename)
+        ])
+        await refreshStoredSamples();
     }, [])
 
     return (
@@ -67,10 +86,9 @@ export const JamsterProvider = ({ children }: PropsWithChildren) => {
             analyserNode,
             storedData,
             storedSamples,
-            refreshStoredData,
-            refreshStoredSamples,
             saveStoredData,
-            saveStoredSample,
+            saveStoredSampleArrayBuffer,
+            saveStoredSampleMcpDescription,
             deleteStoredData,
             deleteStoredSample
         }}>

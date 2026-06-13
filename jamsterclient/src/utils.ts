@@ -4,7 +4,17 @@ import snare1Url from './assets/snare1.wav';
 import hihat2Url from './assets/hihat2.wav';
 import kick2Url from './assets/kick2.wav';
 import snare2Url from './assets/snare2.wav';
-import type { MeasureData, NoteData, RhythmData, StoredData, StoredPatternData, StoredTimelineRowData } from './types';
+import shaker1Url from './assets/shaker1.wav';
+import type { MeasureData, NoteData, RhythmData, StoredPreset, StoredPatternData, StoredTimelineRowData } from './types';
+export const stockSamples = [
+    { url: hihat1Url, mcpDescription: "Basic hihat" },
+    { url: kick1Url, mcpDescription: "Hard kick" },
+    { url: snare1Url, mcpDescription: "Ghost snare" },
+    { url: hihat2Url, mcpDescription: "Basic hihat" },
+    { url: kick2Url, mcpDescription: "Dull kick" },
+    { url: snare2Url, mcpDescription: "Hard snare" },
+    { url: shaker1Url, mcpDescription: "One hit shaker" }
+];
 
 export const examplePatterns: StoredPatternData[] = [
     {
@@ -96,7 +106,7 @@ export const exampleTimelines: StoredTimelineRowData[] = [
     { slots: [1, 0, 1, 0] }
 ]
 
-export const exampleData: StoredData = {
+export const exampleData: StoredPreset = {
     name: "example",
     timelineRows: exampleTimelines,
     patterns: examplePatterns

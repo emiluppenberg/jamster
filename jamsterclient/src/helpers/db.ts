@@ -1,50 +1,57 @@
-import hihat1Url from '../assets/hihat1.wav';
-import kick1Url from '../assets/kick1.wav';
-import snare1Url from '../assets/snare1.wav';
-import hihat2Url from '../assets/hihat2.wav';
-import kick2Url from '../assets/kick2.wav';
-import snare2Url from '../assets/snare2.wav';
-import shaker1Url from '../assets/shaker1.wav';
-import type { StoredData, StoredSample } from "../types";
-import { exampleData } from '../utils';
+import type { StoredPreset, StoredSample, StoredSampleArrayBuffer, StoredSampleMcpDescription } from "../types";
+import { exampleData, stockSamples } from '../utils';
 
-const seedExampleSamples = async (db: IDBDatabase): Promise<void> => {
-    const stockSamples = [
-        { url: hihat1Url, description: "Basic hihat" },
-        {url: kick1Url, description: "Hard kick"},
-        {url: snare1Url, description: "Ghost snare"},
-        {url: hihat2Url, description: "Basic hihat"},
-        {url: kick2Url, description: "Dull kick"},
-        {url: snare2Url, description: "Hard snare"},
-        {url: shaker1Url, description: "One hit shaker"}
-    ];
+const store_samplesArrayBuffers = "samplesArrayBuffers";
+const store_samplesMcpDescriptions = "samplesMcpDescriptions";
+const store_presets = "presets";
 
-    const samples: StoredSample[] = await Promise.all(stockSamples.map(async (sample) => {
+const key_samplesArrayBuffers = "sampleFilename";
+const key_samplesMcpDescriptions = "sampleFilename";
+const key_presets = "name";
+
+const seedStockSamplesArrayBuffers = async (db: IDBDatabase): Promise<void> => {
+    const samplesArrayBuffers: StoredSampleArrayBuffer[] = await Promise.all(stockSamples.map(async (sample) => {
         const response = await fetch(sample.url);
         const arrayBuffer = await response.arrayBuffer();
 
         return {
             sampleFilename: sample.url,
-            mcpDescription: sample.description,
             arrayBuffer,
         };
     }));
 
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction("samples", "readwrite");
-        const store = transaction.objectStore("samples");
+        const transaction = db.transaction(store_samplesArrayBuffers, "readwrite");
+        const store = transaction.objectStore(store_samplesArrayBuffers);
 
-        samples.forEach((sample) => store.put(sample));
+        samplesArrayBuffers.forEach((sample) => store.put(sample));
 
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
     });
 }
 
-const seedExampleData = async (db: IDBDatabase): Promise<void> => {
+const seedStockSamplesMcpDescriptions = async (db: IDBDatabase): Promise<void> => {
+    const samplesMcpDescriptions: StoredSampleMcpDescription[] = await Promise.all(stockSamples.map(async (sample) => ({
+        sampleFilename: sample.url,
+        mcpDescription: sample.mcpDescription
+    })));
+
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction("data", "readwrite");
-        const store = transaction.objectStore("data");
+        const transaction = db.transaction(store_samplesMcpDescriptions, "readwrite");
+        const store = transaction.objectStore(store_samplesMcpDescriptions);
+
+        samplesMcpDescriptions.forEach((sample) => store.put(sample));
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+    });
+}
+
+const seedStockPresets = async (db: IDBDatabase): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(store_presets, "readwrite");
+        const store = transaction.objectStore(store_presets);
 
         store.put(exampleData)
 
@@ -56,52 +63,47 @@ const seedExampleData = async (db: IDBDatabase): Promise<void> => {
 export const openJamsterDB = async (): Promise<IDBDatabase> => (
     new Promise((resolve, reject) => {
         const request = indexedDB.open("jamster", 1);
-        let shouldSeed = false;
+        let seedArrayBuffers = false;
+        let seedMcpDescriptions = false;
+        let seedPresets = false;
 
         request.onupgradeneeded = () => {
             const db = request.result;
 
-            if (!db.objectStoreNames.contains("samples")) {
-                db.createObjectStore("samples", { keyPath: "sampleFilename" });
-                shouldSeed = true;
+            if (!db.objectStoreNames.contains(store_samplesArrayBuffers)) {
+                db.createObjectStore(store_samplesArrayBuffers, { keyPath: key_samplesArrayBuffers });
+                seedArrayBuffers = true;
             }
 
-            if (!db.objectStoreNames.contains("data")) {
-                db.createObjectStore("data", { keyPath: "name" });
-                shouldSeed = true;
+            if (!db.objectStoreNames.contains(store_samplesMcpDescriptions)) {
+                db.createObjectStore(store_samplesMcpDescriptions, { keyPath: key_samplesMcpDescriptions });
+                seedMcpDescriptions = true;
+            }
+
+            if (!db.objectStoreNames.contains(store_presets)) {
+                db.createObjectStore(store_presets, { keyPath: key_presets });
+                seedPresets = true;
             }
         }
 
         request.onsuccess = async () => {
             const db = request.result;
-            shouldSeed && await seedExampleSamples(db);
-            shouldSeed && await seedExampleData(db);
+            seedArrayBuffers && await seedStockSamplesArrayBuffers(db);
+            seedMcpDescriptions && await seedStockSamplesMcpDescriptions(db);
+            seedPresets && await seedStockPresets(db);
             resolve(db);
         }
 
         request.onerror = () => reject(request.error);
     })
 )
-export const getSample = async (sampleFileName: string): Promise<StoredSample> => {
+
+export const getAllSamplesArrayBuffers = async (): Promise<StoredSampleArrayBuffer[]> => {
     const db = await openJamsterDB();
 
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction("samples", "readonly");
-        const store = transaction.objectStore("samples");
-
-        const request = store.get(sampleFileName);
-
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    })
-}
-
-export const getAllSamples = async (): Promise<StoredSample[]> => {
-    const db = await openJamsterDB();
-
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction("samples", "readonly");
-        const store = transaction.objectStore("samples");
+        const transaction = db.transaction(store_samplesArrayBuffers, "readonly");
+        const store = transaction.objectStore(store_samplesArrayBuffers);
 
         const request = store.getAll();
 
@@ -110,12 +112,27 @@ export const getAllSamples = async (): Promise<StoredSample[]> => {
     })
 }
 
-export const saveSample = async (sample: StoredSample): Promise<void> => {
+export const getAllSamplesMcpDescriptions = async (): Promise<StoredSampleMcpDescription[]> => {
     const db = await openJamsterDB();
 
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction("samples", "readwrite");
-        const store = transaction.objectStore("samples");
+        const transaction = db.transaction(store_samplesMcpDescriptions, "readonly");
+        const store = transaction.objectStore(store_samplesMcpDescriptions);
+
+        const request = store.getAll();
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    })
+}
+
+export const saveSampleArrayBuffer = async (sample: StoredSampleArrayBuffer): Promise<void> => {
+    const db = await openJamsterDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("samplesArrayBuffers", "readwrite");
+        const store = transaction.objectStore("samplesArrayBuffers");
+
         store.put(sample);
 
         transaction.oncomplete = () => resolve();
@@ -123,12 +140,26 @@ export const saveSample = async (sample: StoredSample): Promise<void> => {
     })
 }
 
-export const deleteSample = async (sampleFilename: string): Promise<void> => {
+export const saveSampleMcpDescription = async (sample: StoredSampleMcpDescription): Promise<void> => {
     const db = await openJamsterDB();
 
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction("samples", "readwrite");
-        const store = transaction.objectStore("samples");
+        const transaction = db.transaction(store_samplesMcpDescriptions, "readwrite");
+        const store = transaction.objectStore(store_samplesMcpDescriptions);
+
+        store.put(sample);
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+    })
+}
+
+export const deleteSampleArrayBuffer = async (sampleFilename: string): Promise<void> => {
+    const db = await openJamsterDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(store_samplesArrayBuffers, "readwrite");
+        const store = transaction.objectStore(store_samplesArrayBuffers);
 
         store.delete(sampleFilename);
 
@@ -137,12 +168,26 @@ export const deleteSample = async (sampleFilename: string): Promise<void> => {
     })
 }
 
-export const getData = async (): Promise<StoredData[]> => {
+export const deleteSampleMcpDescription = async (sampleFilename: string): Promise<void> => {
     const db = await openJamsterDB();
 
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction("data", "readwrite");
-        const store = transaction.objectStore("data");
+        const transaction = db.transaction(store_samplesMcpDescriptions, "readwrite");
+        const store = transaction.objectStore(store_samplesMcpDescriptions);
+
+        store.delete(sampleFilename);
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+    })
+}
+
+export const getPreset = async (): Promise<StoredPreset[]> => {
+    const db = await openJamsterDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(store_presets, "readwrite");
+        const store = transaction.objectStore(store_presets);
 
         const request = store.getAll();
 
@@ -151,28 +196,28 @@ export const getData = async (): Promise<StoredData[]> => {
     })
 }
 
-export const saveData = async (data: StoredData): Promise<void> => {
+export const savePreset = async (preset: StoredPreset): Promise<void> => {
     const db = await openJamsterDB();
 
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction("data", "readwrite");
-        const store = transaction.objectStore("data");
+        const transaction = db.transaction(store_presets, "readwrite");
+        const store = transaction.objectStore(store_presets);
 
-        store.put(data);
+        store.put(preset);
 
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
     })
 }
 
-export const deleteData = async (dataName: string): Promise<void> => {
+export const deletePreset = async (presetName: string): Promise<void> => {
     const db = await openJamsterDB();
 
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction("data", "readwrite");
-        const store = transaction.objectStore("data");
+        const transaction = db.transaction(store_presets, "readwrite");
+        const store = transaction.objectStore(store_presets);
 
-        store.delete(dataName);
+        store.delete(presetName);
 
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
