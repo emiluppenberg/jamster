@@ -29,10 +29,12 @@ const resizeSlots = (
 const TimelineRows = (props: TimelineProps) => {
 
     const addTimelineRow = () => {
+        const nextIndex = Math.max(...props.timelineRows.map(row => row.index)) + 1;
+        
         props.onTimelineRowsChange([
             ...props.timelineRows,
             {
-                index: props.timelineRows.length,
+                index: nextIndex,
                 slots: createSlots(props.timelineLength),
             },
         ]);
@@ -50,20 +52,20 @@ const TimelineRows = (props: TimelineProps) => {
     }
 
     const handleSlotChange = (
-        timelineDataIndex: number,
+        timelineRowIndex: number,
         slotIndex: number,
         value: string,
     ) => {
         const patternIndex = value === "" ? undefined : Number(value);
 
-        props.onTimelineRowsChange(props.timelineRows.map((timeline) => {
-            if (timeline.index !== timelineDataIndex) return timeline;
+        props.onTimelineRowsChange(props.timelineRows.map((timelineRow) => {
+            if (timelineRow.index !== timelineRowIndex) return timelineRow;
 
-            const slots = resizeSlots(timeline.slots, props.timelineLength);
+            const slots = resizeSlots(timelineRow.slots, props.timelineLength);
             slots[slotIndex] = patternIndex;
 
             return {
-                ...timeline,
+                ...timelineRow,
                 slots,
             };
         }));

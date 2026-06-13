@@ -89,6 +89,7 @@ export interface PlaybackProps {
     onStoreLoaded: (patterns: PatternData[], timelines: TimelineRowData[]) => void;
     onPatternChange: (pattern: PatternData) => void;
     onPatternAdded: (pattern: PatternData) => void;
+    onTimelineRowsChange: React.Dispatch<SetStateAction<TimelineRowData[]>>;
 }
 
 const Playback = (props: PlaybackProps) => {
@@ -249,7 +250,7 @@ const Playback = (props: PlaybackProps) => {
                     <SavePresetDialog patterns={props.patterns} timelineRows={props.timelineRows} bpm={bpm} />
                     <ManageSamplesDialog onPlaySample={playSample} />
                 </div>
-                <McpSocket patterns={props.patterns} onPatternChange={props.onPatternChange} onPatternAdded={props.onPatternAdded} />
+                <McpSocket patterns={props.patterns} timelineRows={props.timelineRows} onPatternChange={props.onPatternChange} onPatternAdded={props.onPatternAdded} onTimelineRowsChange={props.onTimelineRowsChange} />
                 <Equalizer isPlaying={isPlaying} />
             </div>
             {props.children({

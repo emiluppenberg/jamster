@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useJamsterContext } from "../Context";
-import type { PatternData } from "../types";
+import type { PatternData, TimelineRowData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
 import { McpSocketMessageSchema } from "@jamster/shared"
@@ -9,8 +9,10 @@ import { decodeStoredSample } from "../helpers/load";
 
 interface McpSocketProps {
     patterns: PatternData[];
+    timelineRows: TimelineRowData[];
     onPatternChange: (pattern: PatternData) => void;
     onPatternAdded: (pattern: PatternData) => void;
+    onTimelineRowsChange: (timelineRows: TimelineRowData[]) => void;
 }
 
 const McpSocket = (props: McpSocketProps) => {
@@ -53,10 +55,10 @@ const McpSocket = (props: McpSocketProps) => {
     };
 
     const handleCreatePattern = async (dto: CreatePatternDto) => {
-        const nextIndex = Math.max(...props.patterns.map(pattern => pattern.index)) + 1
+        const nextIndexPattern = Math.max(...props.patterns.map(pattern => pattern.index)) + 1
 
         props.onPatternAdded({
-            index: nextIndex,
+            index: nextIndexPattern,
             name: dto.patternName,
             numberOfMeasures: dto.numberOfMeasures,
             rhythms: await Promise.all(dto.rhythms.map(async (rhythm, rhythmIndex) => {
@@ -84,6 +86,14 @@ const McpSocket = (props: McpSocketProps) => {
                 }
             }))
         })
+
+        const nextIndexTimelineRow = Math.max(...props.timelineRows.map(row => row.index)) + 1;
+        const slotsLength = Math.max(...props.timelineRows.map(row => row.slots.length));
+
+        props.onTimelineRowsChange([...props.timelineRows, {
+            index: nextIndexTimelineRow,
+            slots: Array.from({ length: slotsLength }, () => nextIndexPattern)
+        }])
     }
 
     const handleSocketMessage = (event: MessageEvent) => {
