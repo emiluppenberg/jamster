@@ -1,5 +1,6 @@
-import type { StoredPreset, StoredSample, StoredSampleArrayBuffer, StoredSampleMcpDescription } from "../types";
-import { exampleData, stockSamples } from '../utils';
+import { stockSamples, stockPresetDnB, stockPresetFunky } from "../stock";
+import type { StoredPreset, StoredSampleArrayBuffer, StoredSampleMcpDescription } from "../types";
+import { getUrlFilename } from '../utils';
 
 const store_samplesArrayBuffers = "samplesArrayBuffers";
 const store_samplesMcpDescriptions = "samplesMcpDescriptions";
@@ -15,7 +16,7 @@ const seedStockSamplesArrayBuffers = async (db: IDBDatabase): Promise<void> => {
         const arrayBuffer = await response.arrayBuffer();
 
         return {
-            sampleFilename: sample.url,
+            sampleFilename: getUrlFilename(sample.url),
             arrayBuffer,
         };
     }));
@@ -33,7 +34,7 @@ const seedStockSamplesArrayBuffers = async (db: IDBDatabase): Promise<void> => {
 
 const seedStockSamplesMcpDescriptions = async (db: IDBDatabase): Promise<void> => {
     const samplesMcpDescriptions: StoredSampleMcpDescription[] = await Promise.all(stockSamples.map(async (sample) => ({
-        sampleFilename: sample.url,
+        sampleFilename: getUrlFilename(sample.url),
         mcpDescription: sample.mcpDescription
     })));
 
@@ -53,8 +54,9 @@ const seedStockPresets = async (db: IDBDatabase): Promise<void> => {
         const transaction = db.transaction(store_presets, "readwrite");
         const store = transaction.objectStore(store_presets);
 
-        store.put(exampleData)
-
+        store.put(stockPresetDnB)
+        store.put(stockPresetFunky)
+        
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
     });
@@ -88,9 +90,9 @@ export const openJamsterDB = async (): Promise<IDBDatabase> => (
 
         request.onsuccess = async () => {
             const db = request.result;
-            seedArrayBuffers && await seedStockSamplesArrayBuffers(db);
-            seedMcpDescriptions && await seedStockSamplesMcpDescriptions(db);
-            seedPresets && await seedStockPresets(db);
+            if (seedArrayBuffers) await seedStockSamplesArrayBuffers(db);
+            if (seedMcpDescriptions) await seedStockSamplesMcpDescriptions(db);
+            if (seedPresets) await seedStockPresets(db);
             resolve(db);
         }
 
@@ -182,7 +184,7 @@ export const deleteSampleMcpDescription = async (sampleFilename: string): Promis
     })
 }
 
-export const getPreset = async (): Promise<StoredPreset[]> => {
+export const getPresets = async (): Promise<StoredPreset[]> => {
     const db = await openJamsterDB();
 
     return new Promise((resolve, reject) => {

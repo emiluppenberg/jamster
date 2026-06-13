@@ -58,6 +58,7 @@ export type StoredTimelineRowData = {
 
 export type StoredPreset = {
     name: string;
+    bpm: number;
     timelineRows: StoredTimelineRowData[],
     patterns: StoredPatternData[]
 }

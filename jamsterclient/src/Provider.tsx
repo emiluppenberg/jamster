@@ -6,12 +6,12 @@ import {
     deleteSampleMcpDescription,
     getAllSamplesArrayBuffers,
     getAllSamplesMcpDescriptions,
-    getPreset,
+    getPresets,
     saveSampleArrayBuffer,
     saveSampleMcpDescription
 } from "./helpers/db";
 import type { PatternData, StoredPreset, StoredSample, StoredSampleArrayBuffer, StoredSampleMcpDescription, TimelineRowData } from "./types";
-import { storeData } from "./helpers/save";
+import { storePreset } from "./helpers/save";
 import { JamsterContext } from "./Context";
 
 const constructStoredSamples = async (): Promise<StoredSample[]> => {
@@ -22,7 +22,6 @@ const constructStoredSamples = async (): Promise<StoredSample[]> => {
     const descriptionsByFilename = new Map(
         withMcpDescriptions.map((sample) => [sample.sampleFilename, sample.mcpDescription])
     );
-
     return await Promise.all(withArrayBuffers.map(async (sample) => ({
         ...sample,
         mcpDescription: descriptionsByFilename.get(sample.sampleFilename) ?? "",
@@ -33,27 +32,27 @@ const constructStoredSamples = async (): Promise<StoredSample[]> => {
 const appSessionId = crypto.randomUUID();
 const audioContext = new AudioContext();
 const analyserNode = audioContext.createAnalyser();
-const initialStoredData = await getPreset();
+const initialStoredPresets = await getPresets();
 const initialStoredSamples = await constructStoredSamples();
 
 analyserNode.fftSize = eq_fftSize;
 analyserNode.connect(audioContext.destination);
 
 export const JamsterProvider = ({ children }: PropsWithChildren) => {
-    const [storedData, setStoredData] = useState<StoredPreset[]>(initialStoredData);
+    const [storedPresets, setStoredPresets] = useState<StoredPreset[]>(initialStoredPresets);
     const [storedSamples, setStoredSamples] = useState<StoredSample[]>(initialStoredSamples);
 
-    const refreshStoredData = useCallback(async () => {
-        setStoredData(await getPreset());
+    const refreshStoredPresets = useCallback(async () => {
+        setStoredPresets(await getPresets());
     }, []);
 
     const refreshStoredSamples = useCallback(async () => {
         setStoredSamples(await constructStoredSamples());
     }, [])
 
-    const saveStoredData = useCallback(async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string) => {
-        await storeData(patterns, timelineRows, saveName)
-        await refreshStoredData();
+    const saveStoredPreset = useCallback(async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string, bpm: number) => {
+        await storePreset(patterns, timelineRows, saveName, bpm)
+        await refreshStoredPresets();
     }, []);
 
     const saveStoredSampleArrayBuffer = useCallback(async (sample: StoredSampleArrayBuffer) => {
@@ -66,9 +65,9 @@ export const JamsterProvider = ({ children }: PropsWithChildren) => {
         await refreshStoredSamples();
     }, [])
 
-    const deleteStoredData = useCallback(async (dataName: string) => {
+    const deleteStoredPreset = useCallback(async (dataName: string) => {
         await deletePreset(dataName)
-        await refreshStoredData();
+        await refreshStoredPresets();
     }, [])
 
     const deleteStoredSample = useCallback(async (sampleFilename: string) => {
@@ -84,12 +83,12 @@ export const JamsterProvider = ({ children }: PropsWithChildren) => {
             appSessionId,
             audioContext,
             analyserNode,
-            storedData,
+            storedPresets: storedPresets,
             storedSamples,
-            saveStoredData,
+            saveStoredPreset,
             saveStoredSampleArrayBuffer,
             saveStoredSampleMcpDescription,
-            deleteStoredData,
+            deleteStoredPreset,
             deleteStoredSample
         }}>
             {children}

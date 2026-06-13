@@ -5,20 +5,20 @@ import type { PatternData, TimelineRowData } from "../../types";
 interface SavePresetDialogProps {
     patterns: PatternData[];
     timelineRows: TimelineRowData[];
-    onStoreLoaded: (patterns: PatternData[], timeline: TimelineRowData[]) => void;
+    bpm: number;
 }
 
 const SavePresetDialog = (props: SavePresetDialogProps) => {
-    const { storedData, saveStoredData } = useJamsterContext();
+    const { storedPresets, saveStoredPreset } = useJamsterContext();
     const [saveName, setSaveName] = useState("");
 
     const saveDialogRef = useRef<HTMLDialogElement>(null);
-    const isExistingName = useMemo(() => storedData.some(data => data.name === saveName), [saveName, storedData])
+    const isExistingName = useMemo(() => storedPresets.some(data => data.name === saveName), [saveName, storedPresets])
 
     const handleSave = async (): Promise<void> => {
         if (saveName.length === 0) return;
 
-        await saveStoredData(props.patterns, props.timelineRows, saveName);
+        await saveStoredPreset(props.patterns, props.timelineRows, saveName, props.bpm);
 
         saveDialogRef.current?.close();
     }

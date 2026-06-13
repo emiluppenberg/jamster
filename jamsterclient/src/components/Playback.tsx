@@ -236,12 +236,17 @@ const Playback = (props: PlaybackProps) => {
         return getMeasureIndex(cursorTick, pattern, slotCount);
     }
 
+    const handleOnStoreLoaded = (patterns: PatternData[], timelineRows: TimelineRowData[], bpm: number) => {
+        setBpm(bpm)
+        props.onStoreLoaded(patterns, timelineRows)
+    }
+
     return (
         <div className="playback">
             <div className="menu">
                 <div className="store">
-                    <LoadPresetDialog onStoreLoaded={props.onStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
-                    <SavePresetDialog onStoreLoaded={props.onStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
+                    <LoadPresetDialog onStoreLoaded={handleOnStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
+                    <SavePresetDialog patterns={props.patterns} timelineRows={props.timelineRows} bpm={bpm} />
                     <ManageSamplesDialog onPlaySample={playSample} />
                 </div>
                 <McpSocket patterns={props.patterns} onPatternChange={props.onPatternChange} onPatternAdded={props.onPatternAdded} />

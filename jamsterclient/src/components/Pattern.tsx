@@ -136,10 +136,14 @@ const Pattern = (props: PatternProps) => {
         });
     }
 
-    const addRhythm = () => updatePatternRhythms([
-        ...props.pattern.rhythms,
-        createRhythm(props.pattern.rhythms.length, props.pattern.numberOfMeasures, audioContext, analyserNode),
-    ])
+    const addRhythm = () => {
+        const nextIndex = Math.max(...props.pattern.rhythms.map(rhythm => rhythm.index)) + 1
+
+        updatePatternRhythms([
+            ...props.pattern.rhythms,
+            createRhythm(nextIndex, props.pattern.numberOfMeasures, audioContext, analyserNode),
+        ])
+    }
 
     const handleNoteChange = (
         rhythmIndex: number,

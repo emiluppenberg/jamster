@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useJamsterContext } from "../../Context";
-import type { StoredSample } from "../../types";
+import type { StoredSample, StoredSampleMcpDescription } from "../../types";
 
 interface ManageSamplesDialogProps {
     onPlaySample: (sample: AudioBuffer, time: number, destination: AudioNode) => void;
@@ -12,6 +12,7 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [gainNode] = useState(audioContext.createGain())
     const [initialized, setInitialized] = useState(false);
+    const [saveMcpDescriptions, setSaveMcpDescriptions] = useState<StoredSampleMcpDescription[]>([])
 
     useEffect(() => {
         if (initialized) return;
@@ -33,7 +34,8 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
         }
     }
 
-    const handleDialogClose = () => {
+    const handleDialogClose = async () => {
+        await executeSaveMcpDescriptions();
         dialogRef.current?.close();
     }
 
@@ -45,18 +47,31 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
         await deleteStoredSample(sampleFilename);
     }
 
-    const handleChangeMcpDescription = async (e: ChangeEvent<HTMLInputElement>, sample: StoredSample) => {
-        await saveStoredSampleMcpDescription({ sampleFilename: sample.sampleFilename, mcpDescription: e.target.value })
+    const handleChangeMcpDescription = (e: ChangeEvent<HTMLInputElement>, sample: StoredSample) => {
+        setSaveMcpDescriptions(current => [
+            ...current.filter(currentSample => currentSample.sampleFilename !== sample.sampleFilename),
+            { sampleFilename: sample.sampleFilename, mcpDescription: e.target.value },
+        ]);
+    }
+
+    const executeSaveMcpDescriptions = async () => {
+        saveMcpDescriptions.forEach(async (sample) => await saveStoredSampleMcpDescription(sample))
+        setSaveMcpDescriptions([]);
     }
 
     return (
         <>
-            <button className="btn" type="button" onClick={() => dialogRef.current?.showModal()}>Manage samples</button>
-            <dialog className="load-dialog" ref={dialogRef} >
+            <button className="btn" type="button" onClick={() => dialogRef.current?.showModal()}>
+                Manage samples
+            </button>
+            <dialog className="load-dialog" ref={dialogRef} onClose={executeSaveMcpDescriptions}>
                 <div className="dialog-header">
                     <div>
                         <h2 className="dialog-eyebrow">Manage samples</h2>
                     </div>
+                    {saveMcpDescriptions.length > 0 && (
+                        <p className="dialog-hint">Changes will be saved when closing dialog</p>
+                    )}
                     <button className="btn dialog-close" type="button" onClick={handleDialogClose}>
                         X
                     </button>
@@ -79,7 +94,7 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
                         <div key={sample.sampleFilename} className="dialog-row">
                             <button className="btn delete" type="button" onClick={() => handleDeleteStoredSample(sample.sampleFilename)}>-</button>
                             <button
-                                className="dialog-field"
+                                className="dialog-field filename"
                                 type="button"
                                 onClick={() => sample.audioBuffer && props.onPlaySample(sample.audioBuffer, audioContext.currentTime, gainNode)}
                             >
@@ -88,7 +103,7 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
                             <input
                                 type="text"
                                 className="dialog-field mcp-description"
-                                value={sample.mcpDescription}
+                                defaultValue={sample.mcpDescription}
                                 placeholder="MCP Description"
                                 onChange={(e) => handleChangeMcpDescription(e, sample)}
                             />

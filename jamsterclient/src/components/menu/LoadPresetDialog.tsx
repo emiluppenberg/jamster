@@ -6,21 +6,21 @@ import { loadPatterns } from "../../helpers/load";
 interface LoadPresetDialogProps {
     patterns: PatternData[];
     timelineRows: TimelineRowData[];
-    onStoreLoaded: (patterns: PatternData[], timeline: TimelineRowData[]) => void;
+    onStoreLoaded: (patterns: PatternData[], timelineRows: TimelineRowData[], bpm: number) => void;
 }
 
 const LoadPresetDialog = (props: LoadPresetDialogProps) => {
-    const { audioContext, analyserNode, storedSamples, storedData, deleteStoredData } = useJamsterContext();
+    const { audioContext, analyserNode, storedSamples, storedPresets, deleteStoredPreset } = useJamsterContext();
     const loadDialogRef = useRef<HTMLDialogElement>(null);
 
-    const handleLoad = async (storedData: StoredPreset): Promise<void> => {
-        const patterns = await loadPatterns(audioContext, analyserNode, storedData.patterns, storedSamples);
-        const timelines = storedData.timelineRows.map((timeline, index) => ({
+    const handleLoad = async (storedPreset: StoredPreset): Promise<void> => {
+        const patterns = await loadPatterns(audioContext, analyserNode, storedPreset.patterns, storedSamples);
+        const timelines = storedPreset.timelineRows.map((timeline, index) => ({
             index: index,
             slots: timeline.slots
         }));
 
-        props.onStoreLoaded(patterns, timelines);
+        props.onStoreLoaded(patterns, timelines, storedPreset.bpm);
 
         loadDialogRef.current?.close();
     }
@@ -29,8 +29,8 @@ const LoadPresetDialog = (props: LoadPresetDialogProps) => {
         loadDialogRef.current?.close();
     }
 
-    const handleDeleteStoredData = async (dataName: string) => {
-        await deleteStoredData(dataName);
+    const handleDeleteStoredPreset = async (presetname: string) => {
+        await deleteStoredPreset(presetname);
     }
 
     return (
@@ -46,19 +46,19 @@ const LoadPresetDialog = (props: LoadPresetDialogProps) => {
                     </button>
                 </div>
                 <div className="dialog-list">
-                    {storedData.length > 0 ? storedData.map((data, index) => (
-                        <div key={`load-stored-data-${index}`} className="dialog-row">
-                            <button className="btn delete" type="button" onClick={() => handleDeleteStoredData(data.name)}>-</button>
+                    {storedPresets.length > 0 ? storedPresets.map((preset, index) => (
+                        <div key={`load-stored-preset-${index}`} className="dialog-row">
+                            <button className="btn delete" type="button" onClick={() => handleDeleteStoredPreset(preset.name)}>-</button>
                             <button
                                 className="dialog-field"
                                 type="button"
-                                onClick={() => void handleLoad(data)}
+                                onClick={() => void handleLoad(preset)}
                             >
-                                {data.name}
+                                {preset.name}
                             </button>
                         </div>
                     )) : (
-                        <p className="dialog-hint">No saved data yet.</p>
+                        <p className="dialog-hint">No saved preset yet.</p>
                     )}
                 </div>
             </dialog>

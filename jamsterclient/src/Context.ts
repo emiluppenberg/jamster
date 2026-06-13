@@ -5,12 +5,12 @@ export type JamsterState = {
     appSessionId: string;
     audioContext: AudioContext;
     analyserNode: AnalyserNode;
-    storedData: StoredPreset[];
+    storedPresets: StoredPreset[];
     storedSamples: StoredSample[];
-    saveStoredData: (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string) => Promise<void>;
+    saveStoredPreset: (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string, bpm: number) => Promise<void>;
     saveStoredSampleArrayBuffer: (sample: StoredSampleArrayBuffer) => Promise<void>;
     saveStoredSampleMcpDescription: (sample: StoredSampleMcpDescription) => Promise<void>;
-    deleteStoredData: (dataName: string) => Promise<void>;
+    deleteStoredPreset: (dataName: string) => Promise<void>;
     deleteStoredSample: (sampleFilename: string) => Promise<void>;
 }
 

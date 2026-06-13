@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import RhythmSampleDialog from "./RhytmSampleDialog";
+import RhythmSampleDialog from "./RhythmSampleDialog";
 import type { RhythmData } from "../types";
 
 const notesPerMeasureOptions = [4, 8, 16, 32, 64];
