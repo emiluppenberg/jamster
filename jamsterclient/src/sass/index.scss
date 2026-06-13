@@ -45,7 +45,7 @@ $rhythm-controls-width: 11.5rem;
         gap: 1rem;
         width: 100%;
     }
-    
+
     .menu {
         position: sticky;
         top: 1.25rem;
@@ -82,6 +82,8 @@ $rhythm-controls-width: 11.5rem;
     input,
     select {
         font: inherit;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     .btn {
@@ -605,6 +607,10 @@ $rhythm-controls-width: 11.5rem;
         display: flex;
         align-items: center;
         gap: $space-s;
+
+        >button {
+            white-space: wrap;
+        }
     }
 
     .container {
@@ -628,6 +634,11 @@ $rhythm-controls-width: 11.5rem;
         &.patterns {
             gap: $space-m;
             max-width: 100%;
+
+            >.add {
+                margin-top: 0;
+                margin-left: 0.75rem;
+            }
         }
     }
 
@@ -678,17 +689,16 @@ $rhythm-controls-width: 11.5rem;
     }
 
     .add {
-        position: sticky;
-        top: 0;
-        left: 0;
         box-sizing: border-box;
-        width: 100%;
+        width: calc($space-l - 0.75rem - $space-xs);
         padding: 0 $space-xs 0 $space-xs;
         margin-top: $space-s;
 
         .btn {
             width: 100%;
             padding: $space-xs;
+            background: rgba($green, 0.05);
+            border: 1px solid rgba($green, 0.1);
         }
     }
 
