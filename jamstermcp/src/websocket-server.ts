@@ -1,8 +1,7 @@
 import { Server } from "node:http";
 import WebSocket, { WebSocketServer } from "ws";
-import type { McpAppSessionData } from "@jamster/shared"
+import type { McpAppSessionData } from "@beatdoc/shared"
 
-export const clientPort = 5173;
 const appSessionIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export const InitializeWebSocketServer = (server: Server) => {
@@ -35,7 +34,7 @@ export const InitializeWebSocketServer = (server: Server) => {
     }
 
     wss.on("connection", (connection, request) => {
-        const parsedUrl = new URL(request.url ?? "", `http://localhost:${clientPort}`);
+        const parsedUrl = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
         const appSessionId = parsedUrl.searchParams.get("appSessionId");
 
         if (!appSessionId || !appSessionIdPattern.test(appSessionId)) {

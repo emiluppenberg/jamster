@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
-import { type McpSocketMessage, type SetRhythmDto, McpPatternDataSchema, CreatePatternDtoSchema, SetRhythmDtoSchema, CreatePatternDto, McpAppSessionData, McpSampleDataSchema } from "@jamster/shared";
+import { type McpSocketMessage, type SetRhythmDto, McpPatternDataSchema, CreatePatternDtoSchema, SetRhythmDtoSchema, CreatePatternDto, McpAppSessionData, McpSampleDataSchema } from "@beatdoc/shared";
 import WebSocket from "ws"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import z from "zod";
@@ -10,7 +10,7 @@ export const InitializeMcpServer = async (
     sessionData: Map<string, McpAppSessionData>
 ) => {
     const mcpServer = new McpServer({
-        name: "jamster",
+        name: "beatdoc",
         version: "1.0.0"
     })
 

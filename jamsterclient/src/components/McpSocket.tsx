@@ -3,8 +3,8 @@ import { useJamsterContext } from "../Context";
 import type { PatternData, TimelineRowData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
-import { McpSocketMessageSchema } from "@jamster/shared"
-import type { McpAppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto, McpSampleData } from "@jamster/shared"
+import { McpSocketMessageSchema } from "@beatdoc/shared"
+import type { McpAppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto, McpSampleData } from "@beatdoc/shared"
 import { decodeStoredSample } from "../helpers/load";
 
 interface McpSocketProps {

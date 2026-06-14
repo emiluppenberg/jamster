@@ -1,8 +1,8 @@
 import type { RhythmData, MeasureData, NoteData } from "./types";
 
 export const eq_fftSize = 1024;
-export const wssUrl = "wss://jamstermcp.fly.dev"
-export const mcpUrl = "https://jamstermcp.fly.dev/mcp"
+export const wssUrl = "wss://beatdoc-mcp.fly.dev"
+export const mcpUrl = "https://beatdoc-mcp.fly.dev/mcp"
 
 export const getUrlFilename = (url: string) => url.split("/").pop()?.replace("%20", " ") ?? url
 
