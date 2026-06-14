@@ -62,7 +62,7 @@ const SamplesDialog = (props: SamplesDialogProps) => {
     return (
         <>
             <button className="btn" type="button" onClick={() => dialogRef.current?.showModal()}>Samples</button>
-            <dialog className="load-dialog" ref={dialogRef} onClose={executeSaveMcpDescriptions}>
+            <dialog className="samples-dialog" ref={dialogRef} onClose={executeSaveMcpDescriptions}>
                 <div className="dialog-header">
                     <div>
                         <h2 className="dialog-eyebrow">Manage samples</h2>

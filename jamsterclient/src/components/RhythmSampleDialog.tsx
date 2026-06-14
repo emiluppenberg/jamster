@@ -71,7 +71,7 @@ const RhythmSampleDialog = (props: RhythmSampleDialogProps) => {
             <button className="btn load-sample" type="button" onClick={() => dialogRef.current?.showModal()}>
                 {props.sampleFileName.length > 0 ? props.sampleFileName : "No sample"}
             </button>
-            <dialog className="load-dialog" ref={dialogRef} onClose={executeSaveMcpDescriptions}>
+            <dialog className="samples-dialog" ref={dialogRef} onClose={executeSaveMcpDescriptions}>
                 <div className="dialog-header">
                     <div>
                         <h2 className="dialog-eyebrow">{props.rhythm.name} sample</h2>
