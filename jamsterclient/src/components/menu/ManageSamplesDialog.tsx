@@ -3,7 +3,7 @@ import { useJamsterContext } from "../../Context";
 import type { StoredSample, StoredSampleMcpDescription } from "../../types";
 
 interface ManageSamplesDialogProps {
-    onPlaySample: (sample: AudioBuffer, time: number, destination: AudioNode) => void;
+    onPlaySample: (sample: AudioBuffer, destination: AudioNode, time: number) => void;
 }
 
 const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
@@ -96,7 +96,7 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
                             <button
                                 className="dialog-field filename"
                                 type="button"
-                                onClick={() => sample.audioBuffer && props.onPlaySample(sample.audioBuffer, audioContext.currentTime, gainNode)}
+                                onClick={() => sample.audioBuffer && props.onPlaySample(sample.audioBuffer, gainNode, audioContext.currentTime)}
                             >
                                 {sample.sampleFilename}
                             </button>

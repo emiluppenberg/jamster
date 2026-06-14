@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode, type SetStateAction } from "react";
 import { useJamsterContext } from "../Context";
-import type { PatternData, TimelineRowData } from "../types";
+import type { PatternData, RhythmData, TimelineRowData } from "../types";
 import Equalizer from "./Equalizer";
 import McpSocket from "./McpSocket";
 import LoadPresetDialog from "./menu/LoadPresetDialog";
@@ -128,34 +128,70 @@ const Playback = (props: PlaybackProps) => {
         }
     }, []);
 
-    const playSample = (sample: AudioBuffer, time: number, destination: AudioNode) => {
+    const playSample = (sample: AudioBuffer, destination: AudioNode, startTime: number, stopTime?: number,) => {
         const source = audioContext.createBufferSource();
 
         source.buffer = sample;
         source.connect(destination);
-        source.start(time);
+        source.start(startTime);
+        if (stopTime) source.stop(stopTime)
+    }
+
+    const getNoteStopTime = (rhythm: RhythmData, currentMeasureIndex: number, currentNoteIndex: number, startTime: number) => {
+        let stopTime = startTime;
+        const notesPerMeasureFactor = positionsPerMeasure / rhythm.notesPerMeasure
+
+        for (const note of rhythm.measures[currentMeasureIndex].notes) {
+            if (note.index <= currentNoteIndex) continue;
+
+            stopTime += getPositionDurationSeconds(bpmRef.current) * notesPerMeasureFactor
+            if (note.value !== "-" && note.index !== currentNoteIndex) return stopTime;
+        }
+
+        for (let i = currentMeasureIndex + 1; i < rhythm.measures.length; i++) {
+            for (let j = 0; j < rhythm.measures[i].notes.length; j++) {
+                stopTime += getPositionDurationSeconds(bpmRef.current) * notesPerMeasureFactor
+
+                const note = rhythm.measures[i].notes[j];
+                if (note.value !== "-") return stopTime
+            }
+        }
+
+        for (let i = 0; i <= currentMeasureIndex; i++) {
+            for (let j = 0; j < rhythm.measures[i].notes.length; j++) {
+                stopTime += getPositionDurationSeconds(bpmRef.current) * notesPerMeasureFactor
+
+                const note = rhythm.measures[i].notes[j];
+                if (i === currentMeasureIndex && j === currentNoteIndex) return undefined;
+                if (note.value !== "-") return stopTime
+            }
+        }
+
+        return undefined;
     }
 
     const schedulePattern = (pattern: PatternData, cursorTick: number, time: number) => {
         const { slotCount } = getPlaybackState(playbackModeRef.current, timelineRowsRef.current, soloPatternIndexRef.current)
         const position64 = cursorTick % positionsPerMeasure;
-        const measureIndex = getMeasureIndex(cursorTick, pattern, slotCount);
-        if (measureIndex === undefined) return;
+        const currentMeasureIndex = getMeasureIndex(cursorTick, pattern, slotCount);
+        if (currentMeasureIndex === undefined) return;
 
         pattern.rhythms.forEach((rhythm) => {
-            const measure = rhythm.measures[measureIndex];
+            const currentMeasure = rhythm.measures[currentMeasureIndex];
             const sample = rhythm.sample;
-            if (!measure || !sample) return;
+            if (!currentMeasure || !sample) return;
 
-            const note = measure.notes.find((note) => note.position64 === position64);
-            if (!note) return;
-            if (note.value === "-") return;
+            const currentNote = currentMeasure.notes.find((note) => note.position64 === position64);
+            if (!currentNote) return;
+            if (currentNote.value === "-") return;
 
-            const gain = getNoteGain(note.value);
+            const stopTime = getNoteStopTime(rhythm, currentMeasureIndex, currentNote.index, time);
+
+            const gain = getNoteGain(currentNote.value);
             rhythm.gainNode.gain.setValueAtTime(gain, time);
 
             if (gain <= 0) return;
-            playSample(sample, time, rhythm.gainNode);
+            playSample(sample, rhythm.gainNode, time, stopTime);
         });
     }
 
