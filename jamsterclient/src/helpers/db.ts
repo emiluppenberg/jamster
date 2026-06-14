@@ -1,4 +1,4 @@
-import { stockSamples, stockPresetDnB, stockPresetFunky } from "../stock";
+import { stockSamples, stockPresetDnB, stockPresetChillHop } from "../stock";
 import type { StoredPreset, StoredSampleArrayBuffer, StoredSampleMcpDescription } from "../types";
 import { getUrlFilename } from '../utils';
 
@@ -55,7 +55,7 @@ const seedStockPresets = async (db: IDBDatabase): Promise<void> => {
         const store = transaction.objectStore(store_presets);
 
         store.put(stockPresetDnB)
-        store.put(stockPresetFunky)
+        store.put(stockPresetChillHop)
         
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);

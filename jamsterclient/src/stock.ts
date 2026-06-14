@@ -146,20 +146,20 @@ export const stockSamples = [
     { url: maunsterTR909TomMidUrl, mcpDescription: "TR909-Tom Mid" }
 ];
 
-export const stockPatternsFunky: StoredPatternData[] = [
+export const stockPatternsChillHop: StoredPatternData[] = [
     {
         rhythms:
             [
                 {
-                    name: "C#7 Strummed Rhodes",
+                    name: "C#7",
                     sampleFileName: getUrlFilename(jbl3677ChordStrummedRhodesC7CEGBUrl),
                     notesPerMeasure: 16,
                     measures: [
                         {
-                            noteSequence: "9-------9---5-50"
+                            noteSequence: "9-------9---5-5-"
                         },
                         {
-                            noteSequence: "----------------"
+                            noteSequence: "0---------------"
                         },
                         {
                             noteSequence: "----------------"
@@ -170,7 +170,7 @@ export const stockPatternsFunky: StoredPatternData[] = [
                     ],
                 },
                 {
-                    name: "D#7 Strummed Rhodes",
+                    name: "D#7",
                     sampleFileName: getUrlFilename(jbl3677ChordStrummedRhodesD7CDFAUrl),
                     notesPerMeasure: 16,
                     measures: [
@@ -178,10 +178,10 @@ export const stockPatternsFunky: StoredPatternData[] = [
                             noteSequence: "----------------"
                         },
                         {
-                            noteSequence: "9-------9---5-50"
+                            noteSequence: "9-------9---5-5-"
                         },
                         {
-                            noteSequence: "----------------"
+                            noteSequence: "0---------------"
                         },
                         {
                             noteSequence: "----------------"
@@ -189,7 +189,7 @@ export const stockPatternsFunky: StoredPatternData[] = [
                     ]
                 },
                 {
-                    name: "Em7 Strummed Rhodes",
+                    name: "Em7",
                     sampleFileName: getUrlFilename(jbl3677ChordStrummedRhodesEm7DEGBUrl),
                     notesPerMeasure: 16,
                     measures: [
@@ -203,17 +203,17 @@ export const stockPatternsFunky: StoredPatternData[] = [
                             noteSequence: "9-------9-----5-"
                         },
                         {
-                            noteSequence: "-05----0--------"
+                            noteSequence: "--5-----0-------"
                         },
                     ],
                 },
                 {
-                    name: "G#7 Strummed Rhodes",
+                    name: "G#7",
                     sampleFileName: getUrlFilename(jbl3677ChordStrummedRhodesG7DFGBUrl),
                     notesPerMeasure: 16,
                     measures: [
                         {
-                            noteSequence: "----------------"
+                            noteSequence: "0---------------"
                         },
                         {
                             noteSequence: "----------------"
@@ -222,12 +222,12 @@ export const stockPatternsFunky: StoredPatternData[] = [
                             noteSequence: "----------------"
                         },
                         {
-                            noteSequence: "--------9-959-90"
+                            noteSequence: "--------9-959-9-"
                         },
                     ],
                 }
             ],
-        name: "Rhodes Funk Chords - 5 Chord Progression"
+        name: "Strummed Rhodes"
     },
     {
         rhythms:
@@ -366,20 +366,20 @@ export const stockPatternsFunky: StoredPatternData[] = [
                     ]
                 }
             ],
-        name: "Funk Drums Recreated - 4 Bar"
+        name: "Drums"
     },
 ];
 
-export const stockTimelineFunky: StoredTimelineRowData[] = [
+export const stockTimelineChillHop: StoredTimelineRowData[] = [
     { slots: [0, 0, 0, 0] },
     { slots: [1, 1, 1, 1] }
 ]
 
-export const stockPresetFunky: StoredPreset = {
-    name: "Funky",
-    bpm: 105,
-    timelineRows: stockTimelineFunky,
-    patterns: stockPatternsFunky
+export const stockPresetChillHop: StoredPreset = {
+    name: "ChillHop",
+    bpm: 100,
+    timelineRows: stockTimelineChillHop,
+    patterns: stockPatternsChillHop
 }
 
 export const stockPatternsDnB: StoredPatternData[] = [
@@ -387,27 +387,27 @@ export const stockPatternsDnB: StoredPatternData[] = [
         rhythms:
             [
                 {
-                    name: "closed hihat",
-                    sampleFileName: getUrlFilename(djIgnorantLoFiClosedHHUrl),
+                    name: "Closed Hihat",
+                    sampleFileName: getUrlFilename(maunsterTR909ClosedHHUrl),
                     notesPerMeasure: 16,
                     measures: [
                         {
-                            noteSequence: "6-4-6-5-6-4-6-5-"
+                            noteSequence: "9-7-9-8-9-7-9-8-"
                         },
                         {
-                            noteSequence: "6-4-6-5-6-44-6-5"
+                            noteSequence: "9-7-9-8-9-77-9-8"
                         },
                         {
-                            noteSequence: "6-4-635-6-4-6-5-"
+                            noteSequence: "9-7-938-9-7-9-8-"
                         },
                         {
-                            noteSequence: "6-4-6-546-4-645-"
+                            noteSequence: "9-7-9-879-7-978-"
                         },
                     ],
                 },
                 {
-                    name: "open hihat",
-                    sampleFileName: getUrlFilename(djIgnorantLoFiOpenHHUrl),
+                    name: "Open Hihat",
+                    sampleFileName: getUrlFilename(maunsterTR909OpenHHUrl),
                     notesPerMeasure: 16,
                     measures: [
                         {
@@ -425,51 +425,51 @@ export const stockPatternsDnB: StoredPatternData[] = [
                     ]
                 },
                 {
-                    name: "kick",
-                    sampleFileName: getUrlFilename(djIgnorantLoFiKickUrl),
+                    name: "Kick",
+                    sampleFileName: getUrlFilename(maunsterTR909KickTubeDistortedUrl),
                     notesPerMeasure: 8,
                     measures: [
                         {
-                            noteSequence: "8--7-6--"
+                            noteSequence: "5--5-5--"
                         },
                         {
-                            noteSequence: "8---7-6-"
+                            noteSequence: "5----5-5"
                         },
                         {
-                            noteSequence: "8-6--7--"
+                            noteSequence: "5--5-5--"
                         },
                         {
-                            noteSequence: "8--7--76"
+                            noteSequence: "5----5-5"
                         },
                     ],
                 },
                 {
-                    name: "snare",
-                    sampleFileName: getUrlFilename(djIgnorantLoFiSnareUrl),
+                    name: "Snare",
+                    sampleFileName: getUrlFilename(maunsterTR909SnareUrl),
                     notesPerMeasure: 4,
                     measures: [
                         {
-                            noteSequence: "-8-8"
+                            noteSequence: "-9-9"
                         },
                         {
-                            noteSequence: "-8-7"
+                            noteSequence: "-9-9"
                         },
                         {
-                            noteSequence: "-7-8"
+                            noteSequence: "-9-9"
                         },
                         {
-                            noteSequence: "-8-9"
+                            noteSequence: "-999"
                         },
                     ],
                 }
             ],
-        name: "DnB groove"
+        name: "Drums"
     },
     {
         rhythms:
             [
                 {
-                    name: "Synthetik Am7",
+                    name: "Am7",
                     sampleFileName: getUrlFilename(jbl3677ChordSynthetikAm7CEGAUrl),
                     notesPerMeasure: 4,
                     measures: [
@@ -488,7 +488,7 @@ export const stockPatternsDnB: StoredPatternData[] = [
                     ],
                 },
                 {
-                    name: "Synthetik Bbm7",
+                    name: "Bbm7",
                     sampleFileName: getUrlFilename(jbl3677ChordSynthetikBbm7ADFAUrl),
                     notesPerMeasure: 4,
                     measures: [
@@ -507,7 +507,7 @@ export const stockPatternsDnB: StoredPatternData[] = [
                     ]
                 },
                 {
-                    name: "Synthetik Gm7",
+                    name: "Gm7",
                     sampleFileName: getUrlFilename(jbl3677ChordSynthetikGm7DFGAUrl),
                     notesPerMeasure: 4,
                     measures: [
@@ -526,7 +526,7 @@ export const stockPatternsDnB: StoredPatternData[] = [
                     ]
                 }
             ],
-        name: "Synthetik progression"
+        name: "Synth chords"
     },
 ];
 
