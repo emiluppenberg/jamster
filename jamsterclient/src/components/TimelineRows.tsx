@@ -1,5 +1,6 @@
 import { type SetStateAction } from "react";
 import type { PatternData, TimelineRowData, PatternIndex } from "../types";
+import { useJamsterContext } from "../Context";
 
 export interface TimelineProps {
     isPlaying: boolean;
@@ -27,10 +28,11 @@ const resizeSlots = (
 )
 
 const TimelineRows = (props: TimelineProps) => {
+    const { beatName, setBeatName } = useJamsterContext();
 
     const addTimelineRow = () => {
         const nextIndex = Math.max(...props.timelineRows.map(row => row.index)) + 1;
-        
+
         props.onTimelineRowsChange([
             ...props.timelineRows,
             {
@@ -92,7 +94,12 @@ const TimelineRows = (props: TimelineProps) => {
             {props.timelineRows.length > 0 && (
                 <div className="container timelines">
                     <div className="controls">
-                        <h1>Timeline</h1>
+                        <input
+                            type="text"
+                            className="beat-name"
+                            value={beatName}
+                            onChange={(e) => setBeatName(e.target.value)}
+                        />
                         <div className="options">
                             <div className="flex-row-align-center">
                                 <button className={`btn ${props.isPlaying ? "stop" : "play"}`} onClick={handleTogglePlay}>{props.isPlaying ? "Stop" : "Play"}</button>

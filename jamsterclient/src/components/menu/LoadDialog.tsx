@@ -10,7 +10,7 @@ interface LoadDialogProps {
 }
 
 const LoadDialog = (props: LoadDialogProps) => {
-    const { audioContext, analyserNode, storedSamples, storedPresets, deleteStoredPreset } = useJamsterContext();
+    const { audioContext, analyserNode, storedSamples, storedPresets, deleteStoredPreset, setBeatName } = useJamsterContext();
     const loadDialogRef = useRef<HTMLDialogElement>(null);
 
     const handleLoad = async (storedPreset: StoredPreset): Promise<void> => {
@@ -21,7 +21,8 @@ const LoadDialog = (props: LoadDialogProps) => {
         }));
 
         props.onStoreLoaded(patterns, timelines, storedPreset.bpm);
-
+        setBeatName(storedPreset.name)
+        
         loadDialogRef.current?.close();
     }
 

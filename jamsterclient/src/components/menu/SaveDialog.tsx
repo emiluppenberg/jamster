@@ -9,16 +9,15 @@ interface SaveDialogProps {
 }
 
 const SaveDialog = (props: SaveDialogProps) => {
-    const { storedPresets, saveStoredPreset } = useJamsterContext();
-    const [saveName, setSaveName] = useState("");
+    const { storedPresets, saveStoredPreset, beatName, setBeatName } = useJamsterContext();
 
     const saveDialogRef = useRef<HTMLDialogElement>(null);
-    const isExistingName = useMemo(() => storedPresets.some(data => data.name === saveName), [saveName, storedPresets])
+    const isExistingName = useMemo(() => storedPresets.some(data => data.name === beatName), [beatName, storedPresets])
 
     const handleSave = async (): Promise<void> => {
-        if (saveName.length === 0) return;
+        if (beatName.length === 0) return;
 
-        await saveStoredPreset(props.patterns, props.timelineRows, saveName, props.bpm);
+        await saveStoredPreset(props.patterns, props.timelineRows, beatName, props.bpm);
 
         saveDialogRef.current?.close();
     }
@@ -45,10 +44,10 @@ const SaveDialog = (props: SaveDialogProps) => {
                         id="store-save-name"
                         type="text"
                         className="dialog-field"
-                        value={saveName}
-                        onChange={(e) => setSaveName(e.target.value)}
+                        value={beatName}
+                        onChange={(e) => setBeatName(e.target.value)}
                     />
-                    <button className="btn" type="button" onClick={() => void handleSave()} disabled={saveName.length === 0}>Save</button>
+                    <button className="btn" type="button" onClick={() => void handleSave()} disabled={beatName.length === 0}>Save</button>
                 </div>
                 {isExistingName && (
                     <p className="dialog-hint">Saving will overwrite existing data</p>

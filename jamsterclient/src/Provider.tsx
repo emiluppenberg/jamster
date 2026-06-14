@@ -41,6 +41,7 @@ analyserNode.connect(audioContext.destination);
 export const JamsterProvider = ({ children }: PropsWithChildren) => {
     const [storedPresets, setStoredPresets] = useState<StoredPreset[]>(initialStoredPresets);
     const [storedSamples, setStoredSamples] = useState<StoredSample[]>(initialStoredSamples);
+    const [beatName, setBeatName] = useState<string>("New beat")
 
     const refreshStoredPresets = useCallback(async () => {
         setStoredPresets(await getPresets());
@@ -65,8 +66,8 @@ export const JamsterProvider = ({ children }: PropsWithChildren) => {
         await refreshStoredSamples();
     }, [])
 
-    const deleteStoredPreset = useCallback(async (dataName: string) => {
-        await deletePreset(dataName)
+    const deleteStoredPreset = useCallback(async (beatName: string) => {
+        await deletePreset(beatName)
         await refreshStoredPresets();
     }, [])
 
@@ -85,6 +86,8 @@ export const JamsterProvider = ({ children }: PropsWithChildren) => {
             analyserNode,
             storedPresets: storedPresets,
             storedSamples,
+            beatName,
+            setBeatName,
             saveStoredPreset,
             saveStoredSampleArrayBuffer,
             saveStoredSampleMcpDescription,
