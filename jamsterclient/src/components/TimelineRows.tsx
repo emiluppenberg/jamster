@@ -31,7 +31,7 @@ const TimelineRows = (props: TimelineProps) => {
     const { beatName, setBeatName } = useJamsterContext();
 
     const addTimelineRow = () => {
-        const nextIndex = Math.max(...props.timelineRows.map(row => row.index)) + 1;
+        const nextIndex = Math.max(0, ...props.timelineRows.map(row => row.index)) + 1;
 
         props.onTimelineRowsChange([
             ...props.timelineRows,

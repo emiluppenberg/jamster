@@ -138,7 +138,7 @@ const Pattern = (props: PatternProps) => {
     }
 
     const addRhythm = () => {
-        const nextIndex = Math.max(...props.pattern.rhythms.map(rhythm => rhythm.index)) + 1
+        const nextIndex = Math.max(0, ...props.pattern.rhythms.map(rhythm => rhythm.index)) + 1
 
         updatePatternRhythms([
             ...props.pattern.rhythms,

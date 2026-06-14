@@ -55,7 +55,7 @@ const McpSocket = (props: McpSocketProps) => {
     };
 
     const handleCreatePattern = async (dto: CreatePatternDto) => {
-        const nextIndexPattern = Math.max(...props.patterns.map(pattern => pattern.index)) + 1
+        const nextIndexPattern = Math.max(0, ...props.patterns.map(pattern => pattern.index)) + 1
 
         props.onPatternAdded({
             index: nextIndexPattern,
@@ -87,8 +87,8 @@ const McpSocket = (props: McpSocketProps) => {
             }))
         })
 
-        const nextIndexTimelineRow = Math.max(...props.timelineRows.map(row => row.index)) + 1;
-        const slotsLength = Math.max(...props.timelineRows.map(row => row.slots.length));
+        const nextIndexTimelineRow = Math.max(0, ...props.timelineRows.map(row => row.index)) + 1;
+        const slotsLength = Math.max(0, ...props.timelineRows.map(row => row.slots.length));
 
         props.onTimelineRowsChange([...props.timelineRows, {
             index: nextIndexTimelineRow,
@@ -148,6 +148,7 @@ const McpSocket = (props: McpSocketProps) => {
     }, [props.patterns, storedSamples])
 
     const handleToggle = () => {
+        console.log(props.patterns, props.timelineRows)
         const dialog = dialogRef.current;
         if (!dialog) return;
 
