@@ -65,7 +65,7 @@ const SamplesDialog = (props: SamplesDialogProps) => {
             <dialog className="samples-dialog" ref={dialogRef} onClose={executeSaveMcpDescriptions}>
                 <div className="dialog-header">
                     <div>
-                        <h2 className="dialog-eyebrow">Manage samples</h2>
+                        <h2 className="dialog-eyebrow">Samples</h2>
                     </div>
                     {saveMcpDescriptions.length > 0 && (
                         <p className="dialog-hint">Changes will be saved when closing dialog</p>

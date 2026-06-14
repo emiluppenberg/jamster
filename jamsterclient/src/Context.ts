@@ -1,18 +1,18 @@
 import { createContext, useContext, type SetStateAction } from "react"
-import type { PatternData, StoredPreset, StoredSample, StoredSampleArrayBuffer, StoredSampleMcpDescription, TimelineRowData } from "./types";
+import type { PatternData, StoredBeat, StoredSample, StoredSampleArrayBuffer, StoredSampleMcpDescription, TimelineRowData } from "./types";
 
 export type JamsterState = {
     appSessionId: string;
     audioContext: AudioContext;
     analyserNode: AnalyserNode;
-    storedPresets: StoredPreset[];
+    storedBeats: StoredBeat[];
     storedSamples: StoredSample[];
     beatName: string;
     setBeatName: React.Dispatch<SetStateAction<string>>;
-    saveStoredPreset: (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string, bpm: number) => Promise<void>;
+    saveStoredBeat: (patterns: PatternData[], timelineRows: TimelineRowData[], beatName: string, bpm: number) => Promise<void>;
     saveStoredSampleArrayBuffer: (sample: StoredSampleArrayBuffer) => Promise<void>;
     saveStoredSampleMcpDescription: (sample: StoredSampleMcpDescription) => Promise<void>;
-    deleteStoredPreset: (dataName: string) => Promise<void>;
+    deleteStoredBeat: (beatName: string) => Promise<void>;
     deleteStoredSample: (sampleFilename: string) => Promise<void>;
     
 }

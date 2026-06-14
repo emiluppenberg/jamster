@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useRef, useMemo } from "react";
 import { useJamsterContext } from "../../Context";
 import type { PatternData, TimelineRowData } from "../../types";
 
@@ -9,15 +9,15 @@ interface SaveDialogProps {
 }
 
 const SaveDialog = (props: SaveDialogProps) => {
-    const { storedPresets, saveStoredPreset, beatName, setBeatName } = useJamsterContext();
+    const { storedBeats, saveStoredBeat, beatName, setBeatName } = useJamsterContext();
 
     const saveDialogRef = useRef<HTMLDialogElement>(null);
-    const isExistingName = useMemo(() => storedPresets.some(data => data.name === beatName), [beatName, storedPresets])
+    const isExistingName = useMemo(() => storedBeats.some(beat => beat.name === beatName), [beatName, storedBeats])
 
     const handleSave = async (): Promise<void> => {
         if (beatName.length === 0) return;
 
-        await saveStoredPreset(props.patterns, props.timelineRows, beatName, props.bpm);
+        await saveStoredBeat(props.patterns, props.timelineRows, beatName, props.bpm);
 
         saveDialogRef.current?.close();
     }

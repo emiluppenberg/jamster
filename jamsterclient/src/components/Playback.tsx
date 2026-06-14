@@ -6,6 +6,7 @@ import McpSocket from "./McpSocket";
 import LoadDialog from "./menu/LoadDialog";
 import SaveDialog from "./menu/SaveDialog";
 import SamplesDialog from "./menu/SamplesDialog";
+import Brand from "./menu/Brand";
 
 const defaultBpm = 120;
 const beatsPerMeasure = 4;
@@ -284,10 +285,7 @@ const Playback = (props: PlaybackProps) => {
     return (
         <div className="playback">
             <div className="menu">
-                <div className="brand" role="img" aria-label="BeatLab">
-                    <img className="logo" src="/beatlab-logo.svg" alt="" aria-hidden="true" />
-                    {/* <img className="icon" src="/favicon.svg" alt="" aria-hidden="true" /> */}
-                </div>
+                <Brand />
                 <LoadDialog onStoreLoaded={handleOnStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
                 <SaveDialog patterns={props.patterns} timelineRows={props.timelineRows} bpm={bpm} />
                 <SamplesDialog onPlaySample={playSample} />

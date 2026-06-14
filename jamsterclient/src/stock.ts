@@ -69,7 +69,7 @@ import maunsterTR909SnareUrl from './assets/maunster/TR909-Snare.wav';
 import maunsterTR909TomHighUrl from './assets/maunster/TR909-Tom High.wav';
 import maunsterTR909TomLowUrl from './assets/maunster/TR909-Tom Low.wav';
 import maunsterTR909TomMidUrl from './assets/maunster/TR909-Tom Mid.wav';
-import type { StoredPreset, StoredPatternData, StoredTimelineRowData } from './types';
+import type { StoredBeat, StoredPatternData, StoredTimelineRowData } from './types';
 import { getUrlFilename } from './utils';
 
 export const stockSamples = [
@@ -375,7 +375,7 @@ export const stockTimelineChillHop: StoredTimelineRowData[] = [
     { slots: [1, 1, 1, 1] }
 ]
 
-export const stockPresetChillHop: StoredPreset = {
+export const stockBeatChillHop: StoredBeat = {
     name: "ChillHop",
     bpm: 100,
     timelineRows: stockTimelineChillHop,
@@ -535,7 +535,7 @@ export const stockTimelineDnB: StoredTimelineRowData[] = [
     { slots: [1, 1, 1, 1] }
 ]
 
-export const stockPresetDnB: StoredPreset = {
+export const stockBeatDnB: StoredBeat = {
     name: "DnB",
     bpm: 150,
     timelineRows: stockTimelineDnB,

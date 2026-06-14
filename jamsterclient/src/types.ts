@@ -53,7 +53,7 @@ export type StoredTimelineRowData = {
     slots: PatternIndex[];
 }
 
-export type StoredPreset = {
+export type StoredBeat = {
     name: string;
     bpm: number;
     timelineRows: StoredTimelineRowData[],

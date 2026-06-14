@@ -1,5 +1,5 @@
-import type { MeasureData, PatternData, RhythmData, StoredPreset, StoredMeasureData, StoredPatternData, StoredRhythmData, TimelineRowData } from "../types"
-import { savePreset } from "./db"
+import type { MeasureData, PatternData, RhythmData, StoredBeat, StoredMeasureData, StoredPatternData, StoredRhythmData, TimelineRowData } from "../types"
+import { saveBeat } from "./db"
 
 const storeMeasure = (measure: MeasureData): StoredMeasureData => ({
     noteSequence: measure.notes.map((note) => note.value || "-").join("")
@@ -17,18 +17,18 @@ const storePattern = (pattern: PatternData): StoredPatternData => ({
     rhythms: pattern.rhythms.map((rhythm) => storeRhythm(rhythm))
 })
 
-export const storePreset = async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string, bpm: number) => {
+export const storeBeat = async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string, bpm: number) => {
     const storedPatternData = patterns.map((pattern) => storePattern(pattern));
     const storedTimelineRowsData = timelineRows.map((row) => ({
         slots: row.slots
     }));
 
-    const storedData: StoredPreset = {
+    const storedData: StoredBeat = {
         name: saveName,
         bpm: bpm,
         patterns: storedPatternData,
         timelineRows: storedTimelineRowsData
     }
 
-    await savePreset(storedData);
+    await saveBeat(storedData);
 } 

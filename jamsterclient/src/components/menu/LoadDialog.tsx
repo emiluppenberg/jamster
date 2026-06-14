@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useJamsterContext } from "../../Context";
-import type { PatternData, StoredPreset, TimelineRowData } from "../../types";
+import type { PatternData, StoredBeat, TimelineRowData } from "../../types";
 import { loadPatterns } from "../../helpers/load";
 
 interface LoadDialogProps {
@@ -10,18 +10,18 @@ interface LoadDialogProps {
 }
 
 const LoadDialog = (props: LoadDialogProps) => {
-    const { audioContext, analyserNode, storedSamples, storedPresets, deleteStoredPreset, setBeatName } = useJamsterContext();
+    const { audioContext, analyserNode, storedSamples, storedBeats, deleteStoredBeat, setBeatName } = useJamsterContext();
     const loadDialogRef = useRef<HTMLDialogElement>(null);
 
-    const handleLoad = async (storedPreset: StoredPreset): Promise<void> => {
-        const patterns = await loadPatterns(audioContext, analyserNode, storedPreset.patterns, storedSamples);
-        const timelines = storedPreset.timelineRows.map((timeline, index) => ({
+    const handleLoad = async (storedBeat: StoredBeat): Promise<void> => {
+        const patterns = await loadPatterns(audioContext, analyserNode, storedBeat.patterns, storedSamples);
+        const timelines = storedBeat.timelineRows.map((timeline, index) => ({
             index: index,
             slots: timeline.slots
         }));
 
-        props.onStoreLoaded(patterns, timelines, storedPreset.bpm);
-        setBeatName(storedPreset.name)
+        props.onStoreLoaded(patterns, timelines, storedBeat.bpm);
+        setBeatName(storedBeat.name)
         
         loadDialogRef.current?.close();
     }
@@ -30,8 +30,8 @@ const LoadDialog = (props: LoadDialogProps) => {
         loadDialogRef.current?.close();
     }
 
-    const handleDeleteStoredPreset = async (presetname: string) => {
-        await deleteStoredPreset(presetname);
+    const handleDeleteStoredBeat = async (beatName: string) => {
+        await deleteStoredBeat(beatName);
     }
 
     return (
@@ -47,19 +47,19 @@ const LoadDialog = (props: LoadDialogProps) => {
                     </button>
                 </div>
                 <div className="dialog-list">
-                    {storedPresets.length > 0 ? storedPresets.map((preset, index) => (
-                        <div key={`load-stored-preset-${index}`} className="dialog-row">
-                            <button className="btn delete" type="button" onClick={() => handleDeleteStoredPreset(preset.name)}>-</button>
+                    {storedBeats.length > 0 ? storedBeats.map((beat, index) => (
+                        <div key={`load-stored-beat-${index}`} className="dialog-row">
+                            <button className="btn delete" type="button" onClick={() => handleDeleteStoredBeat(beat.name)}>-</button>
                             <button
                                 className="dialog-field"
                                 type="button"
-                                onClick={() => void handleLoad(preset)}
+                                onClick={() => void handleLoad(beat)}
                             >
-                                {preset.name}
+                                {beat.name}
                             </button>
                         </div>
                     )) : (
-                        <p className="dialog-hint">No saved preset yet.</p>
+                        <p className="dialog-hint">No saved beats yet.</p>
                     )}
                 </div>
             </dialog>
