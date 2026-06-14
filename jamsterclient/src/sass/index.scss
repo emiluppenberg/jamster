@@ -72,7 +72,6 @@ $rhythm-controls-width: 11.5rem;
         align-items: center;
         height: 2rem;
         padding-right: $space-s;
-        border-right: 1px solid $border;
 
         img {
             display: block;
@@ -81,18 +80,30 @@ $rhythm-controls-width: 11.5rem;
             &.logo {
                 width: 8rem;
                 border-radius: 6px;
-                transition:
-                    transform 140ms ease;
-
-                &:hover {
-                    transform: scale(0.9);
-                    cursor: pointer;
-                }
             }
 
             &.icon {
-                width: 2rem;
+                width: 1.5rem;
             }
+        }
+    }
+
+    button.brand {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        font: inherit;
+        transition:
+            transform 140ms ease;
+
+        &:hover {
+            transform: scale(0.9);
+        }
+
+        &:focus-visible {
+            outline: 0;
         }
     }
 
@@ -302,6 +313,66 @@ $rhythm-controls-width: 11.5rem;
             color: $muted;
             font-size: 0.85rem;
             font-style: italic;
+        }
+        
+        .dialog-body {
+            display: flex;
+            flex-direction: column;
+            gap: $space-m;
+            color: $mint;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            
+            section {
+                display: flex;
+                flex-direction: column;
+                gap: $space-s;
+            }
+            
+            .about-summary {
+                padding:0 $space-m $space-m $space-m;
+                border-bottom: 1px solid $border;
+                font-style: italic;
+            }
+            
+            .about-credits {
+                color: $muted;
+                padding-top: 0.25rem;
+            }
+
+            p {
+                margin: 0;
+            }
+
+            h2 {
+                margin: 0 0 0.1rem;
+                color: $green;
+                font-size: 0.8rem;
+                font-weight: 700;
+                letter-spacing: 0;
+                text-transform: uppercase;
+            }
+
+            a {
+                color: $mint;
+                font-weight: 700;
+                text-decoration-color: rgba($mint, 0.36);
+                text-underline-offset: 0.18em;
+                transition:
+                    color 140ms ease,
+                    text-decoration-color 140ms ease;
+
+                &:hover {
+                    color: $green;
+                    text-decoration-color: rgba($green, 0.72);
+                }
+
+                &:focus-visible {
+                    outline: 2px solid rgba($green, 0.58);
+                    outline-offset: 3px;
+                    border-radius: 3px;
+                }
+            }
         }
 
         .dialog-list {
