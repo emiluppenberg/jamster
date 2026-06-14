@@ -76,3 +76,8 @@ export type StoredSampleMcpDescription = {
     sampleFilename: string;
     mcpDescription: string;
 }
+
+export type FocusRhythm = {
+    rhythmIndex: number;
+    inputIndex: number;
+}

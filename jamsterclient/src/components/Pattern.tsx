@@ -1,6 +1,6 @@
 import Rhythm from "./Rhythm";
 import { useJamsterContext } from "../Context";
-import type { PatternData, RhythmData } from "../types";
+import type { FocusRhythm, PatternData, RhythmData } from "../types";
 import { useEffect, useState, type CSSProperties } from "react";
 import { createMeasure, createRhythm, getViewportWidthRem, resizeMeasureNotes } from "../utils";
 
@@ -87,6 +87,7 @@ const Pattern = (props: PatternProps) => {
     const { audioContext, analyserNode } = useJamsterContext();
     const [zoomLevel, setZoomLevel] = useState(1);
     const [viewportWidthRem, setViewportWidthRem] = useState(getViewportWidthRem);
+    const [focusRhythm, setFocusRhythm] = useState<FocusRhythm>()
 
     useEffect(() => {
         const updateViewportWidthRem = () => {
@@ -219,6 +220,22 @@ const Pattern = (props: PatternProps) => {
         }
     }
 
+    const handleFocusNewRhythm = (target: "next" | "previous", rhythmIndex: number, inputIndex: number) => {
+        const currentRhythmIndex = props.pattern.rhythms.findIndex(rhythm => rhythm.index === rhythmIndex);
+
+        let targetRhythm = props.pattern.rhythms[currentRhythmIndex];
+
+        if (target === "next") {
+            targetRhythm = props.pattern.rhythms[currentRhythmIndex + 1] ?? props.pattern.rhythms[0];
+        }
+        if (target === "previous") {
+            targetRhythm = props.pattern.rhythms[currentRhythmIndex - 1] ?? props.pattern.rhythms[props.pattern.rhythms.length - 1]
+        }
+
+        setFocusRhythm({ rhythmIndex: targetRhythm.index, inputIndex: inputIndex });
+    }
+
+
     return (
         <div className="pattern" style={patternStyle}>
             <div className="controls">
@@ -271,6 +288,8 @@ const Pattern = (props: PatternProps) => {
                     onNotesPerMeasureChange={handleNotesPerMeasureChange}
                     onDelete={handleDeleteRhythm}
                     onNameChange={handleRhythmNameChange}
+                    onFocusNewRhythm={handleFocusNewRhythm}
+                    focusRhythm={focusRhythm}
                 />
             ))}
             <div className="add">
