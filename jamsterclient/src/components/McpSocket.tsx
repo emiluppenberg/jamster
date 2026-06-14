@@ -5,7 +5,6 @@ import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
 import { McpSocketMessageSchema } from "@beatdoc/shared"
 import type { McpAppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto, McpSampleData } from "@beatdoc/shared"
-import { decodeStoredSample } from "../helpers/load";
 
 interface McpSocketProps {
     patterns: PatternData[];
@@ -37,8 +36,12 @@ const McpSocket = (props: McpSocketProps) => {
             rhythms: pattern.rhythms.map((rhythm, rhythmIndex) => {
                 if (rhythm.name !== dto.rhythm.name) return rhythm;
 
+                const storedSample = storedSamples.find(sample => sample.sampleFilename === dto.rhythm.sampleFilename)
+
                 return {
                     ...rhythm,
+                    sample: storedSample?.audioBuffer,
+                    sampleFilename: dto.rhythm.sampleFilename,
                     index: rhythmIndex,
                     notesPerMeasure: dto.rhythm.notesPerMeasure,
                     measures: dto.rhythm.measures.map((measure, measureIndex) => ({
@@ -66,7 +69,7 @@ const McpSocket = (props: McpSocketProps) => {
                 gainNode.gain.value = 0;
                 gainNode.connect(analyserNode);
 
-                const sample = await decodeStoredSample(audioContext, rhythm.sampleFilename, storedSamples);
+                const storedSample = storedSamples.find(sample => sample.sampleFilename === rhythm.sampleFilename);
 
                 return {
                     index: rhythmIndex,
@@ -74,7 +77,7 @@ const McpSocket = (props: McpSocketProps) => {
                     notesPerMeasure: rhythm.notesPerMeasure,
                     gainNode: gainNode,
                     sampleFilename: rhythm.sampleFilename,
-                    sample: sample,
+                    sample: storedSample?.audioBuffer,
                     measures: rhythm.measures.map((measure, measureIndex) => ({
                         index: measureIndex,
                         notes: Array.from(measure.notes, (note, index) => ({
