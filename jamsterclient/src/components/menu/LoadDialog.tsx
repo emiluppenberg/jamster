@@ -3,13 +3,13 @@ import { useJamsterContext } from "../../Context";
 import type { PatternData, StoredPreset, TimelineRowData } from "../../types";
 import { loadPatterns } from "../../helpers/load";
 
-interface LoadPresetDialogProps {
+interface LoadDialogProps {
     patterns: PatternData[];
     timelineRows: TimelineRowData[];
     onStoreLoaded: (patterns: PatternData[], timelineRows: TimelineRowData[], bpm: number) => void;
 }
 
-const LoadPresetDialog = (props: LoadPresetDialogProps) => {
+const LoadDialog = (props: LoadDialogProps) => {
     const { audioContext, analyserNode, storedSamples, storedPresets, deleteStoredPreset } = useJamsterContext();
     const loadDialogRef = useRef<HTMLDialogElement>(null);
 
@@ -35,7 +35,7 @@ const LoadPresetDialog = (props: LoadPresetDialogProps) => {
 
     return (
         <>
-            <button className="btn" type="button" onClick={() => loadDialogRef.current?.showModal()}>Load preset</button>
+            <button className="btn" type="button" onClick={() => loadDialogRef.current?.showModal()}>Load</button>
             <dialog className="load-dialog" ref={loadDialogRef} >
                 <div className="dialog-header">
                     <div>
@@ -66,4 +66,4 @@ const LoadPresetDialog = (props: LoadPresetDialogProps) => {
     )
 }
 
-export default LoadPresetDialog;
+export default LoadDialog;

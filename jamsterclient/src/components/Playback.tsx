@@ -3,9 +3,9 @@ import { useJamsterContext } from "../Context";
 import type { PatternData, RhythmData, TimelineRowData } from "../types";
 import Equalizer from "./Equalizer";
 import McpSocket from "./McpSocket";
-import LoadPresetDialog from "./menu/LoadPresetDialog";
-import SavePresetDialog from "./menu/SavePresetDialog";
-import ManageSamplesDialog from "./menu/ManageSamplesDialog";
+import LoadDialog from "./menu/LoadDialog";
+import SaveDialog from "./menu/SaveDialog";
+import SamplesDialog from "./menu/SamplesDialog";
 
 const defaultBpm = 120;
 const beatsPerMeasure = 4;
@@ -284,11 +284,13 @@ const Playback = (props: PlaybackProps) => {
     return (
         <div className="playback">
             <div className="menu">
-                <div className="store">
-                    <LoadPresetDialog onStoreLoaded={handleOnStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
-                    <SavePresetDialog patterns={props.patterns} timelineRows={props.timelineRows} bpm={bpm} />
-                    <ManageSamplesDialog onPlaySample={playSample} />
+                <div className="brand" role="img" aria-label="BeatLab">
+                    <img className="logo" src="/beatlab-logo.svg" alt="" aria-hidden="true" />
+                    {/* <img className="icon" src="/favicon.svg" alt="" aria-hidden="true" /> */}
                 </div>
+                <LoadDialog onStoreLoaded={handleOnStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
+                <SaveDialog patterns={props.patterns} timelineRows={props.timelineRows} bpm={bpm} />
+                <SamplesDialog onPlaySample={playSample} />
                 <McpSocket patterns={props.patterns} timelineRows={props.timelineRows} onPatternChange={props.onPatternChange} onPatternAdded={props.onPatternAdded} onTimelineRowsChange={props.onTimelineRowsChange} />
                 <Equalizer isPlaying={isPlaying} />
             </div>

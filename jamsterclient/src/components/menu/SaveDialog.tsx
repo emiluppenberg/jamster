@@ -2,13 +2,13 @@ import { useState, useRef, useMemo } from "react";
 import { useJamsterContext } from "../../Context";
 import type { PatternData, TimelineRowData } from "../../types";
 
-interface SavePresetDialogProps {
+interface SaveDialogProps {
     patterns: PatternData[];
     timelineRows: TimelineRowData[];
     bpm: number;
 }
 
-const SavePresetDialog = (props: SavePresetDialogProps) => {
+const SaveDialog = (props: SaveDialogProps) => {
     const { storedPresets, saveStoredPreset } = useJamsterContext();
     const [saveName, setSaveName] = useState("");
 
@@ -29,7 +29,7 @@ const SavePresetDialog = (props: SavePresetDialogProps) => {
 
     return (
         <>
-            <button className="btn" type="button" onClick={() => saveDialogRef.current?.showModal()}>Save preset</button>
+            <button className="btn" type="button" onClick={() => saveDialogRef.current?.showModal()}>Save</button>
             <dialog className="save-dialog" ref={saveDialogRef}>
                 <div className="dialog-header">
                     <div>
@@ -58,4 +58,4 @@ const SavePresetDialog = (props: SavePresetDialogProps) => {
     )
 }
 
-export default SavePresetDialog;
+export default SaveDialog;

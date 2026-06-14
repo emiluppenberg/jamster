@@ -2,11 +2,11 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useJamsterContext } from "../../Context";
 import type { StoredSample, StoredSampleMcpDescription } from "../../types";
 
-interface ManageSamplesDialogProps {
+interface SamplesDialogProps {
     onPlaySample: (sample: AudioBuffer, destination: AudioNode, time: number) => void;
 }
 
-const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
+const SamplesDialog = (props: SamplesDialogProps) => {
     const { audioContext, analyserNode, storedSamples, saveStoredSampleArrayBuffer, saveStoredSampleMcpDescription, deleteStoredSample } = useJamsterContext();
     const dialogRef = useRef<HTMLDialogElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -61,9 +61,7 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
 
     return (
         <>
-            <button className="btn" type="button" onClick={() => dialogRef.current?.showModal()}>
-                Manage samples
-            </button>
+            <button className="btn" type="button" onClick={() => dialogRef.current?.showModal()}>Samples</button>
             <dialog className="load-dialog" ref={dialogRef} onClose={executeSaveMcpDescriptions}>
                 <div className="dialog-header">
                     <div>
@@ -117,4 +115,4 @@ const ManageSamplesDialog = (props: ManageSamplesDialogProps) => {
     )
 }
 
-export default ManageSamplesDialog;
+export default SamplesDialog;
