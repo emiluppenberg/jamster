@@ -516,6 +516,8 @@ $rhythm-controls-width: 11.5rem;
             color: $mint;
             border-left: 1px solid $border;
             border-radius: 0%;
+            padding: 0 0.5rem;
+            font-size: 0.6rem;
 
             &:last-of-type {
                 border-top-right-radius: 6px;
@@ -528,6 +530,7 @@ $rhythm-controls-width: 11.5rem;
             width: calc($space-l - $width-m);
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
+            padding: 0 0.5rem;
             font-weight: 700;
             text-align: center;
 
