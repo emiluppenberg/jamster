@@ -1,8 +1,9 @@
 import Rhythm from "./Rhythm";
 import { useJamsterContext } from "../Context";
-import type { FocusRhythm, PatternData, RhythmData } from "../types";
+import type { FocusRhythm, PatternData, RhythmData, Warning } from "../types";
 import { useEffect, useState, type CSSProperties } from "react";
 import { createMeasure, createRhythm, getViewportWidthRem, resizeMeasureNotes } from "../utils";
+import WarningDisplay from "./WarningDisplay";
 
 const defaultMeasuresAtScreenWidth = 4;
 const defaultMeasuresScreenRatio = 0.75;
@@ -74,6 +75,7 @@ const updateRhythmNumberOfMeasures = (
 
 export interface PatternProps {
     pattern: PatternData;
+    patterns: PatternData[];
     isPlaying: boolean;
     playingMeasureIndex?: number;
     playingPosition64?: number;
@@ -88,6 +90,7 @@ const Pattern = (props: PatternProps) => {
     const [zoomLevel, setZoomLevel] = useState(1);
     const [viewportWidthRem, setViewportWidthRem] = useState(getViewportWidthRem);
     const [focusRhythm, setFocusRhythm] = useState<FocusRhythm>()
+    const [warnings, setWarnings] = useState<Warning[]>([]);
 
     useEffect(() => {
         const updateViewportWidthRem = () => {
@@ -190,6 +193,11 @@ const Pattern = (props: PatternProps) => {
     }
 
     const handlePatternNameChange = (newName: string) => {
+        const isDuplicateName = props.patterns.some(pattern => pattern.name === newName)
+
+        if (isDuplicateName) setWarnings(current => [...current, { message: "Multiple patterns should not have the same name", id: "patternName" }]);
+        if (!isDuplicateName) setWarnings(current => current.filter(warning => warning.id !== "patternName"));
+
         props.onPatternChange({
             ...props.pattern,
             name: newName,
@@ -197,6 +205,11 @@ const Pattern = (props: PatternProps) => {
     }
 
     const handleRhythmNameChange = (rhythmIndex: number, newName: string) => {
+        const isDuplicateName = props.pattern.rhythms.some(rhythm => rhythm.name === newName);
+
+        if (isDuplicateName) setWarnings(current => [...current, { message: "Multiple rhythms within the same pattern should not have the same name", id: "rhythmName" }]);
+        if (!isDuplicateName) setWarnings(current => current.filter(warning => warning.id !== "rhythmName"));
+
         props.onPatternChange({
             ...props.pattern,
             rhythms: props.pattern.rhythms.map((rhythm) => {
@@ -295,6 +308,7 @@ const Pattern = (props: PatternProps) => {
             <div className="add">
                 <button className="btn" onClick={addRhythm}>Add rhythm</button>
             </div>
+            {warnings.length > 0 && (<WarningDisplay warnings={warnings} />)}
         </div>
     )
 }

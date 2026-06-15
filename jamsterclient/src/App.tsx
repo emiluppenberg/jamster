@@ -60,16 +60,15 @@ const AppContent = () => {
 
   return (
     <div className='app'>
-      <Playback 
-        patterns={patterns} 
-        timelineRows={timelineRows} 
-        onStoreLoaded={handleStoreLoaded} 
-        onPatternChange={handlePatternChange} 
-        onPatternAdded={handlePatternAdded} 
+      <Playback
+        patterns={patterns}
+        timelineRows={timelineRows}
+        onStoreLoaded={handleStoreLoaded}
+        onPatternChange={handlePatternChange}
+        onPatternAdded={handlePatternAdded}
         onPatternDelete={handlePatternDelete}
         onTimelineRowsChange={setTimelineRows}
-
-        >
+      >
         {({ isPlaying, bpm, setBpm, playingPosition64, playingSlotIndex, getPlayingMeasureIndex, playPattern, playTimeline, stopPlayback }) => (
           <>
             <TimelineRows
@@ -92,6 +91,7 @@ const AppContent = () => {
                   key={`pattern-${pattern.index}`}
                   isPlaying={isPlaying}
                   pattern={pattern}
+                  patterns={patterns}
                   playingMeasureIndex={isPlaying ? getPlayingMeasureIndex(pattern) : undefined}
                   playingPosition64={playingPosition64}
                   onPatternChange={handlePatternChange}

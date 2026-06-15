@@ -81,3 +81,8 @@ export type FocusRhythm = {
     rhythmIndex: number;
     inputIndex: number;
 }
+
+export type Warning = {
+    message: string;
+    id: string;
+}

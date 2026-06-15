@@ -314,7 +314,7 @@ $rhythm-controls-width: 11.5rem;
             font-size: 0.85rem;
             font-style: italic;
         }
-        
+
         .dialog-body {
             display: flex;
             flex-direction: column;
@@ -322,19 +322,19 @@ $rhythm-controls-width: 11.5rem;
             color: $mint;
             font-size: 0.95rem;
             line-height: 1.55;
-            
+
             section {
                 display: flex;
                 flex-direction: column;
                 gap: $space-s;
             }
-            
+
             .about-summary {
-                padding:0 $space-m $space-m $space-m;
+                padding: 0 $space-m $space-m $space-m;
                 border-bottom: 1px solid $border;
                 font-style: italic;
             }
-            
+
             .about-credits {
                 color: $muted;
                 padding-top: 0.25rem;
@@ -803,6 +803,33 @@ $rhythm-controls-width: 11.5rem;
             margin-top: $space-s;
         }
     }
+
+    .warning {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        gap: $space-s;
+        max-width: 100%;
+        margin-top: $space-s;
+        padding: 0.55rem 0.7rem;
+        border: 1px solid $danger;
+        border-radius: 6px;
+        background: rgba($danger, 0.1);
+        text-align: center;
+
+        p {
+            span {
+                font-weight: 700;
+                color: rgba($danger, 0.92);
+            }
+
+            color: mix($danger, $mint, 30%);
+            margin: 0;
+            font-size: 0.85rem;
+            line-height: 1.35;
+        }
+    }
+
 
     .add {
         box-sizing: border-box;
