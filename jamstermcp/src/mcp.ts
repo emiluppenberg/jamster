@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
-import { type McpSocketMessage, type SetRhythmDto, McpPatternDataSchema, CreatePatternDtoSchema, SetRhythmDtoSchema, CreatePatternDto, McpAppSessionData, McpSampleDataSchema } from "@beatdoc/shared";
+import { type McpSocketMessage, type SetRhythmDto, McpPatternDataSchema, CreatePatternDtoSchema, SetRhythmDtoSchema, CreatePatternDto, McpAppSessionData, McpSampleDataSchema, DeletePatternDtoSchema, DeleteRhythmDtoSchema } from "@beatdoc/shared";
 import WebSocket from "ws"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import z from "zod";
@@ -59,7 +59,7 @@ export const InitializeMcpServer = async (
                 content: [
                     {
                         type: "text",
-                        text: `Rhythm set in AppSessionId: ${inputs.appSessionId}`
+                        text: `SetRhythmDto was sent to AppSessionId: ${inputs.appSessionId}`
                     }
                 ]
             }
@@ -112,7 +112,91 @@ export const InitializeMcpServer = async (
                 content: [
                     {
                         type: "text",
-                        text: `Created pattern ${inputs.dto.patternName} in AppSessionId: ${inputs.appSessionId}`
+                        text: `CreatePatternDto was sent to AppSessionId: ${inputs.appSessionId}`
+                    }
+                ]
+            }
+        }
+    )
+
+    mcpServer.registerTool(
+        "deletePattern",
+        {
+            description: "Delete a pattern",
+            inputSchema: {
+                appSessionId: z.string().describe("uuid identifying the users client-app-instance"),
+                dto: DeletePatternDtoSchema
+            }
+        },
+        async (inputs) => {
+            const connection = connections.get(inputs.appSessionId);
+
+            if (!connection) {
+                return {
+                    isError: true,
+                    content: [
+                        {
+                            type: "text",
+                            text: `No connection found for AppSessionId: ${inputs.appSessionId}`
+                        }
+                    ]
+                }
+            }
+
+            const message: McpSocketMessage = {
+                type: "deletePattern",
+                payload: inputs.dto
+            }
+
+            connection.send(JSON.stringify(message));
+
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `DeletePatternDto was sent to AppSessionId: ${inputs.appSessionId}`
+                    }
+                ]
+            }
+        }
+    )
+
+    mcpServer.registerTool(
+        "deleteRhythm",
+        {
+            description: "Delete a rhythm within a specified pattern",
+            inputSchema: {
+                appSessionId: z.string().describe("uuid identifying the users client-app-instance"),
+                dto: DeleteRhythmDtoSchema
+            }
+        },
+        async (inputs) => {
+            const connection = connections.get(inputs.appSessionId);
+
+            if (!connection) {
+                return {
+                    isError: true,
+                    content: [
+                        {
+                            type: "text",
+                            text: `No connection found for AppSessionId: ${inputs.appSessionId}`
+                        }
+                    ]
+                }
+            }
+
+            const message: McpSocketMessage = {
+                type: "deleteRhythm",
+                payload: inputs.dto
+            }
+
+            connection.send(JSON.stringify(message));
+
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `DeleteRhythmDto was sent to AppSessionId: ${inputs.appSessionId}`
                     }
                 ]
             }
@@ -122,7 +206,7 @@ export const InitializeMcpServer = async (
     mcpServer.registerTool(
         "getAppSessionData",
         {
-            description: "Get current patterns and available sampleFilenames for a specified AppSessionId",
+            description: "Get current patterns and available samples for a specified AppSessionId",
             inputSchema: {
                 appSessionId: z.string().describe("uuid identifying the users client-app-instance")
             },

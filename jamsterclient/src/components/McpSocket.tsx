@@ -4,13 +4,14 @@ import type { PatternData, TimelineRowData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
 import { McpSocketMessageSchema } from "@beatdoc/shared"
-import type { McpAppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto, McpSampleData } from "@beatdoc/shared"
+import type { McpAppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto, McpSampleData, DeletePatternDto, DeleteRhythmDto } from "@beatdoc/shared"
 
 interface McpSocketProps {
     patterns: PatternData[];
     timelineRows: TimelineRowData[];
     onPatternChange: (pattern: PatternData) => void;
     onPatternAdded: (pattern: PatternData) => void;
+    onPatternDelete: (pattern: PatternData) => void;
     onTimelineRowsChange: (timelineRows: TimelineRowData[]) => void;
 }
 
@@ -28,7 +29,7 @@ const McpSocket = (props: McpSocketProps) => {
     const handleSetRhythm = (dto: SetRhythmDto) => {
         const pattern = props.patterns.find((pattern) => pattern.name === dto.patternName);
         const numberOfMeasures = dto.rhythm.measures.length;
-        if (!pattern) return;
+        if (!pattern) throw new Error(`Could not set rhythm in pattern with name: ${dto.patternName}`);
 
         props.onPatternChange({
             ...pattern,
@@ -99,9 +100,27 @@ const McpSocket = (props: McpSocketProps) => {
         }])
     }
 
+    const handleDeletePattern = async (dto: DeletePatternDto) => {
+        const pattern = props.patterns.find(pattern => pattern.name === dto.patternName);
+        if (!pattern) throw new Error(`Could not delete pattern with name: ${dto.patternName}`)
+
+        props.onPatternDelete(pattern);
+    }
+
+    const handleDeleteRhythm = async (dto: DeleteRhythmDto) => {
+        const pattern = props.patterns.find(pattern => pattern.name === dto.patternName);
+        if (!pattern) throw new Error(`Could not find pattern with name: ${dto.patternName}, to delete rhythm with name: ${dto.rhythmName}`)
+
+        props.onPatternChange({
+            ...pattern,
+            rhythms: pattern.rhythms.filter(rhythm => rhythm.name !== dto.rhythmName)
+        });
+    }
+
+
     const handleSocketMessage = (event: MessageEvent) => {
         const parsed = McpSocketMessageSchema.safeParse(JSON.parse(event.data));
-        if (!parsed.success) return;
+        if (!parsed.success) throw new Error(`Could not parse data received from MCP server: ${event.data}`);
 
         switch (parsed.data.type) {
             case "setRhythm":
@@ -109,6 +128,12 @@ const McpSocket = (props: McpSocketProps) => {
                 break;
             case "createPattern":
                 handleCreatePattern(parsed.data.payload);
+                break;
+            case "deletePattern":
+                handleDeletePattern(parsed.data.payload);
+                break;
+            case "deleteRhythm":
+                handleDeleteRhythm(parsed.data.payload);
                 break;
         }
     };

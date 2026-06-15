@@ -27,6 +27,15 @@ export const CreatePatternDtoSchema = z.object({
     rhythms: z.array(McpRhythmDataSchema)
 })
 
+export const DeletePatternDtoSchema = z.object({
+    patternName: z.string().describe("Name of pattern to delete")
+})
+
+export const DeleteRhythmDtoSchema = z.object({
+    patternName: z.string().describe("Name of pattern containing the rhythm to delete"),
+    rhythmName: z.string().describe("Name of rhythm to delet")
+})
+
 export const McpSocketMessageSchema = z.discriminatedUnion("type", [
     z.object({
         type: z.literal("setRhythm"),
@@ -35,6 +44,14 @@ export const McpSocketMessageSchema = z.discriminatedUnion("type", [
     z.object({
         type: z.literal("createPattern"),
         payload: CreatePatternDtoSchema
+    }),
+    z.object({
+        type: z.literal("deletePattern"),
+        payload: DeletePatternDtoSchema
+    }),
+    z.object({
+        type: z.literal("deleteRhythm"),
+        payload: DeleteRhythmDtoSchema
     })
 ])
 
@@ -49,6 +66,8 @@ export type McpPatternData = z.infer<typeof McpPatternDataSchema>;
 
 export type SetRhythmDto = z.infer<typeof SetRhythmDtoSchema>;
 export type CreatePatternDto = z.infer<typeof CreatePatternDtoSchema>;
+export type DeletePatternDto = z.infer<typeof DeletePatternDtoSchema>;
+export type DeleteRhythmDto = z.infer<typeof DeleteRhythmDtoSchema>;
 
 export type McpSocketMessage = z.infer<typeof McpSocketMessageSchema>;
 
