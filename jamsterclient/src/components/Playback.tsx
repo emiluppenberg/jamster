@@ -48,7 +48,10 @@ const getPlaybackTimelines = (
     patterns: PatternData[],
 ): TimelineRowData[] => {
     if (mode === "pattern" && patternIndex !== undefined) {
-        const slotsLength = patterns[patternIndex].numberOfMeasures
+        const slotsLength = patterns.find(pattern => pattern.index === patternIndex)?.numberOfMeasures
+        
+        if (!slotsLength) throw new Error(`Could not find pattern with index: ${patternIndex}`);
+
         return [{ index: 0, slots: Array.from({ length: slotsLength }, () => patternIndex) }];
     }
 
@@ -241,6 +244,8 @@ const Playback = (props: PlaybackProps) => {
         setIsPlaying(true);
         runScheduler();
         schedulerTimerRef.current = window.setInterval(runScheduler, schedulerIntervalMs);
+
+        console.log(patternIndex)
     }
 
     const stopPlayback = () => {
