@@ -6,6 +6,9 @@
     "module": "esnext",
     "types": ["vite/client"],
     "skipLibCheck": true,
+    "paths": {
+      "zod/v4": ["./node_modules/zod/v4"]
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",
