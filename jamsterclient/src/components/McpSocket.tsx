@@ -176,6 +176,7 @@ const McpSocket = (props: McpSocketProps) => {
     }, [props.patterns, storedSamples])
 
     const handleToggle = () => {
+        console.log(props.patterns, props.timelineRows)
         const dialog = dialogRef.current;
         if (!dialog) return;
 
