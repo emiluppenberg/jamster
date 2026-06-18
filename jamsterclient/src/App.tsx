@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import './App.css'
 import Pattern from './components/Pattern'
 import Playback from './components/Playback';
@@ -22,8 +22,8 @@ const AppContainer = () => {
 
 const AppContent = () => {
   const [patterns, setPatterns] = useState<PatternData[]>([])
-  const [timelineRows, setTimelineRows] = useState<TimelineRowData[]>([{ index: 0, slots: [] }])
-  const [timelineLength, setTimelineLength] = useState(() => getTimelineLength(timelineRows));
+  const [timelineRows, setTimelineRows] = useState<TimelineRowData[]>([])
+  const timelineLength = useMemo(() => getTimelineLength(timelineRows), [timelineRows]);
 
   const addPattern = () => setPatterns((currentPatterns) => [
     ...currentPatterns,
@@ -54,7 +54,6 @@ const AppContent = () => {
 
   const handleStoreLoaded = (patterns: PatternData[], timelineRows: TimelineRowData[]) => {
     setPatterns(patterns);
-    setTimelineLength(getTimelineLength(timelineRows));
     setTimelineRows(timelineRows);
   }
 
@@ -78,7 +77,6 @@ const AppContent = () => {
               patterns={patterns}
               timelineRows={timelineRows}
               timelineLength={timelineLength}
-              setTimelineLength={setTimelineLength}
               onTimelineRowsChange={setTimelineRows}
               playingSlotIndex={playingSlotIndex}
               onPlayTimeline={playTimeline}

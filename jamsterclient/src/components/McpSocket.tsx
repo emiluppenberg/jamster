@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useJamsterContext } from "../Context";
 import type { PatternData, TimelineRowData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
-import { getNotePosition64, mcpUrl, wssUrl } from "../utils";
+import { getNotePosition64, mcpUrl, resizeSlots, wssUrl } from "../utils";
 import { McpSocketMessageSchema } from "@beatdoc/shared"
 import type { McpAppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto, McpSampleData, DeletePatternDto, DeleteRhythmDto } from "@beatdoc/shared"
 
@@ -92,12 +92,15 @@ const McpSocket = (props: McpSocketProps) => {
         })
 
         const nextIndexTimelineRow = Math.max(0, ...props.timelineRows.map(row => row.index)) + 1;
-        const slotsLength = Math.max(0, ...props.timelineRows.map(row => row.slots.length));
+        const slotsLength = Math.max(dto.numberOfMeasures, ...props.timelineRows.map(row => row.slots.length));
 
-        props.onTimelineRowsChange([...props.timelineRows, {
+        props.onTimelineRowsChange([...props.timelineRows.map(row => ({
+            index: row.index,
+            slots: resizeSlots(row.slots, slotsLength)
+        })), ({
             index: nextIndexTimelineRow,
             slots: Array.from({ length: slotsLength }, () => nextIndexPattern)
-        }])
+        })])
     }
 
     const handleDeletePattern = async (dto: DeletePatternDto) => {
@@ -222,8 +225,8 @@ const McpSocket = (props: McpSocketProps) => {
                         value={mcpUrl}
                     />
                 </div>
-                <p className="dialog-hint">
-                    Example - "Create a 2 measure funk beat using available samples in appsessionid XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+                <p className="dialog-hint example">
+                    Example: "Create a 2 measure funk beat in session &lt;AppSessionId&gt;"
                 </p>
             </dialog>
         </div>

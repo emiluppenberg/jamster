@@ -315,6 +315,10 @@ $rhythm-controls-width: 11.5rem;
             color: $muted;
             font-size: 0.85rem;
             font-style: italic;
+
+            &.example {
+                font-size: 0.8rem;
+            }
         }
 
         .dialog-body {
