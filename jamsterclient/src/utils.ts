@@ -1,4 +1,4 @@
-import type { RhythmData, MeasureData, NoteData } from "./types";
+import type { RhythmData, MeasureData, NoteData, PatternIndex } from "./types";
 
 export const eq_fftSize = 1024;
 
@@ -110,3 +110,14 @@ export const resizeMeasureNotes = (
         notes,
     };
 }
+
+export const createSlots = (timelineLength: number): PatternIndex[] => (
+    Array.from({ length: timelineLength }, () => undefined)
+)
+
+export const resizeSlots = (
+    slots: PatternIndex[],
+    timelineLength: number,
+): PatternIndex[] => (
+    Array.from({ length: timelineLength }, (_, slotIndex) => slots[slotIndex])
+)

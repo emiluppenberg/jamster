@@ -20,7 +20,7 @@ const storePattern = (pattern: PatternData): StoredPatternData => ({
 export const storeBeat = async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string, bpm: number) => {
     const storedPatternData = patterns.map((pattern) => storePattern(pattern));
     const storedTimelineRowsData = timelineRows.map((row) => ({
-        slots: row.slots
+        slots: row.slots.map(patternIndex => patterns.findIndex(pattern => pattern.index === patternIndex))
     }));
 
     const storedData: StoredBeat = {
