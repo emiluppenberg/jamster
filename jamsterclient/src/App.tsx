@@ -82,7 +82,6 @@ const AppContent = () => {
               onPlayTimeline={playTimeline}
               onStopPlayback={stopPlayback}
             />
-            <h1>Patterns</h1>
             <div className="container patterns">
               {patterns.map((pattern) => (
                 <Pattern

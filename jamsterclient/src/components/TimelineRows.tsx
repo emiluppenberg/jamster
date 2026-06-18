@@ -1,4 +1,4 @@
-import { type SetStateAction } from "react";
+import { useState, type SetStateAction } from "react";
 import type { PatternData, TimelineRowData } from "../types";
 import { useJamsterContext } from "../Context";
 import { createSlots, resizeSlots } from "../utils";
@@ -18,6 +18,8 @@ export interface TimelineProps {
 
 const TimelineRows = (props: TimelineProps) => {
     const { beatName, setBeatName } = useJamsterContext();
+
+    const [show, setShow] = useState(true);
 
     const addTimelineRow = () => {
         const nextIndex = Math.max(0, ...props.timelineRows.map(row => row.index)) + 1;
@@ -78,7 +80,7 @@ const TimelineRows = (props: TimelineProps) => {
 
     return (
         <>
-            <div className="container timelines">
+            <div className="timeline">
                 <div className="controls">
                     <input
                         type="text"
@@ -114,10 +116,11 @@ const TimelineRows = (props: TimelineProps) => {
                                 />
                             </div>
                         </div>
+                        <button className="btn show-hide" onClick={() => setShow(!show)}>{show ? "Hide" : "Show"}</button>
                     </div>
                 </div>
-                {props.timelineRows.length > 0 && props.timelineRows.map((timeline) => (
-                    <div key={`timeline-${timeline.index}`} className="timeline">
+                {props.timelineRows.length > 0 && show && props.timelineRows.map((timeline) => (
+                    <div key={`timeline-${timeline.index}`} className="timeline-row">
                         <button className="btn delete" onClick={() => handleDeleteTimelineRow(timeline)}>-</button>
                         {Array.from({ length: props.timelineLength }, (_, slotIndex) => (
                             <select
@@ -134,9 +137,11 @@ const TimelineRows = (props: TimelineProps) => {
                         ))}
                     </div>
                 ))}
-                <div className="add">
-                    <button className="btn" onClick={addTimelineRow}>Add track</button>
-                </div>
+                {show && (
+                    <div className="add">
+                        <button className="btn" onClick={addTimelineRow}>Add track</button>
+                    </div>
+                )}
             </div>
         </>
     )
