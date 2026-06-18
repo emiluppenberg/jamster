@@ -38,7 +38,7 @@ $rhythm-controls-width: 11.5rem;
     gap: 1rem;
     min-height: 100svh;
     box-sizing: border-box;
-    padding: calc($app-padding + $menu-height) $app-padding $app-padding $app-padding;
+    padding: $menu-height $app-padding $app-padding $app-padding;
     overflow-x: clip;
     background: $ink;
     color: $text;
@@ -66,6 +66,39 @@ $rhythm-controls-width: 11.5rem;
         border-bottom: 1px solid $border;
         background: $ink-menu;
         box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+    }
+
+
+    .timeline {
+        position: sticky;
+        top: $menu-height;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        width: calc(100% + #{$app-padding * 2});
+        margin-left: -$app-padding;
+        padding: 0.75rem calc($app-padding + 0.75rem + 1px);
+        box-sizing: border-box;
+        overflow-x: auto;
+        border-bottom: 1px solid $border;
+        background: $ink-menu;
+        z-index: 100;
+
+        .timeline-row {
+            display: flex;
+            flex-direction: row;
+            width: max-content;
+            margin-top: 3px;
+            margin-left: $space-xs;
+            border: 1px solid $border;
+            border-radius: 6px;
+            overflow: hidden;
+            background: rgba($surface, 0.9);
+
+            &:nth-child(1 of .timeline-row) {
+                margin-top: $space-s;
+            }
+        }
     }
 
     .brand {
@@ -226,6 +259,10 @@ $rhythm-controls-width: 11.5rem;
         &.stop {
             color: $danger;
             font-weight: 700;
+        }
+
+        &.show-hide {
+            margin-left: $width-l;
         }
     }
 
@@ -743,16 +780,6 @@ $rhythm-controls-width: 11.5rem;
         box-sizing: border-box;
         width: 100%;
 
-        &.timelines {
-            padding: 0.75rem;
-            box-sizing: border-box;
-            overflow-x: auto;
-            border: 1px solid $border;
-            border-radius: 8px;
-            background: $surface;
-            box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
-        }
-
         &.patterns {
             gap: $space-m;
             max-width: 100%;
@@ -763,23 +790,6 @@ $rhythm-controls-width: 11.5rem;
             }
         }
     }
-
-    .timeline {
-        display: flex;
-        flex-direction: row;
-        width: max-content;
-        margin-top: 3px;
-        margin-left: $space-xs;
-        border: 1px solid $border;
-        border-radius: 6px;
-        overflow: hidden;
-        background: rgba($surface, 0.9);
-
-        &:nth-child(1 of .timeline) {
-            margin-top: $space-s;
-        }
-    }
-
 
     .pattern {
         display: inline-flex;
