@@ -1,19 +1,18 @@
-import { useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useJamsterContext } from "../../Context";
 import type { PatternData, StoredBeat, TimelineRowData } from "../../types";
 import { loadPatterns } from "../../helpers/load";
 
 interface LoadDialogProps {
-    patterns: PatternData[];
-    timelineRows: TimelineRowData[];
     onStoreLoaded: (patterns: PatternData[], timelineRows: TimelineRowData[], bpm: number) => void;
 }
 
 const LoadDialog = (props: LoadDialogProps) => {
     const { audioContext, analyserNode, storedSamples, storedBeats, deleteStoredBeat, setBeatName } = useJamsterContext();
     const loadDialogRef = useRef<HTMLDialogElement>(null);
+    const initializedRef = useRef(false)
 
-    const handleLoad = async (storedBeat: StoredBeat): Promise<void> => {
+    const handleLoad = useCallback(async (storedBeat: StoredBeat): Promise<void> => {
         const patterns = await loadPatterns(audioContext, analyserNode, storedBeat.patterns, storedSamples);
         const timelines = storedBeat.timelineRows.map((timeline, index) => ({
             index: index,
@@ -22,9 +21,9 @@ const LoadDialog = (props: LoadDialogProps) => {
 
         props.onStoreLoaded(patterns, timelines, storedBeat.bpm);
         setBeatName(storedBeat.name)
-        
+
         loadDialogRef.current?.close();
-    }
+    }, [audioContext, analyserNode, storedSamples, props.onStoreLoaded, setBeatName])
 
     const handleLoadDialogClose = () => {
         loadDialogRef.current?.close();
@@ -33,6 +32,17 @@ const LoadDialog = (props: LoadDialogProps) => {
     const handleDeleteStoredBeat = async (beatName: string) => {
         await deleteStoredBeat(beatName);
     }
+
+    useEffect(() => {
+        if (initializedRef.current) return
+        
+        initializedRef.current = true
+        
+        const initialBeat = storedBeats[0]
+        if (!initialBeat) return
+
+        void handleLoad(initialBeat)
+    }, [storedBeats, handleLoad])
 
     return (
         <>
