@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type SetStateAction } from "react";
 import { useJamsterContext } from "../Context";
 import type { PatternData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
