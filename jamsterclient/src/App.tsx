@@ -38,6 +38,10 @@ export const AppContent = () => {
     });
   }
 
+  const handleNewBeat = () => {
+    dispatch({ type: "newBeat" });
+  }
+
   const handlePatternAdded = (newPattern: PatternData) => {
     dispatch({ type: "addPattern", pattern: newPattern });
   }
@@ -63,6 +67,7 @@ export const AppContent = () => {
       <Playback
         patterns={patterns}
         timelineRows={timelineRows}
+        onNewBeat={handleNewBeat}
         onStoreLoaded={handleStoreLoaded}
         onPatternChange={handlePatternChange}
         onPatternAdded={handlePatternAdded}

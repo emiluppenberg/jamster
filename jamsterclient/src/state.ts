@@ -10,6 +10,7 @@ export type TimelineRowsUpdate =
     | ((currentRows: TimelineRowData[]) => TimelineRowData[]);
 
 export type AppAction =
+    | { type: "newBeat" }
     | { type: "addPattern"; pattern: PatternData }
     | { type: "changePattern"; pattern: PatternData }
     | { type: "deletePattern"; patternId: PatternId }
@@ -23,6 +24,11 @@ export const initialAppState: AppState = {
 
 export const appStateReducer = (state: AppState, action: AppAction): AppState => {
     switch (action.type) {
+        case "newBeat":
+            return {
+                patterns: [],
+                timelineRows: [],
+            };
         case "addPattern":
             return {
                 ...state,

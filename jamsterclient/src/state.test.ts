@@ -10,6 +10,19 @@ const createPattern = (id: string, name: string): PatternData => ({
 });
 
 describe('appStateReducer', () => {
+    it('clears patterns and timeline rows for a new beat', () => {
+        const pattern = createPattern('pattern-a', 'Pattern 0');
+        const initial: AppState = {
+            patterns: [pattern],
+            timelineRows: [{ slots: [pattern.id] }],
+        };
+
+        expect(appStateReducer(initial, { type: 'newBeat' })).toEqual({
+            patterns: [],
+            timelineRows: [],
+        });
+    });
+
     it('updates only a newly added pattern after an earlier pattern is deleted', () => {
         const first = createPattern('pattern-a', 'Pattern 0');
         const remaining = createPattern('pattern-b', 'Pattern 1');
