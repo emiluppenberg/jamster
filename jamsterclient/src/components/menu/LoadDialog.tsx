@@ -1,29 +1,27 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useJamsterContext } from "../../Context";
 import type { PatternData, StoredBeat, TimelineRowData } from "../../types";
-import { loadPatterns } from "../../helpers/load";
+import { loadPatterns, loadTimelineRows } from "../../helpers/load";
 
 interface LoadDialogProps {
     onStoreLoaded: (patterns: PatternData[], timelineRows: TimelineRowData[], bpm: number) => void;
 }
 
 const LoadDialog = (props: LoadDialogProps) => {
+    const { onStoreLoaded } = props;
     const { audioContext, analyserNode, storedSamples, storedBeats, deleteStoredBeat, setBeatName } = useJamsterContext();
     const loadDialogRef = useRef<HTMLDialogElement>(null);
     const initializedRef = useRef(false)
 
     const handleLoad = useCallback(async (storedBeat: StoredBeat): Promise<void> => {
         const patterns = await loadPatterns(audioContext, analyserNode, storedBeat.patterns, storedSamples);
-        const timelines = storedBeat.timelineRows.map((timeline, index) => ({
-            index: index,
-            slots: timeline.slots
-        }));
+        const timelines = loadTimelineRows(storedBeat.timelineRows, patterns);
 
-        props.onStoreLoaded(patterns, timelines, storedBeat.bpm);
+        onStoreLoaded(patterns, timelines, storedBeat.bpm);
         setBeatName(storedBeat.name)
 
         loadDialogRef.current?.close();
-    }, [audioContext, analyserNode, storedSamples, props.onStoreLoaded, setBeatName])
+    }, [audioContext, analyserNode, storedSamples, onStoreLoaded, setBeatName])
 
     const handleLoadDialogClose = () => {
         loadDialogRef.current?.close();

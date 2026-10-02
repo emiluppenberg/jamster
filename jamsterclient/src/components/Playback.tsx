@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode, type SetStateAction } from "react";
 import { useJamsterContext } from "../Context";
-import type { PatternData, RhythmData, TimelineRowData } from "../types";
+import type { PatternData, PatternId, RhythmData, TimelineRowData } from "../types";
 import Equalizer from "./Equalizer";
 import McpSocket from "./McpSocket";
 import LoadDialog from "./menu/LoadDialog";
@@ -36,23 +36,23 @@ const getSlotCount = (timelines: TimelineRowData[]) => (
     Math.max(0, ...timelines.map((timeline) => timeline.slots.length))
 )
 
-const getPatternByIndex = (patterns: PatternData[], patternIndex: number | undefined) => {
-    if (patternIndex === undefined) return undefined;
-    return patterns.find((pattern) => pattern.index === patternIndex);
+const getPatternById = (patterns: PatternData[], patternId: PatternId | undefined) => {
+    if (patternId === undefined) return undefined;
+    return patterns.find((pattern) => pattern.id === patternId);
 }
 
 const getPlaybackTimelines = (
     mode: PlaybackMode | undefined,
     timelines: TimelineRowData[],
-    patternIndex: number | undefined,
+    patternId: PatternId | undefined,
     patterns: PatternData[],
 ): TimelineRowData[] => {
-    if (mode === "pattern" && patternIndex !== undefined) {
-        const slotsLength = patterns.find(pattern => pattern.index === patternIndex)?.numberOfMeasures
+    if (mode === "pattern" && patternId !== undefined) {
+        const slotsLength = patterns.find((pattern) => pattern.id === patternId)?.numberOfMeasures
         
-        if (!slotsLength) throw new Error(`Could not find pattern with index: ${patternIndex}`);
+        if (!slotsLength) throw new Error(`Could not find pattern with id: ${patternId}`);
 
-        return [{ index: 0, slots: Array.from({ length: slotsLength }, () => patternIndex) }];
+        return [{ slots: Array.from({ length: slotsLength }, () => patternId) }];
     }
 
     if (mode === "timelines") {
@@ -65,10 +65,10 @@ const getPlaybackTimelines = (
 const getPlaybackState = (
     mode: PlaybackMode | undefined,
     timelines: TimelineRowData[],
-    patternIndex: number | undefined,
+    patternId: PatternId | undefined,
     patterns: PatternData[]
 ) => {
-    const playbackTimelines = getPlaybackTimelines(mode, timelines, patternIndex, patterns);
+    const playbackTimelines = getPlaybackTimelines(mode, timelines, patternId, patterns);
     const playbackSlotCount = getSlotCount(playbackTimelines);
 
     return {
@@ -105,12 +105,12 @@ const Playback = (props: PlaybackProps) => {
     const [bpm, setBpm] = useState(defaultBpm);
     const [isPlaying, setIsPlaying] = useState(false);
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode | undefined>(undefined);
-    const [soloPatternIndex, setSoloPatternIndex] = useState<number | undefined>(undefined);
+    const [soloPatternId, setSoloPatternId] = useState<PatternId | undefined>(undefined);
     const [cursorTick, setCursorTick] = useState(0);
     const patternsRef = useRef(props.patterns);
     const timelineRowsRef = useRef(props.timelineRows);
     const playbackModeRef = useRef<PlaybackMode | undefined>(undefined);
-    const soloPatternIndexRef = useRef<number | undefined>(undefined);
+    const soloPatternIdRef = useRef<PatternId | undefined>(undefined);
     const bpmRef = useRef(bpm);
     const schedulerTimerRef = useRef<number | undefined>(undefined);
     const nextCursorTickRef = useRef(0);
@@ -149,11 +149,10 @@ const Playback = (props: PlaybackProps) => {
         let stopTime = startTime;
         const notesPerMeasureFactor = positionsPerMeasure / rhythm.notesPerMeasure
 
-        for (const note of rhythm.measures[currentMeasureIndex].notes) {
-            if (note.index <= currentNoteIndex) continue;
-
+        const currentNotes = rhythm.measures[currentMeasureIndex].notes;
+        for (let noteIndex = currentNoteIndex + 1; noteIndex < currentNotes.length; noteIndex++) {
             stopTime += getPositionDurationSeconds(bpmRef.current) * notesPerMeasureFactor
-            if (note.value !== "-" && note.index !== currentNoteIndex) return stopTime;
+            if (currentNotes[noteIndex].value !== "-") return stopTime;
         }
 
         for (let i = currentMeasureIndex + 1; i < rhythm.measures.length; i++) {
@@ -179,7 +178,7 @@ const Playback = (props: PlaybackProps) => {
     }
 
     const schedulePattern = (pattern: PatternData, cursorTick: number, time: number) => {
-        const { slotCount } = getPlaybackState(playbackModeRef.current, timelineRowsRef.current, soloPatternIndexRef.current, patternsRef.current)
+        const { slotCount } = getPlaybackState(playbackModeRef.current, timelineRowsRef.current, soloPatternIdRef.current, patternsRef.current)
         const position64 = cursorTick % positionsPerMeasure;
         const currentMeasureIndex = getMeasureIndex(cursorTick, pattern, slotCount);
         if (currentMeasureIndex === undefined) return;
@@ -189,11 +188,12 @@ const Playback = (props: PlaybackProps) => {
             const sample = rhythm.sample;
             if (!currentMeasure || !sample) return;
 
-            const currentNote = currentMeasure.notes.find((note) => note.position64 === position64);
-            if (!currentNote) return;
+            const currentNoteIndex = currentMeasure.notes.findIndex((note) => note.position64 === position64);
+            if (currentNoteIndex < 0) return;
+            const currentNote = currentMeasure.notes[currentNoteIndex];
             if (currentNote.value === "-") return;
 
-            const stopTime = getNoteStopTime(rhythm, currentMeasureIndex, currentNote.index, time);
+            const stopTime = getNoteStopTime(rhythm, currentMeasureIndex, currentNoteIndex, time);
 
             const gain = getNoteGain(currentNote.value);
             rhythm.gainNode.gain.setValueAtTime(gain, time);
@@ -204,11 +204,11 @@ const Playback = (props: PlaybackProps) => {
     }
 
     const scheduleTick = (cursorTick: number, time: number) => {
-        const { timelines, slotCount } = getPlaybackState(playbackModeRef.current, timelineRowsRef.current, soloPatternIndexRef.current, patternsRef.current)
+        const { timelines, slotCount } = getPlaybackState(playbackModeRef.current, timelineRowsRef.current, soloPatternIdRef.current, patternsRef.current)
         const slotIndex = Math.floor(cursorTick / positionsPerMeasure) % slotCount;
 
         timelines.forEach((timeline) => {
-            const pattern = getPatternByIndex(patternsRef.current, timeline.slots[slotIndex]);
+            const pattern = getPatternById(patternsRef.current, timeline.slots[slotIndex]);
             if (!pattern) return;
             schedulePattern(pattern, cursorTick, time);
         });
@@ -224,7 +224,7 @@ const Playback = (props: PlaybackProps) => {
         setCursorTick(nextCursorTickRef.current);
     }
 
-    const startPlayback = async (mode: PlaybackMode, patternIndex?: number) => {
+    const startPlayback = async (mode: PlaybackMode, patternId?: PatternId) => {
         if (schedulerTimerRef.current !== undefined) {
             window.clearInterval(schedulerTimerRef.current);
             schedulerTimerRef.current = undefined;
@@ -235,17 +235,16 @@ const Playback = (props: PlaybackProps) => {
         }
 
         playbackModeRef.current = mode;
-        soloPatternIndexRef.current = patternIndex;
+        soloPatternIdRef.current = patternId;
         nextCursorTickRef.current = 0;
         nextTickTimeRef.current = audioContext.currentTime + startDelaySeconds;
         setPlaybackMode(mode);
-        setSoloPatternIndex(patternIndex);
+        setSoloPatternId(patternId);
         setCursorTick(0);
         setIsPlaying(true);
         runScheduler();
         schedulerTimerRef.current = window.setInterval(runScheduler, schedulerIntervalMs);
 
-        console.log(patternIndex)
     }
 
     const stopPlayback = () => {
@@ -257,14 +256,14 @@ const Playback = (props: PlaybackProps) => {
         nextCursorTickRef.current = 0;
         nextTickTimeRef.current = 0;
         playbackModeRef.current = undefined;
-        soloPatternIndexRef.current = undefined;
+        soloPatternIdRef.current = undefined;
         setPlaybackMode(undefined);
-        setSoloPatternIndex(undefined);
+        setSoloPatternId(undefined);
         setCursorTick(0);
         setIsPlaying(false);
     }
 
-    const { timelines, slotCount } = getPlaybackState(playbackMode, props.timelineRows, soloPatternIndex, props.patterns)
+    const { timelines, slotCount } = getPlaybackState(playbackMode, props.timelineRows, soloPatternId, props.patterns)
     const playingPosition64 = isPlaying ? cursorTick % positionsPerMeasure : undefined;
     const playingSlotIndex = isPlaying && slotCount > 0
         ? Math.floor(cursorTick / positionsPerMeasure) % slotCount
@@ -276,7 +275,7 @@ const Playback = (props: PlaybackProps) => {
 
         const slotIndex = Math.floor(cursorTick / positionsPerMeasure) % slotCount;
         const isPatternPlaying = timelines.some((timeline) => (
-            timeline.slots[slotIndex] === pattern.index
+            timeline.slots[slotIndex] === pattern.id
         ));
 
         if (!isPatternPlaying) return undefined;
@@ -312,7 +311,7 @@ const Playback = (props: PlaybackProps) => {
                 playingSlotIndex: playingSlotIndex,
                 getPlayingMeasureIndex,
                 playPattern: (pattern) => {
-                    void startPlayback("pattern", pattern.index);
+                    void startPlayback("pattern", pattern.id);
                 },
                 playTimeline: () => void startPlayback("timelines"),
                 stopPlayback: stopPlayback

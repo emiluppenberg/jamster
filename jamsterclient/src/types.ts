@@ -1,19 +1,21 @@
 export type TimelineRowData = {
-    index: number;
-    slots: PatternIndex[];
+    slots: PatternSlot[];
 }
 
-export type PatternIndex = number | undefined;
+export type PatternId = string;
+export type PatternSlot = PatternId | undefined;
+export type RhythmId = string;
+export type StoredPatternIndex = number | undefined;
 
 export type PatternData = {
-    index: number;
+    id: PatternId;
     numberOfMeasures: number;
     rhythms: RhythmData[];
     name: string;
 }
 
 export type RhythmData = {
-    index: number;
+    id: RhythmId;
     name: string;
     gainNode: GainNode;
     notesPerMeasure: number;
@@ -23,12 +25,10 @@ export type RhythmData = {
 }
 
 export type MeasureData = {
-    index: number;
     notes: NoteData[];
 }
 
 export type NoteData = {
-    index: number;
     position64: number;
     value: string;
 }
@@ -50,7 +50,7 @@ export type StoredMeasureData = {
 }
 
 export type StoredTimelineRowData = {
-    slots: PatternIndex[];
+    slots: StoredPatternIndex[];
 }
 
 export type StoredBeat = {
@@ -78,7 +78,7 @@ export type StoredSampleMcpDescription = {
 }
 
 export type FocusRhythm = {
-    rhythmIndex: number;
+    rhythmId: RhythmId;
     inputIndex: number;
 }
 

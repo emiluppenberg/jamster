@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import RhythmSampleDialog from "./RhythmSampleDialog";
-import type { FocusRhythm, RhythmData } from "../types";
+import type { FocusRhythm, RhythmData, RhythmId } from "../types";
 
 const notesPerMeasureOptions = [4, 8, 16, 32, 64];
 
@@ -9,29 +9,21 @@ export interface RhythmProps {
     playingMeasureIndex?: number;
     playingPosition64?: number;
     onNoteChange: (
-        rhythmIndex: number,
+        rhythmId: RhythmId,
         measureIndex: number,
         noteIndex: number,
         value: string,
     ) => void;
-    onSampleChange: (rhythmIndex: number, sample: AudioBuffer, fileName: string) => void;
-    onNotesPerMeasureChange: (rhythmIndex: number, notesPerMeasure: number) => void;
-    onDelete: (rhytmIndex: number) => void;
-    onNameChange: (rhythmIndex: number, newName: string) => void;
-    onFocusNewRhythm: (target: "next" | "previous", rhythmIndex: number, inputIndex: number) => void;
+    onSampleChange: (rhythmId: RhythmId, sample: AudioBuffer, fileName: string) => void;
+    onNotesPerMeasureChange: (rhythmId: RhythmId, notesPerMeasure: number) => void;
+    onDelete: (rhythmId: RhythmId) => void;
+    onNameChange: (rhythmId: RhythmId, newName: string) => void;
+    onFocusNewRhythm: (target: "next" | "previous", rhythmId: RhythmId, inputIndex: number) => void;
     focusRhythm: FocusRhythm | undefined;
 }
 
 const Rhythm = (props: RhythmProps) => {
     const noteInputRefs = useRef<Array<HTMLInputElement | undefined>>([]);
-
-    useEffect(() => {
-        if (!props.focusRhythm) return;
-        if (props.focusRhythm.rhythmIndex !== props.rhythm.index) return;
-
-        const focusInput = noteInputRefs.current[props.focusRhythm.inputIndex] ?? noteInputRefs.current[0]
-        focusAndSelectNote(focusInput);
-    }, [props.focusRhythm])
 
     const focusAndSelectNote = (input: HTMLInputElement | undefined) => {
         if (input === undefined) {
@@ -44,6 +36,14 @@ const Rhythm = (props: RhythmProps) => {
             input.select();
         });
     }
+
+    useEffect(() => {
+        if (!props.focusRhythm) return;
+        if (props.focusRhythm.rhythmId !== props.rhythm.id) return;
+
+        const focusInput = noteInputRefs.current[props.focusRhythm.inputIndex] ?? noteInputRefs.current[0]
+        focusAndSelectNote(focusInput);
+    }, [props.focusRhythm, props.rhythm.id])
 
     const focusNote = (measureIndex: number, noteIndex: number, target?: "next" | "previous") => {
         const currentInputIndex = measureIndex * props.rhythm.notesPerMeasure + noteIndex;
@@ -77,13 +77,13 @@ const Rhythm = (props: RhythmProps) => {
 
         if (e.key === "ArrowUp") {
             e.preventDefault();
-            props.onFocusNewRhythm("previous", props.rhythm.index, currentInputIndex)
+            props.onFocusNewRhythm("previous", props.rhythm.id, currentInputIndex)
             return;
         }
 
         if (e.key === "ArrowDown") {
             e.preventDefault();
-            props.onFocusNewRhythm("next", props.rhythm.index, currentInputIndex)
+            props.onFocusNewRhythm("next", props.rhythm.id, currentInputIndex)
             return;
         }
 
@@ -120,7 +120,7 @@ const Rhythm = (props: RhythmProps) => {
         value = isNumber ? value : "-";
 
         props.onNoteChange(
-            props.rhythm.index,
+            props.rhythm.id,
             measureIndex,
             noteIndex,
             value,
@@ -138,16 +138,16 @@ const Rhythm = (props: RhythmProps) => {
     return (
         <div className="rhythm">
             <div className="anchor">
-                <button className="btn delete delete-rhythm" onClick={() => props.onDelete(props.rhythm.index)}>-</button>
+                <button className="btn delete delete-rhythm" onClick={() => props.onDelete(props.rhythm.id)}>-</button>
                 <input
                     type="text"
                     className="rhythm-name"
                     value={props.rhythm.name}
-                    onChange={(e) => props.onNameChange(props.rhythm.index, e.target.value)}
+                    onChange={(e) => props.onNameChange(props.rhythm.id, e.target.value)}
                 />
             </div>
             <RhythmSampleDialog
-                setSample={(sample, fileName) => props.onSampleChange(props.rhythm.index, sample, fileName)}
+                setSample={(sample, fileName) => props.onSampleChange(props.rhythm.id, sample, fileName)}
                 sampleFileName={props.rhythm.sampleFilename}
                 rhythm={props.rhythm}
             />
@@ -155,7 +155,7 @@ const Rhythm = (props: RhythmProps) => {
                 className="notes-per-measure"
                 value={props.rhythm.notesPerMeasure}
                 onChange={(e) => {
-                    props.onNotesPerMeasureChange(props.rhythm.index, Number(e.target.value));
+                    props.onNotesPerMeasureChange(props.rhythm.id, Number(e.target.value));
                 }}
             >
                 {notesPerMeasureOptions.map((notesPerMeasure) => (
@@ -165,25 +165,26 @@ const Rhythm = (props: RhythmProps) => {
                 ))}
             </select>
             <div className="measures">
-                {props.rhythm.measures.map((measure) => (
+                {props.rhythm.measures.map((measure, measureIndex) => (
                     <div
-                        key={`${props.rhythm.name}-measure-${measure.index}`}
-                        className={`measure${measure.index === props.playingMeasureIndex ? " is-playing" : ""}`}
+                        key={`measure-${measureIndex}`}
+                        className={`measure${measureIndex === props.playingMeasureIndex ? " is-playing" : ""}`}
                     >
-                        {measure.notes.map((note) => (
+                        {measure.notes.map((note, noteIndex) => (
                             <input
-                                key={`${props.rhythm.name}-measure-${measure.index}-note-${note.index}`}
+                                readOnly
+                                key={`measure-${measureIndex}-note-${noteIndex}`}
                                 ref={(input) => {
-                                    noteInputRefs.current[measure.index * props.rhythm.notesPerMeasure + note.index] = input === null ? undefined : input;
+                                    noteInputRefs.current[measureIndex * props.rhythm.notesPerMeasure + noteIndex] = input === null ? undefined : input;
                                 }}
-                                className={`note${measure.index === props.playingMeasureIndex && note.position64 === props.playingPosition64 ? " is-playing" : ""}`}
+                                className={`note${measureIndex === props.playingMeasureIndex && note.position64 === props.playingPosition64 ? " is-playing" : ""}`}
                                 type="text"
                                 inputMode="numeric"
                                 maxLength={1}
                                 pattern={"[0-9\\-]"}
                                 value={note.value}
                                 onFocus={(e) => e.currentTarget.select()}
-                                onKeyDown={(e) => handleKeyDown(e, measure.index, note.index)}
+                                onKeyDown={(e) => handleKeyDown(e, measureIndex, noteIndex)}
                             />
                         ))}
                     </div>

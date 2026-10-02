@@ -1,5 +1,5 @@
-import type { MeasureData, PatternData, RhythmData, StoredMeasureData, StoredPatternData, StoredSample } from "../types";
-import { getNotePosition64 } from "../utils";
+import type { MeasureData, PatternData, RhythmData, StoredMeasureData, StoredPatternData, StoredSample, StoredTimelineRowData, TimelineRowData } from "../types";
+import { createRuntimeId, getNotePosition64 } from "../utils";
 
 export const decodeStoredSample = async (audioContext: AudioContext, sampleFileName: string, storedSamples: StoredSample[]) => {
     const storedSample = storedSamples.find(stored => stored.sampleFilename === sampleFileName)
@@ -11,13 +11,11 @@ export const loadMeasures = (
     notesPerMeasure: number,
     measures: StoredMeasureData[],
 ): MeasureData[] => {
-    return measures.map((measure, measureIndex) => ({
-        index: measureIndex,
+    return measures.map((measure) => ({
         notes: Array.from({ length: notesPerMeasure }, (_, noteIndex) => {
             const value = measure.noteSequence[noteIndex] ?? "-";
 
             return {
-                index: noteIndex,
                 position64: getNotePosition64(noteIndex, notesPerMeasure),
                 value: value
             }
@@ -29,7 +27,6 @@ export const loadRhythm = async (
     audioContext: AudioContext,
     analyserNode: AnalyserNode,
     storedSamples: StoredSample[],
-    index: number,
     name: string,
     sampleFileName: string,
     notesPerMeasure: number,
@@ -42,7 +39,7 @@ export const loadRhythm = async (
     const sample = await decodeStoredSample(audioContext, sampleFileName, storedSamples)
 
     return {
-        index: index,
+        id: createRuntimeId(),
         name: name,
         gainNode: gainNode,
         notesPerMeasure: notesPerMeasure,
@@ -53,15 +50,14 @@ export const loadRhythm = async (
 }
 
 export const loadPatterns = async (audioContext: AudioContext, analyserNode: AnalyserNode, patternData: StoredPatternData[], storedSamples: StoredSample[]): Promise<PatternData[]> => {
-    return await Promise.all(patternData!.map(async (pattern, patternIndex) => ({
-        index: patternIndex,
+    return await Promise.all(patternData.map(async (pattern) => ({
+        id: createRuntimeId(),
         numberOfMeasures: Math.max(1, ...pattern.rhythms.map(r => r.measures.length)),
-        rhythms: await Promise.all(pattern.rhythms.map((rhythm, rhythmIndex) =>
+        rhythms: await Promise.all(pattern.rhythms.map((rhythm) =>
             loadRhythm(
                 audioContext,
                 analyserNode,
                 storedSamples,
-                rhythmIndex,
                 rhythm.name,
                 rhythm.sampleFileName,
                 rhythm.notesPerMeasure,
@@ -71,3 +67,13 @@ export const loadPatterns = async (audioContext: AudioContext, analyserNode: Ana
         name: pattern.name
     })));
 }
+
+export const loadTimelineRows = (
+    storedRows: StoredTimelineRowData[],
+    patterns: PatternData[],
+): TimelineRowData[] => storedRows.map((row) => ({
+    slots: row.slots.map((patternPosition) => {
+        if (patternPosition === undefined || patternPosition < 0) return undefined;
+        return patterns[patternPosition]?.id;
+    }),
+}));
