@@ -210,12 +210,27 @@ export const stockPatternsSunnyDays: StoredPatternData[] = [
 			}
 		],
 		name: "Sunny"
-	}
+	},
+    {
+        rhythms: [
+            {
+                name: "Fm",
+                sampleFileName: getUrlFilename(jbl3677ChordAstronautFmCFAUrl),
+                notesPerMeasure: 4,
+                measures: [
+                    {noteSequence: "9---"},
+                    {noteSequence: "----"}
+                ],
+            }
+        ],
+        name: "Bell"
+    }
 ]
 
 export const stockTimelineSunnyDays: StoredTimelineRowData[] = [
     { slots: [0, 0, 0, 0] },
-    { slots: [1, 1, 1, 1] }
+    { slots: [1, 1, 1, 1] },
+    { slots: [2, 2, 2, 2]}
 ]
 
 export const stockBeatSunnyDays: StoredBeat = {
@@ -225,7 +240,7 @@ export const stockBeatSunnyDays: StoredBeat = {
     patterns: stockPatternsSunnyDays
 }
 
-export const stockPatternsChillHop: StoredPatternData[] = [
+export const stockPatternsSlowRhodes: StoredPatternData[] = [
     {
         rhythms:
             [
@@ -426,37 +441,37 @@ export const stockPatternsChillHop: StoredPatternData[] = [
                     ],
                 },
                 {
-                    name: "Tambourine Perc",
-                    sampleFileName: getUrlFilename(djIgnorantLoFiTambourineUrl),
+                    name: "Ride",
+                    sampleFileName: getUrlFilename(djIgnorantLoFiRideUrl),
                     notesPerMeasure: 16,
                     measures: [
                         {
-                            noteSequence: "--4---5---4---6-"
+                            noteSequence: "5---4--25---5--2"
                         },
                         {
-                            noteSequence: "--4---5---4---5-"
+                            noteSequence: "5---3---3--55--2"
                         },
                         {
-                            noteSequence: "--5---4---5---6-"
+                            noteSequence: "5---4--25---4---"
                         },
                         {
-                            noteSequence: "--4---6---5---7-"
-                        }
-                    ]
-                }
+                            noteSequence: "5---5---4--35--5"
+                        },
+                    ],
+                },
             ],
         name: "Drums"
     },
 ];
 
-export const stockTimelineChillHop: StoredTimelineRowData[] = [
+export const stockTimelineSlowRhodes: StoredTimelineRowData[] = [
     { slots: [0, 0, 0, 0] },
     { slots: [1, 1, 1, 1] }
 ]
 
-export const stockBeatChillHop: StoredBeat = {
-    name: "ChillHop",
+export const stockBeatSlowRhodes: StoredBeat = {
+    name: "Slow Rhodes",
     bpm: 100,
-    timelineRows: stockTimelineChillHop,
-    patterns: stockPatternsChillHop
+    timelineRows: stockTimelineSlowRhodes,
+    patterns: stockPatternsSlowRhodes
 }
