@@ -4,6 +4,9 @@ import type { McpAppSessionData } from "@beatdoc/shared"
 
 const appSessionIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const allowedOrigins = [process.env.ALLOWED_ORIGIN, process.env.ALLOWED_ORIGIN_DEV].filter((origin): origin is string => Boolean(origin));
+const allowedOriginDevRegex = process.env.ALLOWED_ORIGIN_DEV_REGEX
+    ? new RegExp(process.env.ALLOWED_ORIGIN_DEV_REGEX)
+    : undefined;
 
 export const InitializeWebSocketServer = (server: Server) => {
     const wss = new WebSocketServer({ noServer: true });
@@ -11,7 +14,7 @@ export const InitializeWebSocketServer = (server: Server) => {
     const sessionData = new Map<string, McpAppSessionData>();
 
     server.on("upgrade", (request, socket, head) => {
-        if (!request.headers.origin || !allowedOrigins.includes(request.headers.origin)) {
+        if (!request.headers.origin || (!allowedOrigins.includes(request.headers.origin) && !allowedOriginDevRegex?.test(request.headers.origin))) {
             socket.destroy();
             return;
         }

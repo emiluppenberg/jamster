@@ -1,4 +1,4 @@
-import type { MeasureData, PatternData, RhythmData, StoredBeat, StoredMeasureData, StoredPatternData, StoredRhythmData, TimelineRowData } from "../types"
+import type { MeasureData, PatternData, RhythmData, StoredBeat, StoredMeasureData, StoredPatternData, StoredRhythmData, StoredTimelineRowData, TimelineRowData } from "../types"
 import { saveBeat } from "./db"
 
 const storeMeasure = (measure: MeasureData): StoredMeasureData => ({
@@ -17,11 +17,21 @@ const storePattern = (pattern: PatternData): StoredPatternData => ({
     rhythms: pattern.rhythms.map((rhythm) => storeRhythm(rhythm))
 })
 
+export const storeTimelineRows = (
+    patterns: PatternData[],
+    timelineRows: TimelineRowData[],
+): StoredTimelineRowData[] => timelineRows.map((row) => ({
+    slots: row.slots.map((patternId) => {
+        if (patternId === undefined) return undefined;
+
+        const patternPosition = patterns.findIndex((pattern) => pattern.id === patternId);
+        return patternPosition >= 0 ? patternPosition : undefined;
+    }),
+}));
+
 export const storeBeat = async (patterns: PatternData[], timelineRows: TimelineRowData[], saveName: string, bpm: number) => {
     const storedPatternData = patterns.map((pattern) => storePattern(pattern));
-    const storedTimelineRowsData = timelineRows.map((row) => ({
-        slots: row.slots.map(patternIndex => patterns.findIndex(pattern => pattern.index === patternIndex))
-    }));
+    const storedTimelineRowsData = storeTimelineRows(patterns, timelineRows);
 
     const storedData: StoredBeat = {
         name: saveName,

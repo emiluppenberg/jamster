@@ -1,8 +1,8 @@
 import Rhythm from "./Rhythm";
 import { useJamsterContext } from "../Context";
-import type { FocusRhythm, PatternData, RhythmData, Warning } from "../types";
+import type { FocusRhythm, PatternData, RhythmData, RhythmId, Warning } from "../types";
 import { useEffect, useState, type CSSProperties } from "react";
-import { createMeasure, createRhythm, getViewportWidthRem, resizeMeasureNotes } from "../utils";
+import { createMeasure, createRhythm, getUniqueNumberedName, getViewportWidthRem, resizeMeasureNotes } from "../utils";
 import WarningDisplay from "./WarningDisplay";
 
 const defaultMeasuresAtScreenWidth = 4;
@@ -18,13 +18,13 @@ const updateRhythmNoteValue = (
 ): RhythmData => {
     return {
         ...rhythm,
-        measures: rhythm.measures.map((measure) => {
-            if (measure.index !== measureIndex) return measure;
+        measures: rhythm.measures.map((measure, currentMeasureIndex) => {
+            if (currentMeasureIndex !== measureIndex) return measure;
 
             return {
                 ...measure,
-                notes: measure.notes.map((note) => {
-                    if (note.index !== noteIndex) return note;
+                notes: measure.notes.map((note, currentNoteIndex) => {
+                    if (currentNoteIndex !== noteIndex) return note;
 
                     return {
                         ...note,
@@ -56,7 +56,7 @@ const updateRhythmNotesPerMeasure = (
         ...rhythm,
         notesPerMeasure,
         measures: rhythm.measures.map((measure) => (
-            resizeMeasureNotes(measure, rhythm.notesPerMeasure, notesPerMeasure)
+            resizeMeasureNotes(measure, notesPerMeasure)
         )),
     };
 }
@@ -68,7 +68,7 @@ const updateRhythmNumberOfMeasures = (
     return {
         ...rhythm,
         measures: Array.from({ length: numberOfMeasures }, (_, measureIndex) => (
-            rhythm.measures[measureIndex] ?? createMeasure(measureIndex, rhythm.notesPerMeasure)
+            rhythm.measures[measureIndex] ?? createMeasure(rhythm.notesPerMeasure)
         )),
     };
 }
@@ -141,36 +141,39 @@ const Pattern = (props: PatternProps) => {
     }
 
     const addRhythm = () => {
-        const nextIndex = Math.max(0, ...props.pattern.rhythms.map(rhythm => rhythm.index)) + 1
+        const name = getUniqueNumberedName(
+            "Rhythm",
+            props.pattern.rhythms.map((rhythm) => rhythm.name),
+        );
 
         updatePatternRhythms([
             ...props.pattern.rhythms,
-            createRhythm(nextIndex, props.pattern.numberOfMeasures, audioContext, analyserNode),
+            createRhythm(name, props.pattern.numberOfMeasures, audioContext, analyserNode),
         ])
     }
 
     const handleNoteChange = (
-        rhythmIndex: number,
+        rhythmId: RhythmId,
         measureIndex: number,
         noteIndex: number,
         value: string,
     ) => {
         updatePatternRhythms(props.pattern.rhythms.map((rhythm) => {
-            if (rhythm.index !== rhythmIndex) return rhythm;
+            if (rhythm.id !== rhythmId) return rhythm;
             return updateRhythmNoteValue(rhythm, measureIndex, noteIndex, value);
         }));
     }
 
-    const handleSampleChange = (rhythmIndex: number, sample: AudioBuffer, fileName: string) => {
+    const handleSampleChange = (rhythmId: RhythmId, sample: AudioBuffer, fileName: string) => {
         updatePatternRhythms(props.pattern.rhythms.map((rhythm) => {
-            if (rhythm.index !== rhythmIndex) return rhythm;
+            if (rhythm.id !== rhythmId) return rhythm;
             return updateRhythmSample(rhythm, sample, fileName);
         }));
     }
 
-    const handleNotesPerMeasureChange = (rhythmIndex: number, notesPerMeasure: number) => {
+    const handleNotesPerMeasureChange = (rhythmId: RhythmId, notesPerMeasure: number) => {
         updatePatternRhythms(props.pattern.rhythms.map((rhythm) => {
-            if (rhythm.index !== rhythmIndex) return rhythm;
+            if (rhythm.id !== rhythmId) return rhythm;
             return updateRhythmNotesPerMeasure(rhythm, notesPerMeasure);
         }));
     }
@@ -185,10 +188,10 @@ const Pattern = (props: PatternProps) => {
         });
     }
 
-    const handleDeleteRhythm = (rhythmIndex: number) => {
+    const handleDeleteRhythm = (rhythmId: RhythmId) => {
         props.onPatternChange({
             ...props.pattern,
-            rhythms: props.pattern.rhythms.filter((rhythm) => rhythm.index !== rhythmIndex)
+            rhythms: props.pattern.rhythms.filter((rhythm) => rhythm.id !== rhythmId)
         })
     }
 
@@ -204,7 +207,7 @@ const Pattern = (props: PatternProps) => {
         });
     }
 
-    const handleRhythmNameChange = (rhythmIndex: number, newName: string) => {
+    const handleRhythmNameChange = (rhythmId: RhythmId, newName: string) => {
         const isDuplicateName = props.pattern.rhythms.some(rhythm => rhythm.name === newName);
 
         if (isDuplicateName) setWarnings(current => [...current, { message: "Multiple rhythms within the same pattern should not have the same name", id: "rhythmName" }]);
@@ -213,7 +216,7 @@ const Pattern = (props: PatternProps) => {
         props.onPatternChange({
             ...props.pattern,
             rhythms: props.pattern.rhythms.map((rhythm) => {
-                if (rhythm.index !== rhythmIndex) return rhythm;
+                if (rhythm.id !== rhythmId) return rhythm;
                 return {
                     ...rhythm,
                     name: newName
@@ -233,8 +236,8 @@ const Pattern = (props: PatternProps) => {
         }
     }
 
-    const handleFocusNewRhythm = (target: "next" | "previous", rhythmIndex: number, inputIndex: number) => {
-        const currentRhythmIndex = props.pattern.rhythms.findIndex(rhythm => rhythm.index === rhythmIndex);
+    const handleFocusNewRhythm = (target: "next" | "previous", rhythmId: RhythmId, inputIndex: number) => {
+        const currentRhythmIndex = props.pattern.rhythms.findIndex((rhythm) => rhythm.id === rhythmId);
 
         let targetRhythm = props.pattern.rhythms[currentRhythmIndex];
 
@@ -245,7 +248,7 @@ const Pattern = (props: PatternProps) => {
             targetRhythm = props.pattern.rhythms[currentRhythmIndex - 1] ?? props.pattern.rhythms[props.pattern.rhythms.length - 1]
         }
 
-        setFocusRhythm({ rhythmIndex: targetRhythm.index, inputIndex: inputIndex });
+        setFocusRhythm({ rhythmId: targetRhythm.id, inputIndex: inputIndex });
     }
 
 
@@ -292,7 +295,7 @@ const Pattern = (props: PatternProps) => {
             </div>
             {props.pattern.rhythms.map((rhythm) => (
                 <Rhythm
-                    key={`${props.pattern.name}-rhythm-${rhythm.index}`}
+                    key={rhythm.id}
                     rhythm={rhythm}
                     playingMeasureIndex={props.playingMeasureIndex}
                     playingPosition64={props.playingPosition64}

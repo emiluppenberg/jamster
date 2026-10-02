@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useReducer, type Dispatch, type SetStateAction } from 'react';
 import './App.css'
 import Pattern from './components/Pattern'
 import Playback from './components/Playback';
 import { JamsterProvider } from './Provider'
 import type { PatternData, TimelineRowData } from './types';
 import TimelineRows from './components/TimelineRows';
+import { appStateReducer, initialAppState } from './state';
+import { createRuntimeId, getUniqueNumberedName } from './utils';
 
 const getTimelineLength = (timelineRows: TimelineRowData[]) => (
   Math.max(1, ...timelineRows.map((row) => row.slots.length))
@@ -20,41 +22,40 @@ const AppContainer = () => {
   )
 }
 
-const AppContent = () => {
-  const [patterns, setPatterns] = useState<PatternData[]>([])
-  const [timelineRows, setTimelineRows] = useState<TimelineRowData[]>([])
+export const AppContent = () => {
+  const [{ patterns, timelineRows }, dispatch] = useReducer(appStateReducer, initialAppState)
   const timelineLength = useMemo(() => getTimelineLength(timelineRows), [timelineRows]);
 
-  const addPattern = () => setPatterns((currentPatterns) => [
-    ...currentPatterns,
-    {
-      index: currentPatterns.length,
-      numberOfMeasures: defaultNumberOfMeasures,
-      rhythms: [],
-      name: `Pattern ${currentPatterns.length}`
-    },
-  ])
+  const addPattern = () => {
+    dispatch({
+      type: "addPattern",
+      pattern: {
+        id: createRuntimeId(),
+        numberOfMeasures: defaultNumberOfMeasures,
+        rhythms: [],
+        name: getUniqueNumberedName("Pattern", patterns.map((pattern) => pattern.name)),
+      },
+    });
+  }
 
   const handlePatternAdded = (newPattern: PatternData) => {
-    setPatterns(currentPatterns => [
-      ...currentPatterns, newPattern
-    ])
+    dispatch({ type: "addPattern", pattern: newPattern });
   }
 
   const handlePatternChange = (newPattern: PatternData) => {
-    setPatterns((currentPatterns) => currentPatterns.map((pattern) => {
-      if (pattern.index !== newPattern.index) return pattern;
-      return newPattern;
-    }));
+    dispatch({ type: "changePattern", pattern: newPattern });
   }
 
   const handlePatternDelete = (deletePattern: PatternData) => {
-    setPatterns((currentPatterns) => currentPatterns.filter((pattern) => pattern.index !== deletePattern.index));
+    dispatch({ type: "deletePattern", patternId: deletePattern.id });
   }
 
   const handleStoreLoaded = (patterns: PatternData[], timelineRows: TimelineRowData[]) => {
-    setPatterns(patterns);
-    setTimelineRows(timelineRows);
+    dispatch({ type: "loadStore", patterns, timelineRows });
+  }
+
+  const setTimelineRows: Dispatch<SetStateAction<TimelineRowData[]>> = (update) => {
+    dispatch({ type: "setTimelineRows", update });
   }
 
   return (
@@ -85,7 +86,7 @@ const AppContent = () => {
             <div className="container patterns">
               {patterns.map((pattern) => (
                 <Pattern
-                  key={`pattern-${pattern.index}`}
+                  key={pattern.id}
                   isPlaying={isPlaying}
                   pattern={pattern}
                   patterns={patterns}

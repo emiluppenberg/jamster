@@ -1,4 +1,4 @@
-import { stockSamples, stockBeatDnB, stockBeatChillHop } from "../stock";
+import { stockSamples, stockBeatSunnyDays, stockBeatSlowRhodes } from "../stock";
 import type { StoredBeat, StoredSampleArrayBuffer, StoredSampleMcpDescription } from "../types";
 import { getUrlFilename } from '../utils';
 
@@ -54,8 +54,8 @@ const seedStockBeats = async (db: IDBDatabase): Promise<void> => {
         const transaction = db.transaction(store_beats, "readwrite");
         const store = transaction.objectStore(store_beats);
 
-        store.put(stockBeatDnB)
-        store.put(stockBeatChillHop)
+        store.put(stockBeatSunnyDays)
+        store.put(stockBeatSlowRhodes)
         
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);

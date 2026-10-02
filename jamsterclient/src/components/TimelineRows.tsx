@@ -10,7 +10,7 @@ export interface TimelineProps {
     patterns: PatternData[];
     timelineRows: TimelineRowData[];
     timelineLength: number;
-    onTimelineRowsChange: (timelines: TimelineRowData[]) => void;
+    onTimelineRowsChange: React.Dispatch<SetStateAction<TimelineRowData[]>>;
     playingSlotIndex: number | undefined;
     onPlayTimeline: () => void;
     onStopPlayback: () => void;
@@ -22,12 +22,9 @@ const TimelineRows = (props: TimelineProps) => {
     const [show, setShow] = useState(true);
 
     const addTimelineRow = () => {
-        const nextIndex = Math.max(0, ...props.timelineRows.map(row => row.index)) + 1;
-
         props.onTimelineRowsChange([
             ...props.timelineRows,
             {
-                index: nextIndex,
                 slots: createSlots(props.timelineLength),
             },
         ]);
@@ -48,13 +45,13 @@ const TimelineRows = (props: TimelineProps) => {
         slotIndex: number,
         value: string,
     ) => {
-        const patternIndex = value === "" ? undefined : Number(value);
+        const patternId = value === "" ? undefined : value;
 
-        props.onTimelineRowsChange(props.timelineRows.map((timelineRow) => {
-            if (timelineRow.index !== timelineRowIndex) return timelineRow;
+        props.onTimelineRowsChange(props.timelineRows.map((timelineRow, currentRowIndex) => {
+            if (currentRowIndex !== timelineRowIndex) return timelineRow;
 
             const slots = resizeSlots(timelineRow.slots, props.timelineLength);
-            slots[slotIndex] = patternIndex;
+            slots[slotIndex] = patternId;
 
             return {
                 ...timelineRow,
@@ -63,8 +60,8 @@ const TimelineRows = (props: TimelineProps) => {
         }));
     }
 
-    const handleDeleteTimelineRow = (deleteTimeline: TimelineRowData) => {
-        props.onTimelineRowsChange(props.timelineRows.filter(timeline => timeline !== deleteTimeline))
+    const handleDeleteTimelineRow = (deleteRowIndex: number) => {
+        props.onTimelineRowsChange(props.timelineRows.filter((_, rowIndex) => rowIndex !== deleteRowIndex))
     }
 
     const handleTogglePlay = () => {
@@ -119,19 +116,19 @@ const TimelineRows = (props: TimelineProps) => {
                         <button className="btn show-hide" onClick={() => setShow(!show)}>{show ? "Hide" : "Show"}</button>
                     </div>
                 </div>
-                {props.timelineRows.length > 0 && show && props.timelineRows.map((timeline) => (
-                    <div key={`timeline-${timeline.index}`} className="timeline-row">
-                        <button className="btn delete" onClick={() => handleDeleteTimelineRow(timeline)}>-</button>
+                {props.timelineRows.length > 0 && show && props.timelineRows.map((timeline, timelineRowIndex) => (
+                    <div key={`timeline-${timelineRowIndex}`} className="timeline-row">
+                        <button className="btn delete" onClick={() => handleDeleteTimelineRow(timelineRowIndex)}>-</button>
                         {Array.from({ length: props.timelineLength }, (_, slotIndex) => (
                             <select
-                                key={`timeline-${timeline.index}-slot-${slotIndex}`}
+                                key={`timeline-${timelineRowIndex}-slot-${slotIndex}`}
                                 className={`slot-pattern${slotIndex === props.playingSlotIndex ? " is-playing" : ""}`}
                                 value={timeline.slots[slotIndex] ?? ""}
-                                onChange={(e) => handleSlotChange(timeline.index, slotIndex, e.target.value)}
+                                onChange={(e) => handleSlotChange(timelineRowIndex, slotIndex, e.target.value)}
                             >
                                 <option value="">-</option>
                                 {props.patterns.map((pattern) => (
-                                    <option key={`timeline-${timeline.index}-option-${pattern.index}`} value={pattern.index}>{pattern.name}</option>
+                                    <option key={`${timelineRowIndex}-${pattern.id}`} value={pattern.id}>{pattern.name}</option>
                                 ))}
                             </select>
                         ))}

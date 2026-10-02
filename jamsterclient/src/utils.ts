@@ -1,4 +1,4 @@
-import type { RhythmData, MeasureData, NoteData, PatternIndex } from "./types";
+import type { RhythmData, MeasureData, NoteData, PatternSlot } from "./types";
 
 export const eq_fftSize = 1024;
 
@@ -25,8 +25,18 @@ export const getNotePosition64 = (noteIndex: number, notesPerMeasure: number) =>
     noteIndex * (64 / notesPerMeasure)
 )
 
+export const createRuntimeId = () => crypto.randomUUID();
+
+export const getUniqueNumberedName = (prefix: string, existingNames: string[]) => {
+    const names = new Set(existingNames);
+    let suffix = 0;
+
+    while (names.has(`${prefix} ${suffix}`)) suffix += 1;
+    return `${prefix} ${suffix}`;
+}
+
 export const createRhythm = (
-    index: number,
+    name: string,
     numberOfMeasures: number,
     audioContext: AudioContext,
     analyserNode: AnalyserNode
@@ -36,8 +46,8 @@ export const createRhythm = (
     gainNode.connect(analyserNode);
 
     return {
-        index: index,
-        name: `Rhythm ${index}`,
+        id: createRuntimeId(),
+        name,
         gainNode: gainNode,
         notesPerMeasure: 4,
         measures: createMeasures(numberOfMeasures, 4),
@@ -46,22 +56,20 @@ export const createRhythm = (
 }
 
 export const createMeasures = (numberOfMeasures: number, notesPerMeasure: number): MeasureData[] => (
-    Array.from({ length: numberOfMeasures }, (_, measureIndex) => (
-        createMeasure(measureIndex, notesPerMeasure)
+    Array.from({ length: numberOfMeasures }, () => (
+        createMeasure(notesPerMeasure)
     ))
 )
 
 
 export const createNotes = (notesPerMeasure: number): NoteData[] => (
     Array.from({ length: notesPerMeasure }, (_, noteIndex) => ({
-        index: noteIndex,
         position64: getNotePosition64(noteIndex, notesPerMeasure),
         value: "-",
     }))
 )
 
-export const createMeasure = (index: number, notesPerMeasure: number): MeasureData => ({
-    index,
+export const createMeasure = (notesPerMeasure: number): MeasureData => ({
     notes: createNotes(notesPerMeasure),
 })
 
@@ -81,7 +89,6 @@ const positionsPerMeasure = 64;
 
 export const resizeMeasureNotes = (
     measure: MeasureData,
-    previousNotesPerMeasure: number,
     nextNotesPerMeasure: number,
 ): MeasureData => {
     const notes = createNotes(nextNotesPerMeasure);
@@ -89,8 +96,7 @@ export const resizeMeasureNotes = (
     measure.notes.forEach((note) => {
         if (note.value === "") return;
 
-        const position64 = note.position64 ?? getNotePosition64(note.index, previousNotesPerMeasure);
-        const rhythmicPosition = position64 / positionsPerMeasure;
+        const rhythmicPosition = note.position64 / positionsPerMeasure;
         const noteIndex = Math.min(
             nextNotesPerMeasure - 1,
             Math.round(rhythmicPosition * nextNotesPerMeasure),
@@ -111,13 +117,13 @@ export const resizeMeasureNotes = (
     };
 }
 
-export const createSlots = (timelineLength: number): PatternIndex[] => (
+export const createSlots = (timelineLength: number): PatternSlot[] => (
     Array.from({ length: timelineLength }, () => undefined)
 )
 
 export const resizeSlots = (
-    slots: PatternIndex[],
+    slots: PatternSlot[],
     timelineLength: number,
-): PatternIndex[] => (
+): PatternSlot[] => (
     Array.from({ length: timelineLength }, (_, slotIndex) => slots[slotIndex])
 )
