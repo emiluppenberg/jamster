@@ -292,7 +292,7 @@ const Playback = (props: PlaybackProps) => {
         <div className="playback">
             <div className="menu">
                 <Brand />
-                <LoadDialog onStoreLoaded={handleOnStoreLoaded} patterns={props.patterns} timelineRows={props.timelineRows} />
+                <LoadDialog onStoreLoaded={handleOnStoreLoaded}/>
                 <SaveDialog patterns={props.patterns} timelineRows={props.timelineRows} bpm={bpm} />
                 <SamplesDialog onPlaySample={playSample} />
                 <McpSocket
