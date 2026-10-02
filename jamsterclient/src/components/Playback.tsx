@@ -304,11 +304,9 @@ const Playback = (props: PlaybackProps) => {
                 <SamplesDialog onPlaySample={playSample} />
                 <McpSocket
                     patterns={props.patterns}
-                    timelineRows={props.timelineRows}
                     onPatternChange={props.onPatternChange}
                     onPatternAdded={props.onPatternAdded}
-                    onPatternDelete={props.onPatternDelete}
-                    onTimelineRowsChange={props.onTimelineRowsChange} />
+                    onPatternDelete={props.onPatternDelete} />
                 <Equalizer isPlaying={isPlaying} />
             </div>
             {props.children({

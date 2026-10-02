@@ -1,4 +1,5 @@
 import type { PatternData, PatternId, TimelineRowData } from "./types";
+import { resizeSlots } from "./utils";
 
 export type AppState = {
     patterns: PatternData[];
@@ -29,11 +30,29 @@ export const appStateReducer = (state: AppState, action: AppAction): AppState =>
                 patterns: [],
                 timelineRows: [],
             };
-        case "addPattern":
+        case "addPattern": {
+            const timelineLength = Math.max(
+                action.pattern.numberOfMeasures,
+                ...state.timelineRows.map((row) => row.slots.length),
+            );
+
             return {
                 ...state,
                 patterns: [...state.patterns, action.pattern],
+                timelineRows: [
+                    ...state.timelineRows.map((row) => ({
+                        ...row,
+                        slots: resizeSlots(row.slots, timelineLength),
+                    })),
+                    {
+                        slots: Array.from(
+                            { length: timelineLength },
+                            () => action.pattern.id,
+                        ),
+                    },
+                ],
             };
+        }
         case "changePattern":
             return {
                 ...state,

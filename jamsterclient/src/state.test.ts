@@ -50,6 +50,44 @@ describe('appStateReducer', () => {
         expect(afterChange.patterns[0]).toBe(remaining);
     });
 
+    it('adds an assigned timeline row when a pattern is added', () => {
+        const existing = createPattern('pattern-a', 'Pattern 0');
+        const added = createPattern('pattern-b', 'Pattern 1');
+        added.numberOfMeasures = 4;
+        const initial: AppState = {
+            patterns: [existing],
+            timelineRows: [{ slots: [existing.id, undefined] }],
+        };
+
+        const result = appStateReducer(initial, {
+            type: 'addPattern',
+            pattern: added,
+        });
+
+        expect(result.timelineRows).toEqual([
+            { slots: [existing.id, undefined, undefined, undefined] },
+            { slots: [added.id, added.id, added.id, added.id] },
+        ]);
+    });
+
+    it('uses the existing timeline length for a newly assigned pattern row', () => {
+        const added = createPattern('pattern-b', 'Pattern 1');
+        added.numberOfMeasures = 2;
+        const initial: AppState = {
+            patterns: [],
+            timelineRows: [{ slots: [undefined, undefined, undefined] }],
+        };
+
+        const result = appStateReducer(initial, {
+            type: 'addPattern',
+            pattern: added,
+        });
+
+        expect(result.timelineRows[1]).toEqual({
+            slots: [added.id, added.id, added.id],
+        });
+    });
+
     it('clears every timeline slot that references a deleted pattern', () => {
         const deleted = createPattern('pattern-a', 'Pattern 0');
         const retained = createPattern('pattern-b', 'Pattern 1');
