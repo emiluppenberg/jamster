@@ -1,18 +1,16 @@
 import { useEffect, useRef, useState, type SetStateAction } from "react";
 import { useJamsterContext } from "../Context";
-import type { PatternData, TimelineRowData } from "../types";
+import type { PatternData } from "../types";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
-import { createRuntimeId, getNotePosition64, mcpUrl, resizeSlots, wssUrl } from "../utils";
+import { createRuntimeId, getNotePosition64, mcpUrl, wssUrl } from "../utils";
 import { McpSocketMessageSchema } from "@beatdoc/shared"
 import type { McpAppSessionData, CreatePatternDto, McpPatternData, SetRhythmDto, McpSampleData, DeletePatternDto, DeleteRhythmDto } from "@beatdoc/shared"
 
 interface McpSocketProps {
     patterns: PatternData[];
-    timelineRows: TimelineRowData[];
     onPatternChange: (pattern: PatternData) => void;
     onPatternAdded: (pattern: PatternData) => void;
     onPatternDelete: (pattern: PatternData) => void;
-    onTimelineRowsChange: React.Dispatch<SetStateAction<TimelineRowData[]>>;
 }
 
 const McpSocket = (props: McpSocketProps) => {
@@ -86,18 +84,6 @@ const McpSocket = (props: McpSocketProps) => {
             }))
         })
 
-        props.onTimelineRowsChange((currentRows) => {
-            const slotsLength = Math.max(dto.numberOfMeasures, ...currentRows.map((row) => row.slots.length));
-
-            return [
-                ...currentRows.map((row) => ({
-                    slots: resizeSlots(row.slots, slotsLength),
-                })),
-                {
-                    slots: Array.from({ length: slotsLength }, () => patternId),
-                },
-            ];
-        });
     }
 
     const handleDeletePattern = async (dto: DeletePatternDto) => {

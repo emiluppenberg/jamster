@@ -93,6 +93,7 @@ export interface PlaybackProps {
     patterns: PatternData[];
     timelineRows: TimelineRowData[];
     children: (props: PlaybackRenderProps) => ReactNode;
+    onNewBeat: () => void;
     onStoreLoaded: (patterns: PatternData[], timelines: TimelineRowData[]) => void;
     onPatternChange: (pattern: PatternData) => void;
     onPatternAdded: (pattern: PatternData) => void;
@@ -101,7 +102,7 @@ export interface PlaybackProps {
 }
 
 const Playback = (props: PlaybackProps) => {
-    const { audioContext } = useJamsterContext();
+    const { audioContext, setBeatName } = useJamsterContext();
     const [bpm, setBpm] = useState(defaultBpm);
     const [isPlaying, setIsPlaying] = useState(false);
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode | undefined>(undefined);
@@ -287,20 +288,25 @@ const Playback = (props: PlaybackProps) => {
         props.onStoreLoaded(patterns, timelineRows)
     }
 
+    const handleNewBeat = () => {
+        stopPlayback();
+        setBeatName("");
+        props.onNewBeat();
+    }
+
     return (
         <div className="playback">
             <div className="menu">
                 <Brand />
+                <button className="btn" type="button" onClick={handleNewBeat}>New</button>
                 <LoadDialog onStoreLoaded={handleOnStoreLoaded}/>
                 <SaveDialog patterns={props.patterns} timelineRows={props.timelineRows} bpm={bpm} />
                 <SamplesDialog onPlaySample={playSample} />
                 <McpSocket
                     patterns={props.patterns}
-                    timelineRows={props.timelineRows}
                     onPatternChange={props.onPatternChange}
                     onPatternAdded={props.onPatternAdded}
-                    onPatternDelete={props.onPatternDelete}
-                    onTimelineRowsChange={props.onTimelineRowsChange} />
+                    onPatternDelete={props.onPatternDelete} />
                 <Equalizer isPlaying={isPlaying} />
             </div>
             {props.children({
