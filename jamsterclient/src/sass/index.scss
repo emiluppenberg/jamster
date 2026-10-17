@@ -7,7 +7,7 @@ $mint: #a2e8dd;
 $green: #32de8a;
 $danger: #de4f32;
 
-$app-bg: #0f1715;
+$app-bg: #07100e;
 $ink: #0f1715;
 $ink-menu: #091311;
 $surface: #17231f;
@@ -17,6 +17,18 @@ $text: #eefaf7;
 $muted: rgba($mint, 0.68);
 $border: rgba($mint, 0.18);
 $border-strong: rgba($mint, 0.36);
+$app-gradient:
+    radial-gradient(
+        ellipse at 12% 0%,
+        rgba($deep, 0.14) 0%,
+        transparent 32rem
+    ),
+    linear-gradient(
+        180deg,
+        color.mix($ink, $ink-menu, 45%) 0%,
+        $app-bg 48%,
+        color.mix($app-bg, #000, 86%) 100%
+    );
 $chrome-gradient: linear-gradient(
     180deg,
     color.mix($surface-raised, $ink-menu, 24%) 0%,
@@ -25,9 +37,9 @@ $chrome-gradient: linear-gradient(
 );
 $panel-gradient: linear-gradient(
     145deg,
-    color.mix($surface-raised, $surface, 45%) 0%,
-    $surface 55%,
-    color.mix($surface, $ink, 72%) 100%
+    color.mix($surface-raised, $ink-menu, 42%) 0%,
+    color.mix($surface, $ink-menu, 58%) 54%,
+    color.mix($ink, $ink-menu, 72%) 100%
 );
 
 $note-bg: #13211d;
@@ -57,6 +69,7 @@ $rhythm-controls-width: 19.25rem;
     padding: $menu-height $app-padding $app-padding $app-padding;
     overflow-x: clip;
     background: $app-bg;
+    background-image: $app-gradient;
     color: $text;
 
     .playback {
@@ -849,13 +862,13 @@ $rhythm-controls-width: 19.25rem;
         box-sizing: border-box;
         padding: 0.75rem;
         overflow-x: auto;
-        border: 1px solid $border;
+        border: 1px solid rgba($mint, 0.22);
         border-radius: 8px;
         background: $panel-gradient;
         box-shadow:
             inset 0 1px 0 rgba($mint, 0.05),
-            0 18px 44px rgba(0, 0, 0, 0.28),
-            0 4px 12px rgba(0, 0, 0, 0.2);
+            0 18px 44px rgba($ink-menu, 0.5),
+            0 4px 12px rgba(0, 0, 0, 0.22);
 
         >.controls {
             position: sticky;
@@ -950,6 +963,12 @@ $rhythm-controls-width: 19.25rem;
 
         >.anchor {
             background: $surface-raised;
+
+            >button,
+            >input,
+            >select {
+                color: $mint;
+            }
 
             .load-sample {
                 margin-left: 0.75rem;
