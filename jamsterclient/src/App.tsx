@@ -74,10 +74,10 @@ export const AppContent = () => {
         onPatternDelete={handlePatternDelete}
         onTimelineRowsChange={setTimelineRows}
       >
-        {({ isPlaying, bpm, setBpm, playingPosition64, playingSlotIndex, getPlayingMeasureIndex, playPattern, playTimeline, stopPlayback }) => (
+        {({ isTimelinePlaying, isPatternPlaying, bpm, setBpm, playingPosition64, playingSlotIndex, getPlayingMeasureIndex, playPattern, playTimeline, stopPlayback }) => (
           <>
             <TimelineRows
-              isPlaying={isPlaying}
+              isPlaying={isTimelinePlaying}
               bpm={bpm}
               setBpm={setBpm}
               patterns={patterns}
@@ -92,10 +92,10 @@ export const AppContent = () => {
               {patterns.map((pattern) => (
                 <Pattern
                   key={pattern.id}
-                  isPlaying={isPlaying}
+                  isPlaying={isPatternPlaying(pattern)}
                   pattern={pattern}
                   patterns={patterns}
-                  playingMeasureIndex={isPlaying ? getPlayingMeasureIndex(pattern) : undefined}
+                  playingMeasureIndex={getPlayingMeasureIndex(pattern)}
                   playingPosition64={playingPosition64}
                   onPatternChange={handlePatternChange}
                   onPatternDelete={handlePatternDelete}
