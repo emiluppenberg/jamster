@@ -29,7 +29,7 @@ $app-padding: 1.25rem;
 $menu-height: calc(2rem + ($space-m * 2) + 1px);
 $width-l: 5rem;
 $width-m: 3rem;
-$rhythm-controls-width: 11.5rem;
+$rhythm-controls-width: 19.25rem;
 
 .app {
     display: flex;
@@ -808,12 +808,18 @@ $rhythm-controls-width: 11.5rem;
         box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
 
         >.controls {
-            position: relative;
+            position: sticky;
+            left: 0;
             margin-top: 0;
 
             >.options {
                 padding-left: calc($space-l - 0.75rem);
             }
+        }
+
+        >.add {
+            position: sticky;
+            left: 0;
         }
 
         :nth-child(1 of .rhythm) {
@@ -892,10 +898,19 @@ $rhythm-controls-width: 11.5rem;
             border-top: 0;
         }
 
+        >.anchor {
+            background: $surface-raised;
+
+            .load-sample {
+                margin-left: 0.75rem;
+            }
+        }
+
         .measures {
             display: inline-flex;
             flex: 0 0 calc(var(--measure-width) * var(--number-of-measures));
             width: calc(var(--measure-width) * var(--number-of-measures));
+            margin-left: $rhythm-controls-width;
 
             .measure {
                 display: inline-flex;
