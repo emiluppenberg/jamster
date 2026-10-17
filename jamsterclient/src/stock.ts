@@ -73,16 +73,16 @@ import type { StoredBeat, StoredPatternData, StoredTimelineRowData } from './typ
 import { getUrlFilename } from './utils';
 
 export const stockSamples = [
-    { url: djIgnorantLoFiClapUrl, mcpDescription: "Chillhop drums - Clap" },
-    { url: djIgnorantLoFiClosedHHUrl, mcpDescription: "Chillhop drums - Closed HiHat" },
-    { url: djIgnorantLoFiCrashUrl, mcpDescription: "Chillhop drums - Crash" },
-    { url: djIgnorantLoFiKickUrl, mcpDescription: "Chillhop drums - Kick" },
-    { url: djIgnorantLoFiOpenHHUrl, mcpDescription: "Chillhop drums - Open HiHat " },
-    { url: djIgnorantLoFiRideUrl, mcpDescription: "Chillhop drums - Ride" },
-    { url: djIgnorantLoFiRimUrl, mcpDescription: "Chillhop drums - Rim" },
-    { url: djIgnorantLoFiShakerUrl, mcpDescription: "Chillhop drums - Shaker" },
-    { url: djIgnorantLoFiSnareUrl, mcpDescription: "Chillhop drums - Snare" },
-    { url: djIgnorantLoFiTambourineUrl, mcpDescription: "Chillhop drums - Tambourine" },
+    { url: djIgnorantLoFiClapUrl, mcpDescription: "LoFi drums - Clap" },
+    { url: djIgnorantLoFiClosedHHUrl, mcpDescription: "LoFi drums - Closed HiHat" },
+    { url: djIgnorantLoFiCrashUrl, mcpDescription: "LoFi drums - Crash" },
+    { url: djIgnorantLoFiKickUrl, mcpDescription: "LoFi drums - Kick" },
+    { url: djIgnorantLoFiOpenHHUrl, mcpDescription: "LoFi drums - Open HiHat " },
+    { url: djIgnorantLoFiRideUrl, mcpDescription: "LoFi drums - Ride" },
+    { url: djIgnorantLoFiRimUrl, mcpDescription: "LoFi drums - Rim" },
+    { url: djIgnorantLoFiShakerUrl, mcpDescription: "LoFi drums - Shaker" },
+    { url: djIgnorantLoFiSnareUrl, mcpDescription: "LoFi drums - Snare" },
+    { url: djIgnorantLoFiTambourineUrl, mcpDescription: "LoFi drums - Tambourine" },
     { url: jbl3677ChordAstronautAmCEAUrl, mcpDescription: "Am chord - High frequency reverb keys" },
     { url: jbl3677ChordAstronautCmCEGUrl, mcpDescription: "Cm chord - High frequency reverb keys" },
     { url: jbl3677ChordAstronautFmCFAUrl, mcpDescription: "Fm chord - High frequency reverb keys" },
@@ -218,7 +218,7 @@ export const stockPatternsSunnyDays: StoredPatternData[] = [
                 sampleFileName: getUrlFilename(jbl3677ChordAstronautFmCFAUrl),
                 notesPerMeasure: 4,
                 measures: [
-                    {noteSequence: "9---"},
+                    {noteSequence: "5---"},
                     {noteSequence: "----"}
                 ],
             }

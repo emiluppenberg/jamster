@@ -145,25 +145,25 @@ const Rhythm = (props: RhythmProps) => {
                     value={props.rhythm.name}
                     onChange={(e) => props.onNameChange(props.rhythm.id, e.target.value)}
                 />
+                <RhythmSampleDialog
+                    setSample={(sample, fileName) => props.onSampleChange(props.rhythm.id, sample, fileName)}
+                    sampleFileName={props.rhythm.sampleFilename}
+                    rhythm={props.rhythm}
+                />
+                <select
+                    className="notes-per-measure"
+                    value={props.rhythm.notesPerMeasure}
+                    onChange={(e) => {
+                        props.onNotesPerMeasureChange(props.rhythm.id, Number(e.target.value));
+                    }}
+                >
+                    {notesPerMeasureOptions.map((notesPerMeasure) => (
+                        <option key={`${props.rhythm.name}-notes-per-measure-${notesPerMeasure}`} value={notesPerMeasure}>
+                            /{notesPerMeasure}
+                        </option>
+                    ))}
+                </select>
             </div>
-            <RhythmSampleDialog
-                setSample={(sample, fileName) => props.onSampleChange(props.rhythm.id, sample, fileName)}
-                sampleFileName={props.rhythm.sampleFilename}
-                rhythm={props.rhythm}
-            />
-            <select
-                className="notes-per-measure"
-                value={props.rhythm.notesPerMeasure}
-                onChange={(e) => {
-                    props.onNotesPerMeasureChange(props.rhythm.id, Number(e.target.value));
-                }}
-            >
-                {notesPerMeasureOptions.map((notesPerMeasure) => (
-                    <option key={`${props.rhythm.name}-notes-per-measure-${notesPerMeasure}`} value={notesPerMeasure}>
-                        /{notesPerMeasure}
-                    </option>
-                ))}
-            </select>
             <div className="measures">
                 {props.rhythm.measures.map((measure, measureIndex) => (
                     <div
